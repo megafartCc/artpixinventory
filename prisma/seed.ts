@@ -597,6 +597,96 @@ async function main() {
     });
   }
 
+  const purchasingUser = await prisma.user.findUnique({
+    where: { email: "purchasing@artpix3d.com" },
+    select: { id: true },
+  });
+
+  const sampleVendor = vendorByName.get("Crystal Harbor Supply");
+  const sampleProductSmall = productByCompoundId.get("3CRS");
+  const sampleProductMedium = productByCompoundId.get("3CRM");
+
+  if (
+    purchasingUser?.id &&
+    sampleVendor?.id &&
+    sampleProductSmall?.id &&
+    sampleProductMedium?.id
+  ) {
+    const samplePo = await prisma.purchaseOrder.upsert({
+      where: { poNumber: "PO-DEMO-ORDERED-1" },
+      update: {
+        vendorId: sampleVendor.id,
+        vendorOrderId: "CHS-APR-ORDER-1",
+        status: "ORDERED",
+        orderDate: new Date("2026-04-10T00:00:00.000Z"),
+        expectedDate: new Date("2026-05-08T00:00:00.000Z"),
+        containerTemplateId: sampleVendor.containerTemplateId,
+        subtotal: "1983.00",
+        shippingCost: "240.00",
+        otherCosts: "60.00",
+        totalCost: "2283.00",
+        totalWeightKg: "99.34",
+        totalPallets: 1,
+        totalLooseBoxes: 8,
+        constraintWarnings: [],
+        notes: "Seeded ordered PO for receiving and pallet workflow tests.",
+        createdById: purchasingUser.id,
+        approvedById: purchasingUser.id,
+        approvedAt: new Date("2026-04-11T00:00:00.000Z"),
+      },
+      create: {
+        poNumber: "PO-DEMO-ORDERED-1",
+        vendorId: sampleVendor.id,
+        vendorOrderId: "CHS-APR-ORDER-1",
+        status: "ORDERED",
+        orderDate: new Date("2026-04-10T00:00:00.000Z"),
+        expectedDate: new Date("2026-05-08T00:00:00.000Z"),
+        containerTemplateId: sampleVendor.containerTemplateId,
+        subtotal: "1983.00",
+        shippingCost: "240.00",
+        otherCosts: "60.00",
+        totalCost: "2283.00",
+        totalWeightKg: "99.34",
+        totalPallets: 1,
+        totalLooseBoxes: 8,
+        constraintWarnings: [],
+        notes: "Seeded ordered PO for receiving and pallet workflow tests.",
+        createdById: purchasingUser.id,
+        approvedById: purchasingUser.id,
+        approvedAt: new Date("2026-04-11T00:00:00.000Z"),
+      },
+      select: { id: true },
+    });
+
+    await prisma.pOItem.deleteMany({
+      where: { purchaseOrderId: samplePo.id },
+    });
+
+    await prisma.pOItem.createMany({
+      data: [
+        {
+          purchaseOrderId: samplePo.id,
+          productId: sampleProductSmall.id,
+          orderedQty: 96,
+          receivedQty: 0,
+          unitCost: "9.50",
+          totalCost: "912.00",
+          notes: "Front-face crystal batch",
+        },
+        {
+          purchaseOrderId: samplePo.id,
+          productId: sampleProductMedium.id,
+          orderedQty: 84,
+          receivedQty: 0,
+          unitCost: "12.75",
+          totalCost: "1071.00",
+          notes: "Mixed portrait assortment",
+        },
+      ],
+      skipDuplicates: true,
+    });
+  }
+
   const stockSeedEntries = [
     { compoundId: "3CRS", locationId: shelfA1?.id, quantity: 100 },
     { compoundId: "3CRM", locationId: shelfA2?.id, quantity: 50 },

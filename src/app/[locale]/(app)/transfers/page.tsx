@@ -1,11 +1,39 @@
-export default function TransfersPage() {
+import { unstable_noStore as noStore } from "next/cache";
+import prisma from "@/lib/prisma";
+import { TransfersClient } from "@/components/transfers/TransfersClient";
+
+export default async function TransfersPage({
+  params,
+}: {
+  params: { locale: string };
+}) {
+  noStore();
+
+  const transfers = await prisma.transfer.findMany({
+    orderBy: { startedAt: "desc" },
+    include: {
+      createdBy: {
+        select: { name: true },
+      },
+      picks: {
+        select: { id: true },
+      },
+    },
+  });
+
   return (
-    <div className="p-6 lg:p-8">
-      <h1 className="text-2xl font-bold text-slate-800">Transfers</h1>
-      <p className="text-slate-500 mt-1">Stock transfers — Coming in Session 11</p>
-      <div className="mt-8 bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-400">
-        <p>Pick, drop, and transfer workflows between locations will be built here.</p>
-      </div>
-    </div>
+    <TransfersClient
+      locale={params.locale}
+      transfers={transfers.map((transfer) => ({
+        id: transfer.id,
+        reference: transfer.reference,
+        status: transfer.status,
+        createdBy: transfer.createdBy.name,
+        startedAt: transfer.startedAt.toISOString().slice(0, 16).replace("T", " "),
+        completedAt:
+          transfer.completedAt?.toISOString().slice(0, 16).replace("T", " ") ?? "-",
+        itemsCount: transfer.picks.length,
+      }))}
+    />
   );
 }

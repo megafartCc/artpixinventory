@@ -46,6 +46,14 @@ export function canApprovePurchaseOrders(role: string | undefined) {
   return hasAnyRole(role, ["ADMIN", "MANAGER"]);
 }
 
+export function canManageReceiving(role: string | undefined) {
+  return hasAnyRole(role, ["ADMIN", "MANAGER", "WAREHOUSE"]);
+}
+
+export function canManageTransfers(role: string | undefined) {
+  return hasAnyRole(role, ["ADMIN", "MANAGER", "WAREHOUSE"]);
+}
+
 export function canAccessSettings(role: string | undefined) {
   return hasAnyRole(role, ["ADMIN"]);
 }
