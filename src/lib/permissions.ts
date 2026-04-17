@@ -65,3 +65,7 @@ export function canManageDefects(role: string | undefined) {
 export function canReviewDefects(role: string | undefined) {
   return hasAnyRole(role, ["ADMIN", "MANAGER"]);
 }
+
+export function canManageVendorCredits(role: string | undefined) {
+  return hasAnyRole(role, ["ADMIN", "MANAGER", "PURCHASER"]);
+}

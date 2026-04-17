@@ -27,7 +27,7 @@ export async function sendSlackNotification(input: {
     },
   });
 
-  const settingKey = `slack_webhook_${input.channel.replace("#", "").replace("-", "_")}`;
+  const settingKey = `slack_webhook_${input.channel.replace("#", "").replaceAll("-", "_")}`;
   const setting = await prisma.setting.findUnique({
     where: { key: settingKey },
     select: { value: true },
