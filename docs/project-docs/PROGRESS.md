@@ -21,7 +21,7 @@
 Phase 2 - Core Modules
 
 ## Next Up
-- [ ] Session 14: Defects
+- [x] Session 14: Defects
 - [ ] Session 15: Vendor Credits
 - [ ] Session 16: Inventory Counts
 
@@ -34,6 +34,6 @@ Phase 2 - Core Modules
 - Seed data now includes demo vendors, vendor-product mappings, and product packaging defaults so PO creation and container math can be exercised immediately after seeding.
 - Sessions 12 and 13 now add PO receiving, receiving sessions, pallet creation with ZPL label output, pallet placement by QR, transfer collection/drop-off, transfer cancellation rollback, and transfer detail/history.
 - Seed data now includes a sample ORDERED purchase order so receiving and pallet workflows are usable immediately after `prisma:seed`.
-- Placeholder-only pages still exist for defects and settings.
+- Defects module now supports batch reports, review queue, stock deduction on confirm, and vendor-credit suggestion flags for vendor faults.
 - Products module is functional but still not fully complete to the original Session 4 plan: no dedicated detail/new/edit routes, no stock-by-location view, no vendor mapping section, and no image upload.
-- Defects and settings remain placeholder pages and are the next major unfinished modules after receiving and transfer work.
+- Settings remains a placeholder and vendor credits/inventory counts are the next major unfinished modules.
