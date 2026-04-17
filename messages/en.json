@@ -10,7 +10,10 @@
     "receiving": "Receiving",
     "transfers": "Transfers",
     "defects": "Defects",
-    "settings": "Settings"
+    "settings": "Settings",
+    "labels": "Labels",
+    "production": "Production",
+    "reports": "Reports"
   },
   "Dashboard": {
     "title": "Welcome to ArtPix 3D",

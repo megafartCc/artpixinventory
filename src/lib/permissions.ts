@@ -57,3 +57,11 @@ export function canManageTransfers(role: string | undefined) {
 export function canAccessSettings(role: string | undefined) {
   return hasAnyRole(role, ["ADMIN"]);
 }
+
+export function canManageDefects(role: string | undefined) {
+  return hasAnyRole(role, ["ADMIN", "MANAGER"]);
+}
+
+export function canReviewDefects(role: string | undefined) {
+  return hasAnyRole(role, ["ADMIN", "MANAGER"]);
+}

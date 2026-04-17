@@ -16,14 +16,20 @@
 - [x] Session 11: PO Approval + PDF + Duplicate
 - [x] Session 12: Receiving + Pallets
 - [x] Session 13: Pick-and-Drop Transfers
+- [x] Session 14: Defects
+- [x] Session 15: Label Printing
+- [x] Session 16: Defects Hardening
+- [x] Session 17: ERPIX Integration
+- [x] Session 21: Dashboard + Slack + Settings
+- [x] Session 20: Reports + QBO Export
+- [x] Session 18: Production Queue
 
 ## Current Phase
 Phase 2 - Core Modules
 
 ## Next Up
-- [ ] Session 14: Defects
-- [ ] Session 15: Vendor Credits
-- [ ] Session 16: Inventory Counts
+- [ ] Session 19: Vendor Credits
+- [ ] Session 22: Polish + Bug Fixes
 
 ## Notes
 - `PROGRESS.md` was stale; repo inspection showed Sessions 1-4 were already in place before this pass.
@@ -34,6 +40,6 @@ Phase 2 - Core Modules
 - Seed data now includes demo vendors, vendor-product mappings, and product packaging defaults so PO creation and container math can be exercised immediately after seeding.
 - Sessions 12 and 13 now add PO receiving, receiving sessions, pallet creation with ZPL label output, pallet placement by QR, transfer collection/drop-off, transfer cancellation rollback, and transfer detail/history.
 - Seed data now includes a sample ORDERED purchase order so receiving and pallet workflows are usable immediately after `prisma:seed`.
-- Placeholder-only pages still exist for defects and settings.
+- Defects module now supports batch reports, review queue, stock deduction on confirm, and vendor-credit suggestion flags for vendor faults.
 - Products module is functional but still not fully complete to the original Session 4 plan: no dedicated detail/new/edit routes, no stock-by-location view, no vendor mapping section, and no image upload.
-- Defects and settings remain placeholder pages and are the next major unfinished modules after receiving and transfer work.
+- Production queue sync placeholder, reports hub/pages, and dashboard+settings+slack notification plumbing are now in place; vendor credits and final polish remain.
