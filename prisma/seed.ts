@@ -3,6 +3,7 @@ import {
   UserRole,
   LocationType,
   MachineType,
+  FaultType,
 } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -263,6 +264,30 @@ async function main() {
         type: machine.type,
         locationId: station.id,
         erpixMachineId: machine.name,
+        active: true,
+      },
+    });
+  }
+
+
+  const defectReasons = [
+    { name: "Cracked crystal", faultType: FaultType.VENDOR },
+    { name: "Surface defect", faultType: FaultType.VENDOR },
+    { name: "Wrong dimensions", faultType: FaultType.VENDOR },
+    { name: "Engraving error", faultType: FaultType.INTERNAL },
+    { name: "Handling damage", faultType: FaultType.INTERNAL },
+  ];
+
+  for (const reason of defectReasons) {
+    await prisma.defectReason.upsert({
+      where: { name: reason.name },
+      update: {
+        faultType: reason.faultType,
+        active: true,
+      },
+      create: {
+        name: reason.name,
+        faultType: reason.faultType,
         active: true,
       },
     });
