@@ -1,0 +1,22 @@
+{
+  "Navigation": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "locations": "Locations",
+    "machines": "Machines",
+    "receiving": "Receiving",
+    "transfers": "Transfers",
+    "defects": "Defects",
+    "settings": "Settings"
+  },
+  "Dashboard": {
+    "title": "Welcome to ArtPix 3D",
+    "description": "Warehouse Management System"
+  },
+  "Common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "Navigation": {
+    "dashboard": "Панель приладів",
+    "products": "Товари",
+    "locations": "Локації",
+    "machines": "Обладнання",
+    "receiving": "Приймання",
+    "transfers": "Переміщення",
+    "defects": "Дефекти",
+    "settings": "Налаштування"
+  },
+  "Dashboard": {
+    "title": "Ласкаво просимо до ArtPix 3D",
+    "description": "Система управління складом"
+  },
+  "Common": {
+    "cancel": "Скасувати",
+    "save": "Зберегти",
+    "delete": "Видалити",
+    "edit": "Редагувати"
+  }
+}
