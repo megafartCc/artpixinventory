@@ -166,7 +166,7 @@ export function AppShell({
           <div className="flex items-center gap-3">
             {/* Locale Switcher */}
             <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-0.5">
-              {["en", "ru", "uk"].map((loc) => (
+              {["en", "ru", "ua"].map((loc) => (
                 <Link
                   key={loc}
                   href={`/${loc}${pathname}`}

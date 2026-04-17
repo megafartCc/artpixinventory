@@ -17,13 +17,60 @@
     "credits": "Credits"
   },
   "Dashboard": {
-    "title": "Welcome to ArtPix 3D",
-    "description": "Warehouse Management System"
+    "title": "Dashboard",
+    "description": "Operational summary and active alerts.",
+    "totalProducts": "Total Products",
+    "lowStock": "Low Stock Alerts",
+    "openPos": "Open POs",
+    "pendingDefects": "Pending Defects",
+    "recentActivity": "Recent Activity",
+    "activeOps": "Active Operations"
   },
   "Common": {
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit"
+  },
+  "CommonExtended": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "save": "Save",
+    "remove": "Remove",
+    "addItem": "Add Item",
+    "syncNow": "Sync Now",
+    "saving": "Saving..."
+  },
+  "Credits": {
+    "title": "Vendor Credits",
+    "subtitle": "Track supplier credit claims and lifecycle.",
+    "new": "New Credit",
+    "newTitle": "New Vendor Credit",
+    "vendor": "Vendor",
+    "linkedPo": "Linked PO (optional)",
+    "reason": "Reason",
+    "notes": "Notes",
+    "lineItems": "Line Items",
+    "create": "Create Credit",
+    "status": "Status",
+    "set": "Set",
+    "detailBack": "Back to Credits"
+  },
+  "Production": {
+    "title": "Production Queue",
+    "subtitle": "Placeholder ERPIX-driven restock requirements per machine.",
+    "lastSynced": "Last synced",
+    "noRows": "No production queue records yet. Click “Sync Now” to generate placeholder data.",
+    "machine": "Machine",
+    "product": "Product",
+    "needed": "Needed",
+    "inStock": "In Stock",
+    "status": "Status",
+    "sufficient": "Sufficient",
+    "restock": "Restock Needed"
+  },
+  "Reports": {
+    "title": "Reports",
+    "subtitle": "Select a report below."
   }
 }

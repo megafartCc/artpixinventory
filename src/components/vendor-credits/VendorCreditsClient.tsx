@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export function VendorCreditsClient({
   locale,
@@ -18,16 +19,18 @@ export function VendorCreditsClient({
     createdAt: string;
   }>;
 }) {
+  const t = useTranslations("Credits");
+
   return (
     <div className="p-6 lg:p-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Vendor Credits</h1>
-            <p className="mt-1 text-slate-500">Track supplier credit claims and lifecycle.</p>
+            <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
+            <p className="mt-1 text-slate-500">{t("subtitle")}</p>
           </div>
           <Link href={`/${locale}/credits/new`} className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white">
-            New Credit
+            {t("new")}
           </Link>
         </div>
 
@@ -37,11 +40,11 @@ export function VendorCreditsClient({
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-4 py-3">Credit#</th>
-                  <th className="px-4 py-3">Vendor</th>
+                  <th className="px-4 py-3">{t("vendor")}</th>
                   <th className="px-4 py-3">PO#</th>
-                  <th className="px-4 py-3">Reason</th>
+                  <th className="px-4 py-3">{t("reason")}</th>
                   <th className="px-4 py-3">Total</th>
-                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">{t("status")}</th>
                   <th className="px-4 py-3">Date</th>
                 </tr>
               </thead>
