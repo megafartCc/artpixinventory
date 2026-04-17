@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { canManageDefects } from "@/lib/permissions";
 import { defectReportCreateSchema } from "@/lib/defect-schemas";
 import { generateNextReference } from "@/lib/inventory-utils";
+import { sendSlackNotification } from "@/lib/slack";
 
 export async function GET() {
   const defects = await prisma.defectReport.findMany({
@@ -155,6 +156,14 @@ export async function POST(request: Request) {
       });
 
       return createdReport;
+    });
+
+    await sendSlackNotification({
+      type: "DEFECT_REPORTED",
+      channel: "#quality",
+      message: `Defect report ${report.reportNumber} submitted for review (${report.items.length} item(s)).`,
+      entityType: "DefectReport",
+      entityId: report.id,
     });
 
     return NextResponse.json({ data: report, message: "Defect report submitted for review." });

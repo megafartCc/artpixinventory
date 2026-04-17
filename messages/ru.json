@@ -11,7 +11,9 @@
     "transfers": "Перемещения",
     "defects": "Дефекты",
     "settings": "Настройки",
-    "labels": "Этикетки"
+    "labels": "Этикетки",
+    "production": "Производство",
+    "reports": "Отчеты"
   },
   "Dashboard": {
     "title": "Добро пожаловать в ArtPix 3D",

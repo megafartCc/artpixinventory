@@ -20,14 +20,16 @@
 - [x] Session 15: Label Printing
 - [x] Session 16: Defects Hardening
 - [x] Session 17: ERPIX Integration
+- [x] Session 21: Dashboard + Slack + Settings
+- [x] Session 20: Reports + QBO Export
+- [x] Session 18: Production Queue
 
 ## Current Phase
 Phase 2 - Core Modules
 
 ## Next Up
-- [ ] Session 18: Production Queue
 - [ ] Session 19: Vendor Credits
-- [ ] Session 20: Reports + QBO Export
+- [ ] Session 22: Polish + Bug Fixes
 
 ## Notes
 - `PROGRESS.md` was stale; repo inspection showed Sessions 1-4 were already in place before this pass.
@@ -40,4 +42,4 @@ Phase 2 - Core Modules
 - Seed data now includes a sample ORDERED purchase order so receiving and pallet workflows are usable immediately after `prisma:seed`.
 - Defects module now supports batch reports, review queue, stock deduction on confirm, and vendor-credit suggestion flags for vendor faults.
 - Products module is functional but still not fully complete to the original Session 4 plan: no dedicated detail/new/edit routes, no stock-by-location view, no vendor mapping section, and no image upload.
-- Settings remains partially implemented; production queue, vendor credits, and reports are the next major unfinished modules.
+- Production queue sync placeholder, reports hub/pages, and dashboard+settings+slack notification plumbing are now in place; vendor credits and final polish remain.

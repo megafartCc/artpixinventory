@@ -11,7 +11,9 @@
     "transfers": "Transfers",
     "defects": "Defects",
     "settings": "Settings",
-    "labels": "Labels"
+    "labels": "Labels",
+    "production": "Production",
+    "reports": "Reports"
   },
   "Dashboard": {
     "title": "Welcome to ArtPix 3D",

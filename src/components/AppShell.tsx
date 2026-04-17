@@ -24,6 +24,8 @@ import {
   Users,
   FileText,
   Printer,
+  Factory,
+  BarChart3,
 } from "lucide-react";
 
 const navItems = [
@@ -38,6 +40,8 @@ const navItems = [
   { key: "transfers", href: "/transfers", icon: ArrowLeftRight },
   { key: "defects", href: "/defects", icon: AlertTriangle },
   { key: "labels", href: "/labels", icon: Printer },
+  { key: "production", href: "/production", icon: Factory },
+  { key: "reports", href: "/reports", icon: BarChart3 },
   { key: "settings", href: "/settings", icon: Settings },
 ];
 

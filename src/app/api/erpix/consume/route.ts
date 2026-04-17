@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { createActivityLog, generateNextReference } from "@/lib/inventory-utils";
 import { validateErpixApiKey, withErpixRetry } from "@/lib/erpix-client";
 import { erpixConsumeSchema } from "@/lib/erpix-schemas";
+import { sendSlackNotification } from "@/lib/slack";
 
 export async function POST(request: Request) {
   const authError = validateErpixApiKey(request);
@@ -94,6 +95,16 @@ export async function POST(request: Request) {
             },
           });
 
+          if (!isCorrectLocation) {
+            await sendSlackNotification({
+              type: "WRONG_LOCATION",
+              channel: "#inventory-alerts",
+              message: `Wrong-location event: ${machine.name} consumed ${parsed.data.quantity}× ${product.compoundId} from an empty/incorrect slot.`,
+              entityType: "MachineConsumption",
+              entityId: consumption.id,
+            });
+          }
+
           let defectReportId: string | null = null;
 
           if (parsed.data.defect?.isDefective) {
@@ -147,6 +158,16 @@ export async function POST(request: Request) {
             });
 
             defectReportId = defectReport.id;
+
+            if (reason.faultType === "VENDOR") {
+              await sendSlackNotification({
+                type: "DEFECT_VENDOR_CREDIT_SUGGESTED",
+                channel: "#quality",
+                message: `Vendor fault detected from ERPIX for ${product.compoundId}; suggest vendor credit.`,
+                entityType: "DefectReport",
+                entityId: defectReport.id,
+              });
+            }
           }
 
           await createActivityLog(tx, {
@@ -180,6 +201,13 @@ export async function POST(request: Request) {
         delayMs: 10_000,
         onFinalFailure: async (error) => {
           console.error("ERPIX consume final failure", error);
+          await sendSlackNotification({
+            type: "ERPIX_SYNC_FAILURE",
+            channel: "#system-errors",
+            message: `ERPIX consume final failure: ${error instanceof Error ? error.message : "Unknown error"}`,
+            entityType: "ERPIX",
+            entityId: "consume",
+          });
         },
       }
     );

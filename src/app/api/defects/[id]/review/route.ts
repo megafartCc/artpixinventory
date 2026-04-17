@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { canReviewDefects } from "@/lib/permissions";
 import { defectReviewSchema } from "@/lib/defect-schemas";
+import { sendSlackNotification } from "@/lib/slack";
 
 export async function POST(
   request: Request,
@@ -178,6 +179,16 @@ export async function POST(
         };
         vendorSuggestedCount: number;
       };
+
+      if (confirmedResult.vendorSuggestedCount > 0) {
+        await sendSlackNotification({
+          type: "DEFECT_VENDOR_CREDIT_SUGGESTED",
+          channel: "#quality",
+          message: `Defect report confirmed; suggest vendor credit for ${confirmedResult.vendorSuggestedCount} item(s).`,
+          entityType: "DefectReport",
+          entityId: confirmedResult.confirmed.id,
+        });
+      }
 
       return NextResponse.json({
         data: confirmedResult.confirmed,
