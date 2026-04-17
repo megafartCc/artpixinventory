@@ -20,13 +20,17 @@ import {
   ArrowLeftRight,
   Cog,
   Home,
+  Boxes,
+  Users,
 } from "lucide-react";
 
 const navItems = [
   { key: "dashboard", href: "/", icon: LayoutDashboard },
   { key: "products", href: "/products", icon: Package },
+  { key: "stock", href: "/stock", icon: Boxes },
   { key: "locations", href: "/locations", icon: MapPin },
   { key: "machines", href: "/machines", icon: Cog },
+  { key: "vendors", href: "/vendors", icon: Users },
   { key: "receiving", href: "/receiving", icon: Truck },
   { key: "transfers", href: "/transfers", icon: ArrowLeftRight },
   { key: "defects", href: "/defects", icon: AlertTriangle },
@@ -35,6 +39,7 @@ const navItems = [
 
 const mobileNavItems = [
   { key: "dashboard", href: "/", icon: Home },
+  { key: "stock", href: "/stock", icon: Boxes },
   { key: "products", href: "/products", icon: Package },
   { key: "transfers", href: "/transfers", icon: ArrowLeftRight },
   { key: "settings", href: "/settings", icon: Settings },

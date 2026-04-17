@@ -2,8 +2,10 @@
   "Navigation": {
     "dashboard": "Dashboard",
     "products": "Products",
+    "stock": "Stock",
     "locations": "Locations",
     "machines": "Machines",
+    "vendors": "Vendors",
     "receiving": "Receiving",
     "transfers": "Transfers",
     "defects": "Defects",

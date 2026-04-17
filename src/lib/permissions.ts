@@ -30,6 +30,14 @@ export function canManageMachines(role: string | undefined) {
   return hasAnyRole(role, ["ADMIN", "MANAGER"]);
 }
 
+export function canAdjustStock(role: string | undefined) {
+  return hasAnyRole(role, ["ADMIN", "MANAGER"]);
+}
+
+export function canManageVendors(role: string | undefined) {
+  return hasAnyRole(role, ["ADMIN", "MANAGER", "PURCHASER"]);
+}
+
 export function canAccessSettings(role: string | undefined) {
   return hasAnyRole(role, ["ADMIN"]);
 }

@@ -102,6 +102,51 @@ async function main() {
   );
   const indexByName = new Map(indexes.map((index) => [index.name, index]));
 
+  const containerTemplateSeeds = [
+    {
+      name: "20ft Container",
+      maxWeightKg: "18000",
+      maxPallets: 10,
+      maxLooseBoxes: 80,
+      description: "Standard 20-foot container capacity preset.",
+    },
+    {
+      name: "40ft Container",
+      maxWeightKg: "20000",
+      maxPallets: 21,
+      maxLooseBoxes: 189,
+      description: "Standard 40-foot container capacity preset.",
+    },
+    {
+      name: "40ft HC",
+      maxWeightKg: "20000",
+      maxPallets: 24,
+      maxLooseBoxes: 220,
+      description: "40-foot high-cube container capacity preset.",
+    },
+  ];
+
+  for (const template of containerTemplateSeeds) {
+    await prisma.containerTemplate.upsert({
+      where: { name: template.name },
+      update: {
+        maxWeightKg: template.maxWeightKg,
+        maxPallets: template.maxPallets,
+        maxLooseBoxes: template.maxLooseBoxes,
+        description: template.description,
+        active: true,
+      },
+      create: {
+        name: template.name,
+        maxWeightKg: template.maxWeightKg,
+        maxPallets: template.maxPallets,
+        maxLooseBoxes: template.maxLooseBoxes,
+        description: template.description,
+        active: true,
+      },
+    });
+  }
+
   const mainWarehouse = await ensureLocation({
     name: "Main Warehouse",
     type: LocationType.WAREHOUSE,
@@ -339,6 +384,101 @@ async function main() {
         categoryId,
       })),
       skipDuplicates: true,
+    });
+  }
+
+  const [shelfA1, shelfA2, shelfA3, shelfB1, shelfB2] = await Promise.all([
+    prisma.location.findFirst({
+      where: { name: "Shelf A1", parentId: zoneA.id },
+      select: { id: true },
+    }),
+    prisma.location.findFirst({
+      where: { name: "Shelf A2", parentId: zoneA.id },
+      select: { id: true },
+    }),
+    prisma.location.findFirst({
+      where: { name: "Shelf A3", parentId: zoneA.id },
+      select: { id: true },
+    }),
+    prisma.location.findFirst({
+      where: { name: "Shelf B1", parentId: zoneB.id },
+      select: { id: true },
+    }),
+    prisma.location.findFirst({
+      where: { name: "Shelf B2", parentId: zoneB.id },
+      select: { id: true },
+    }),
+  ]);
+
+  const products = await prisma.product.findMany({
+    where: {
+      compoundId: {
+        in: productSeeds.map((product) => product.compoundId),
+      },
+    },
+    select: { id: true, compoundId: true },
+  });
+  const productByCompoundId = new Map(
+    products.map((product) => [product.compoundId, product])
+  );
+
+  const stockSeedEntries = [
+    { compoundId: "3CRS", locationId: shelfA1?.id, quantity: 100 },
+    { compoundId: "3CRM", locationId: shelfA2?.id, quantity: 50 },
+    { compoundId: "3CRL", locationId: shelfA3?.id, quantity: 30 },
+    { compoundId: "3CHS", locationId: shelfA1?.id, quantity: 24 },
+    { compoundId: "3CHM", locationId: shelfA2?.id, quantity: 18 },
+    { compoundId: "3CIM", locationId: shelfB1?.id, quantity: 60 },
+    { compoundId: "3CDM", locationId: shelfB2?.id, quantity: 15 },
+  ];
+
+  for (const entry of stockSeedEntries) {
+    const product = productByCompoundId.get(entry.compoundId);
+    if (!product?.id || !entry.locationId) {
+      continue;
+    }
+
+    await prisma.stockLevel.upsert({
+      where: {
+        productId_locationId: {
+          productId: product.id,
+          locationId: entry.locationId,
+        },
+      },
+      update: { quantity: entry.quantity },
+      create: {
+        productId: product.id,
+        locationId: entry.locationId,
+        quantity: entry.quantity,
+      },
+    });
+  }
+
+  await prisma.stockReservation.deleteMany({
+    where: {
+      erpixOrderId: {
+        in: ["ERPIX-DEMO-RES-1", "ERPIX-DEMO-RES-2"],
+      },
+    },
+  });
+
+  const sampleReservations = [
+    { compoundId: "3CRS", quantity: 8, erpixOrderId: "ERPIX-DEMO-RES-1" },
+    { compoundId: "3CIM", quantity: 5, erpixOrderId: "ERPIX-DEMO-RES-2" },
+  ];
+
+  for (const reservation of sampleReservations) {
+    const product = productByCompoundId.get(reservation.compoundId);
+    if (!product?.id) {
+      continue;
+    }
+
+    await prisma.stockReservation.create({
+      data: {
+        productId: product.id,
+        quantity: reservation.quantity,
+        erpixOrderId: reservation.erpixOrderId,
+      },
     });
   }
 
