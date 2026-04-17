@@ -38,6 +38,14 @@ export function canManageVendors(role: string | undefined) {
   return hasAnyRole(role, ["ADMIN", "MANAGER", "PURCHASER"]);
 }
 
+export function canManagePurchaseOrders(role: string | undefined) {
+  return hasAnyRole(role, ["ADMIN", "MANAGER", "PURCHASER"]);
+}
+
+export function canApprovePurchaseOrders(role: string | undefined) {
+  return hasAnyRole(role, ["ADMIN", "MANAGER"]);
+}
+
 export function canAccessSettings(role: string | undefined) {
   return hasAnyRole(role, ["ADMIN"]);
 }

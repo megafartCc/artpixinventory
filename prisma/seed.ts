@@ -295,60 +295,100 @@ async function main() {
       name: "3D Crystal Small Rectangle",
       indexName: "3D Crystals",
       categories: [crystals.id, rectangles.id],
+      avgCost: "9.50",
+      itemsPerBox: 12,
+      boxesPerPallet: 48,
+      itemWeight: "1.10",
     },
     {
       compoundId: "3CRM",
       name: "3D Crystal Medium Rectangle",
       indexName: "3D Crystals",
       categories: [crystals.id, rectangles.id],
+      avgCost: "12.75",
+      itemsPerBox: 10,
+      boxesPerPallet: 42,
+      itemWeight: "1.35",
     },
     {
       compoundId: "3CRL",
       name: "3D Crystal Large Rectangle",
       indexName: "3D Crystals",
       categories: [crystals.id, rectangles.id],
+      avgCost: "16.90",
+      itemsPerBox: 8,
+      boxesPerPallet: 36,
+      itemWeight: "1.80",
     },
     {
       compoundId: "3CRXL",
       name: "3D Crystal XL Rectangle",
       indexName: "3D Crystals",
       categories: [crystals.id, rectangles.id],
+      avgCost: "22.40",
+      itemsPerBox: 6,
+      boxesPerPallet: 30,
+      itemWeight: "2.40",
     },
     {
       compoundId: "3CHS",
       name: "3D Crystal Small Heart",
       indexName: "3D Crystals",
       categories: [crystals.id, hearts.id],
+      avgCost: "10.10",
+      itemsPerBox: 12,
+      boxesPerPallet: 48,
+      itemWeight: "1.05",
     },
     {
       compoundId: "3CHM",
       name: "3D Crystal Medium Heart",
       indexName: "3D Crystals",
       categories: [crystals.id, hearts.id],
+      avgCost: "13.95",
+      itemsPerBox: 10,
+      boxesPerPallet: 42,
+      itemWeight: "1.45",
     },
     {
       compoundId: "3CHL",
       name: "3D Crystal Large Heart",
       indexName: "3D Crystals",
       categories: [crystals.id, hearts.id],
+      avgCost: "18.75",
+      itemsPerBox: 8,
+      boxesPerPallet: 36,
+      itemWeight: "1.95",
     },
     {
       compoundId: "3CDS",
       name: "Crystal Dome Small",
       indexName: "2D Crystals",
       categories: [crystals.id],
+      avgCost: "8.80",
+      itemsPerBox: 16,
+      boxesPerPallet: 54,
+      itemWeight: "0.90",
     },
     {
       compoundId: "3CDM",
       name: "Crystal Dome Medium",
       indexName: "2D Crystals",
       categories: [crystals.id],
+      avgCost: "11.60",
+      itemsPerBox: 12,
+      boxesPerPallet: 48,
+      itemWeight: "1.20",
     },
     {
       compoundId: "3CIM",
       name: "LED Light Base Medium",
       indexName: "Light Bases",
       categories: [accessories.id],
+      avgCost: "14.50",
+      itemsPerBox: 8,
+      boxesPerPallet: 36,
+      itemWeight: "1.80",
     },
   ];
 
@@ -364,6 +404,12 @@ async function main() {
         name: seed.name,
         indexId: index.id,
         uom: "pcs",
+        avgCost: seed.avgCost,
+        itemsPerBox: seed.itemsPerBox,
+        boxesPerPallet: seed.boxesPerPallet,
+        weight: seed.itemWeight,
+        itemWeight: seed.itemWeight,
+        weightUnit: "lb",
         active: true,
       },
       create: {
@@ -371,6 +417,12 @@ async function main() {
         name: seed.name,
         indexId: index.id,
         uom: "pcs",
+        avgCost: seed.avgCost,
+        itemsPerBox: seed.itemsPerBox,
+        boxesPerPallet: seed.boxesPerPallet,
+        weight: seed.itemWeight,
+        itemWeight: seed.itemWeight,
+        weightUnit: "lb",
         active: true,
       },
     });
@@ -421,6 +473,129 @@ async function main() {
   const productByCompoundId = new Map(
     products.map((product) => [product.compoundId, product])
   );
+
+  const [container20, container40] = await Promise.all([
+    prisma.containerTemplate.findUnique({
+      where: { name: "20ft Container" },
+      select: { id: true },
+    }),
+    prisma.containerTemplate.findUnique({
+      where: { name: "40ft Container" },
+      select: { id: true },
+    }),
+  ]);
+
+  const vendors = await Promise.all([
+    prisma.vendor.upsert({
+      where: { name: "Crystal Harbor Supply" },
+      update: {
+        contactName: "Alice Chen",
+        email: "purchasing@crystalharbor.example",
+        phone: "+86-21-5555-0140",
+        address: "88 Harbor Industrial Rd, Shanghai",
+        country: "China",
+        paymentTerms: "Net 30",
+        defaultLeadTimeDays: 28,
+        enableContainerConstraints: true,
+        containerTemplateId: container40?.id ?? null,
+        notes: "Primary crystal vendor for container imports.",
+        active: true,
+      },
+      create: {
+        name: "Crystal Harbor Supply",
+        contactName: "Alice Chen",
+        email: "purchasing@crystalharbor.example",
+        phone: "+86-21-5555-0140",
+        address: "88 Harbor Industrial Rd, Shanghai",
+        country: "China",
+        paymentTerms: "Net 30",
+        defaultLeadTimeDays: 28,
+        enableContainerConstraints: true,
+        containerTemplateId: container40?.id ?? null,
+        notes: "Primary crystal vendor for container imports.",
+        active: true,
+      },
+    }),
+    prisma.vendor.upsert({
+      where: { name: "Bright Base Manufacturing" },
+      update: {
+        contactName: "Marco Silva",
+        email: "sales@brightbase.example",
+        phone: "+1-480-555-0108",
+        address: "1207 Mesa Commerce Pkwy, Phoenix, AZ",
+        country: "USA",
+        paymentTerms: "Net 15",
+        defaultLeadTimeDays: 10,
+        enableContainerConstraints: true,
+        containerTemplateId: container20?.id ?? null,
+        notes: "Domestic source for light bases and accessories.",
+        active: true,
+      },
+      create: {
+        name: "Bright Base Manufacturing",
+        contactName: "Marco Silva",
+        email: "sales@brightbase.example",
+        phone: "+1-480-555-0108",
+        address: "1207 Mesa Commerce Pkwy, Phoenix, AZ",
+        country: "USA",
+        paymentTerms: "Net 15",
+        defaultLeadTimeDays: 10,
+        enableContainerConstraints: true,
+        containerTemplateId: container20?.id ?? null,
+        notes: "Domestic source for light bases and accessories.",
+        active: true,
+      },
+    }),
+  ]);
+
+  const vendorByName = new Map(vendors.map((vendor) => [vendor.name, vendor]));
+
+  const vendorMappings = [
+    ["Crystal Harbor Supply", "3CRS", true, 48, "9.50", 28, "CHS-3CRS"],
+    ["Crystal Harbor Supply", "3CRM", true, 42, "12.75", 28, "CHS-3CRM"],
+    ["Crystal Harbor Supply", "3CRL", true, 36, "16.90", 28, "CHS-3CRL"],
+    ["Crystal Harbor Supply", "3CRXL", true, 30, "22.40", 28, "CHS-3CRXL"],
+    ["Crystal Harbor Supply", "3CHS", true, 48, "10.10", 28, "CHS-3CHS"],
+    ["Crystal Harbor Supply", "3CHM", true, 42, "13.95", 28, "CHS-3CHM"],
+    ["Crystal Harbor Supply", "3CHL", true, 36, "18.75", 28, "CHS-3CHL"],
+    ["Crystal Harbor Supply", "3CDS", true, 54, "8.80", 28, "CHS-3CDS"],
+    ["Crystal Harbor Supply", "3CDM", true, 48, "11.60", 28, "CHS-3CDM"],
+    ["Bright Base Manufacturing", "3CIM", true, 36, "14.50", 10, "BBM-3CIM"],
+  ] as const;
+
+  for (const mapping of vendorMappings) {
+    const vendor = vendorByName.get(mapping[0]);
+    const product = productByCompoundId.get(mapping[1]);
+
+    if (!vendor?.id || !product?.id) {
+      continue;
+    }
+
+    await prisma.productVendor.upsert({
+      where: {
+        productId_vendorId: {
+          productId: product.id,
+          vendorId: vendor.id,
+        },
+      },
+      update: {
+        isDefault: mapping[2],
+        moq: mapping[3],
+        unitCost: mapping[4],
+        leadTimeDays: mapping[5],
+        vendorSku: mapping[6],
+      },
+      create: {
+        productId: product.id,
+        vendorId: vendor.id,
+        isDefault: mapping[2],
+        moq: mapping[3],
+        unitCost: mapping[4],
+        leadTimeDays: mapping[5],
+        vendorSku: mapping[6],
+      },
+    });
+  }
 
   const stockSeedEntries = [
     { compoundId: "3CRS", locationId: shelfA1?.id, quantity: 100 },

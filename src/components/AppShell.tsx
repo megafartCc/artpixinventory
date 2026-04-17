@@ -22,6 +22,7 @@ import {
   Home,
   Boxes,
   Users,
+  FileText,
 } from "lucide-react";
 
 const navItems = [
@@ -31,6 +32,7 @@ const navItems = [
   { key: "locations", href: "/locations", icon: MapPin },
   { key: "machines", href: "/machines", icon: Cog },
   { key: "vendors", href: "/vendors", icon: Users },
+  { key: "purchaseOrders", href: "/purchase-orders", icon: FileText },
   { key: "receiving", href: "/receiving", icon: Truck },
   { key: "transfers", href: "/transfers", icon: ArrowLeftRight },
   { key: "defects", href: "/defects", icon: AlertTriangle },
