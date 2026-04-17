@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 const statuses = ["PENDING", "APPROVED", "APPLIED", "CLOSED"];
 
@@ -23,6 +24,7 @@ export function VendorCreditDetailClient({
     items: Array<{ id: string; productLabel: string; quantity: number; unitCost: string; totalCredit: string; notes: string }>;
   };
 }) {
+  const t = useTranslations("Credits");
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -39,7 +41,7 @@ export function VendorCreditDetailClient({
     setBusy(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Failed to update status.");
+      setError(payload.error ?? t("errors.updateStatus"));
       return;
     }
 
@@ -50,20 +52,20 @@ export function VendorCreditDetailClient({
     <div className="p-6 lg:p-8">
       <div className="mx-auto max-w-6xl space-y-6">
         <div>
-          <Link href={`/${locale}/credits`} className="text-sm text-slate-500 hover:text-slate-700">Back to Credits</Link>
+          <Link href={`/${locale}/credits`} className="text-sm text-slate-500 hover:text-slate-700">{t("detailBack")}</Link>
           <h1 className="mt-2 text-3xl font-bold text-slate-900">{credit.creditNumber}</h1>
           <p className="mt-1 text-slate-500">{credit.vendorName} • {credit.reason} • ${credit.totalAmount}</p>
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-700">Status: <span className="font-medium">{credit.status}</span></p>
+          <p className="text-sm text-slate-700">{t("status")}: <span className="font-medium">{credit.status}</span></p>
           <p className="text-sm text-slate-700">PO: {credit.poNumber}</p>
-          <p className="mt-2 text-sm text-slate-600">{credit.notes || "No notes."}</p>
+          <p className="mt-2 text-sm text-slate-600">{credit.notes || t("noNotes")}</p>
 
           <div className="mt-4 flex flex-wrap gap-2">
             {statuses.map((status) => (
               <button key={status} disabled={busy || status === credit.status} onClick={() => void updateStatus(status)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm disabled:opacity-50">
-                Set {status}
+                {t("set")} {status}
               </button>
             ))}
           </div>
@@ -74,11 +76,11 @@ export function VendorCreditDetailClient({
           <table className="min-w-full divide-y divide-slate-200 text-sm">
             <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
               <tr>
-                <th className="px-4 py-3">Product</th>
-                <th className="px-4 py-3">Qty</th>
-                <th className="px-4 py-3">Unit Cost</th>
-                <th className="px-4 py-3">Total</th>
-                <th className="px-4 py-3">Notes</th>
+                <th className="px-4 py-3">{t("columns.product")}</th>
+                <th className="px-4 py-3">{t("columns.qty")}</th>
+                <th className="px-4 py-3">{t("columns.unitCost")}</th>
+                <th className="px-4 py-3">{t("columns.total")}</th>
+                <th className="px-4 py-3">{t("columns.notes")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">

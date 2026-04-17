@@ -1,8 +1,10 @@
 import { unstable_noStore as noStore } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import prisma from "@/lib/prisma";
 
-export default async function ProductionDailyReportPage() {
+export default async function ProductionDailyReportPage({ params }: { params: { locale: string } }) {
   noStore();
+  const t = await getTranslations({ locale: params.locale, namespace: "ReportsProduction" });
 
   const today = new Date();
   const start = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
@@ -29,14 +31,14 @@ export default async function ProductionDailyReportPage() {
     <div className="p-6 lg:p-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Production Daily Report</h1>
-          <p className="mt-1 text-slate-500">Date: {start.toISOString().slice(0, 10)}</p>
+          <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
+          <p className="mt-1 text-slate-500">{t("date")}: {start.toISOString().slice(0, 10)}</p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          <Metric title="Total Consumed" value={String(totalConsumed)} />
-          <Metric title="Total Defective" value={String(totalDefective)} />
-          <Metric title="Defect Rate %" value={defectRate} />
+          <Metric title={t("metrics.totalConsumed")} value={String(totalConsumed)} />
+          <Metric title={t("metrics.totalDefective")} value={String(totalDefective)} />
+          <Metric title={t("metrics.defectRate")} value={defectRate} />
         </div>
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -44,11 +46,11 @@ export default async function ProductionDailyReportPage() {
             <table className="min-w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">Time</th>
-                  <th className="px-4 py-3">Machine</th>
-                  <th className="px-4 py-3">Product</th>
-                  <th className="px-4 py-3">Qty</th>
-                  <th className="px-4 py-3">Operator</th>
+                  <th className="px-4 py-3">{t("columns.time")}</th>
+                  <th className="px-4 py-3">{t("columns.machine")}</th>
+                  <th className="px-4 py-3">{t("columns.product")}</th>
+                  <th className="px-4 py-3">{t("columns.qty")}</th>
+                  <th className="px-4 py-3">{t("columns.operator")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">

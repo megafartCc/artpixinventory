@@ -1,5 +1,6 @@
 import { unstable_noStore as noStore } from "next/cache";
 import { getServerSession } from "next-auth";
+import { getTranslations } from "next-intl/server";
 import prisma from "@/lib/prisma";
 import { DefectReasonsSectionClient } from "@/components/settings/DefectReasonsSectionClient";
 import { SystemSettingsClient } from "@/components/settings/SystemSettingsClient";
@@ -16,15 +17,16 @@ const settingKeys = [
   "slack_webhook_system_errors",
 ] as const;
 
-export default async function SettingsPage() {
+export default async function SettingsPage({ params }: { params: { locale: string } }) {
   noStore();
+  const t = await getTranslations({ locale: params.locale, namespace: "Settings" });
 
   const session = await getServerSession(authOptions);
   if (!session?.user || !canAccessSettings(session.user.role)) {
     return (
       <div className="p-6 lg:p-8">
         <div className="mx-auto max-w-3xl rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
-          Admin access is required to view settings.
+          {t("accessDenied")}
         </div>
       </div>
     );
@@ -50,14 +52,14 @@ export default async function SettingsPage() {
   const map = Object.fromEntries(settings.map((entry) => [entry.key, entry.value]));
   const erpixMasked = process.env.ERPIX_API_KEY
     ? `${process.env.ERPIX_API_KEY.slice(0, 3)}***${process.env.ERPIX_API_KEY.slice(-3)}`
-    : "Not configured";
+    : t("notConfigured");
 
   return (
     <div className="p-6 lg:p-8">
       <div className="mx-auto max-w-6xl space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Settings</h1>
-          <p className="mt-1 text-slate-500">System configuration and lookup tables.</p>
+          <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
+          <p className="mt-1 text-slate-500">{t("subtitle")}</p>
         </div>
 
         <SystemSettingsClient
@@ -79,16 +81,16 @@ export default async function SettingsPage() {
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">Reason</th>
-                  <th className="px-4 py-3">Fault Type</th>
-                  <th className="px-4 py-3">ERPIX ID</th>
+                  <th className="px-4 py-3">{t("columns.reason")}</th>
+                  <th className="px-4 py-3">{t("columns.faultType")}</th>
+                  <th className="px-4 py-3">{t("columns.erpixId")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                 {defectReasons.length === 0 ? (
                   <tr>
                     <td colSpan={3} className="px-4 py-8 text-center text-slate-400">
-                      No active defect reasons found.
+                      {t("noActiveReasons")}
                     </td>
                   </tr>
                 ) : (

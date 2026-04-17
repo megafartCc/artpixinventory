@@ -3,6 +3,7 @@
 import { startTransition, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 type ReviewRow = {
   id: string;
@@ -28,6 +29,7 @@ export function DefectReviewClient({
   locale: string;
   reports: ReviewRow[];
 }) {
+  const t = useTranslations("DefectReview");
   const router = useRouter();
   const [error, setError] = useState("");
   const [pendingId, setPendingId] = useState<string | null>(null);
@@ -46,7 +48,7 @@ export function DefectReviewClient({
     setPendingId(null);
 
     if (!response.ok) {
-      setError(payload.error ?? "Review action failed.");
+      setError(payload.error ?? t("errors.reviewFailed"));
       return;
     }
 
@@ -58,14 +60,14 @@ export function DefectReviewClient({
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Defect Review Queue</h1>
-            <p className="mt-1 text-slate-500">Confirm reports to deduct stock and flag vendor credit suggestions.</p>
+            <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
+            <p className="mt-1 text-slate-500">{t("subtitle")}</p>
           </div>
           <Link
             href={`/${locale}/defects`}
             className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
-            Back to Defects
+            {t("back")}
           </Link>
         </div>
 
@@ -73,7 +75,7 @@ export function DefectReviewClient({
 
         {reports.length === 0 ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-16 text-center text-slate-400">
-            No reports waiting for review.
+            {t("empty")}
           </div>
         ) : (
           reports.map((report) => (
@@ -83,10 +85,10 @@ export function DefectReviewClient({
                   <p className="text-sm text-slate-500">{report.createdAt}</p>
                   <h2 className="text-xl font-semibold text-slate-900">{report.reportNumber}</h2>
                   <p className="text-sm text-slate-600">
-                    Source: {report.source.replaceAll("_", " ")} • Created by {report.createdBy}
+                    {t("sourceLabel")}: {t(`source.${report.source}` as "source.PRE_PRODUCTION")} • {t("createdBy")} {report.createdBy}
                   </p>
                   <p className="text-sm text-slate-600">
-                    {report.machineName ? `Machine: ${report.machineName}` : `From location: ${report.fromLocation}`}
+                    {report.machineName ? `${t("machine")}: ${report.machineName}` : `${t("fromLocation")}: ${report.fromLocation}`}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -95,14 +97,14 @@ export function DefectReviewClient({
                     disabled={pendingId === report.id}
                     className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60"
                   >
-                    Reject
+                    {t("reject")}
                   </button>
                   <button
                     onClick={() => void review(report.id, "CONFIRM")}
                     disabled={pendingId === report.id}
                     className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
                   >
-                    Confirm
+                    {t("confirm")}
                   </button>
                 </div>
               </div>
@@ -111,10 +113,10 @@ export function DefectReviewClient({
                 <table className="min-w-full divide-y divide-slate-100 text-sm">
                   <thead className="text-left text-xs uppercase tracking-wide text-slate-500">
                     <tr>
-                      <th className="py-2 pr-3">Product</th>
-                      <th className="py-2 pr-3">Reason</th>
-                      <th className="py-2 pr-3">Fault Type</th>
-                      <th className="py-2 pr-3">Qty</th>
+                      <th className="py-2 pr-3">{t("columns.product")}</th>
+                      <th className="py-2 pr-3">{t("columns.reason")}</th>
+                      <th className="py-2 pr-3">{t("columns.faultType")}</th>
+                      <th className="py-2 pr-3">{t("columns.qty")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -122,7 +124,7 @@ export function DefectReviewClient({
                       <tr key={item.id}>
                         <td className="py-2 pr-3">{item.productLabel}</td>
                         <td className="py-2 pr-3">{item.reason}</td>
-                        <td className="py-2 pr-3">{item.faultType}</td>
+                        <td className="py-2 pr-3">{t(`faultType.${item.faultType}` as "faultType.VENDOR")}</td>
                         <td className="py-2 pr-3">{item.quantity}</td>
                       </tr>
                     ))}

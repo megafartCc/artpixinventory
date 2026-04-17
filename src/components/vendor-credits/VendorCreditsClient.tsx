@@ -39,13 +39,13 @@ export function VendorCreditsClient({
             <table className="min-w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">Credit#</th>
+                  <th className="px-4 py-3">{t("columns.credit")}</th>
                   <th className="px-4 py-3">{t("vendor")}</th>
-                  <th className="px-4 py-3">PO#</th>
+                  <th className="px-4 py-3">{t("columns.po")}</th>
                   <th className="px-4 py-3">{t("reason")}</th>
-                  <th className="px-4 py-3">Total</th>
+                  <th className="px-4 py-3">{t("columns.total")}</th>
                   <th className="px-4 py-3">{t("status")}</th>
-                  <th className="px-4 py-3">Date</th>
+                  <th className="px-4 py-3">{t("columns.date")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">

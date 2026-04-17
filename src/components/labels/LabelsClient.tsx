@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { buildLocationLabelZpl, buildPalletLabelZpl, buildProductLabelZpl } from "@/lib/zpl";
 
 type ProductOption = { id: string; compoundId: string; name: string };
@@ -18,6 +19,7 @@ export function LabelsClient({
   locations: LocationOption[];
   pallets: PalletOption[];
 }) {
+  const t = useTranslations("Labels");
   const [tab, setTab] = useState<"products" | "locations" | "pallets">("products");
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [productQty, setProductQty] = useState<Record<string, string>>({});
@@ -63,8 +65,8 @@ export function LabelsClient({
     <div className="p-6 lg:p-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Label Printing</h1>
-          <p className="mt-1 text-slate-500">Generate ZPL for product barcode, location QR, and pallet labels.</p>
+          <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
+          <p className="mt-1 text-slate-500">{t("subtitle")}</p>
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -72,25 +74,25 @@ export function LabelsClient({
             onClick={() => setTab("products")}
             className={`${tabButtonClass} ${tab === "products" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700"}`}
           >
-            Product Labels
+            {t("tabs.products")}
           </button>
           <button
             onClick={() => setTab("locations")}
             className={`${tabButtonClass} ${tab === "locations" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700"}`}
           >
-            Location Labels
+            {t("tabs.locations")}
           </button>
           <button
             onClick={() => setTab("pallets")}
             className={`${tabButtonClass} ${tab === "pallets" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700"}`}
           >
-            Pallet Labels
+            {t("tabs.pallets")}
           </button>
         </div>
 
         {tab === "products" ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <p className="text-sm text-slate-600">Select products and quantity per product.</p>
+            <p className="text-sm text-slate-600">{t("selectProducts")}</p>
             <div className="mt-3 space-y-2">
               {products.map((product) => {
                 const checked = selectedProductIds.includes(product.id);
@@ -125,7 +127,7 @@ export function LabelsClient({
 
         {tab === "locations" ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <p className="text-sm text-slate-600">Select locations to print QR labels.</p>
+            <p className="text-sm text-slate-600">{t("selectLocations")}</p>
             <div className="mt-3 space-y-2">
               {locations.map((location) => (
                 <label key={location.id} className="flex items-center gap-3 rounded-lg border border-slate-100 px-3 py-2">
@@ -150,7 +152,7 @@ export function LabelsClient({
 
         {tab === "pallets" ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <p className="text-sm text-slate-600">Recent READY pallets:</p>
+            <p className="text-sm text-slate-600">{t("recentPallets")}</p>
             <div className="mt-3 space-y-2">
               {pallets.map((pallet) => (
                 <label key={pallet.id} className="flex items-center gap-3 rounded-lg border border-slate-100 px-3 py-2">
@@ -170,18 +172,18 @@ export function LabelsClient({
 
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-900">ZPL Preview</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t("previewTitle")}</h2>
             <button
               type="button"
               onClick={() => navigator.clipboard.writeText(previewZpl)}
               disabled={!previewZpl}
               className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 disabled:opacity-50"
             >
-              Copy ZPL
+              {t("copyZpl")}
             </button>
           </div>
           <pre className="mt-3 max-h-96 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100">
-            {previewZpl || "Select items above to generate ZPL preview."}
+            {previewZpl || t("previewEmpty")}
           </pre>
         </div>
       </div>

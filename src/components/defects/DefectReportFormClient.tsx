@@ -3,6 +3,7 @@
 import { startTransition, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const inputClassName =
   "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-200";
@@ -52,6 +53,8 @@ export function DefectReportFormClient({
   machines: MachineOption[];
   defaultDefectiveLocationId: string;
 }) {
+  const t = useTranslations("DefectForm");
+  const tc = useTranslations("CommonExtended");
   const router = useRouter();
   const [source, setSource] = useState<"PRE_PRODUCTION" | "PRODUCTION">("PRE_PRODUCTION");
   const [machineId, setMachineId] = useState("");
@@ -113,7 +116,7 @@ export function DefectReportFormClient({
     setSaving(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Failed to create defect report.");
+      setError(payload.error ?? t("errors.createFailed"));
       return;
     }
 
@@ -126,26 +129,26 @@ export function DefectReportFormClient({
       <div className="mx-auto max-w-5xl space-y-6">
         <div>
           <Link href={`/${locale}/defects`} className="text-sm font-medium text-slate-500 hover:text-slate-700">
-            Back to Defects
+            {t("back")}
           </Link>
-          <h1 className="mt-3 text-3xl font-bold text-slate-900">New Defect Report</h1>
-          <p className="mt-1 text-slate-500">Submit a batch defect report for manager review.</p>
+          <h1 className="mt-3 text-3xl font-bold text-slate-900">{t("title")}</h1>
+          <p className="mt-1 text-slate-500">{t("subtitle")}</p>
         </div>
 
         <div className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 md:grid-cols-2">
           <label className="space-y-1 text-sm text-slate-600">
-            <span className="font-medium text-slate-700">Source</span>
+            <span className="font-medium text-slate-700">{t("source")}</span>
             <select value={source} onChange={(event) => setSource(event.target.value as typeof source)} className={inputClassName}>
-              <option value="PRE_PRODUCTION">Pre-production</option>
-              <option value="PRODUCTION">Production</option>
+              <option value="PRE_PRODUCTION">{t("sourceOptions.preProduction")}</option>
+              <option value="PRODUCTION">{t("sourceOptions.production")}</option>
             </select>
           </label>
 
           {source === "PRODUCTION" ? (
             <label className="space-y-1 text-sm text-slate-600">
-              <span className="font-medium text-slate-700">Machine</span>
+              <span className="font-medium text-slate-700">{t("machine")}</span>
               <select value={machineId} onChange={(event) => setMachineId(event.target.value)} className={inputClassName}>
-                <option value="">Select machine</option>
+                <option value="">{t("selectMachine")}</option>
                 {machines.map((machine) => (
                   <option key={machine.id} value={machine.id}>
                     {machine.name}
@@ -155,9 +158,9 @@ export function DefectReportFormClient({
             </label>
           ) : (
             <label className="space-y-1 text-sm text-slate-600">
-              <span className="font-medium text-slate-700">From location</span>
+              <span className="font-medium text-slate-700">{t("fromLocation")}</span>
               <select value={fromLocationId} onChange={(event) => setFromLocationId(event.target.value)} className={inputClassName}>
-                <option value="">Select location</option>
+                <option value="">{t("selectLocation")}</option>
                 {locations.map((location) => (
                   <option key={location.id} value={location.id}>
                     {location.name}
@@ -168,9 +171,9 @@ export function DefectReportFormClient({
           )}
 
           <label className="space-y-1 text-sm text-slate-600">
-            <span className="font-medium text-slate-700">Defective holding location</span>
+            <span className="font-medium text-slate-700">{t("defectiveLocation")}</span>
             <select value={locationId} onChange={(event) => setLocationId(event.target.value)} className={inputClassName}>
-              <option value="">Select location</option>
+              <option value="">{t("selectLocation")}</option>
               {locations.map((location) => (
                 <option key={location.id} value={location.id}>
                   {location.name}
@@ -180,26 +183,26 @@ export function DefectReportFormClient({
           </label>
 
           <label className="space-y-1 text-sm text-slate-600">
-            <span className="font-medium text-slate-700">ERPIX Order ID (optional)</span>
+            <span className="font-medium text-slate-700">{t("erpixOrderId")}</span>
             <input value={erpixOrderId} onChange={(event) => setErpixOrderId(event.target.value)} className={inputClassName} />
           </label>
 
           <label className="space-y-1 text-sm text-slate-600">
-            <span className="font-medium text-slate-700">Operator name (optional)</span>
+            <span className="font-medium text-slate-700">{t("operatorName")}</span>
             <input value={operatorName} onChange={(event) => setOperatorName(event.target.value)} className={inputClassName} />
           </label>
 
           <label className="space-y-1 text-sm text-slate-600 md:col-span-2">
-            <span className="font-medium text-slate-700">Notes</span>
+            <span className="font-medium text-slate-700">{t("notes")}</span>
             <textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={3} className={inputClassName} />
           </label>
         </div>
 
         <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-slate-900">Defect Items</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t("itemsTitle")}</h2>
             <button type="button" onClick={addItem} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-              Add Item
+              {tc("addItem")}
             </button>
           </div>
 
@@ -207,7 +210,7 @@ export function DefectReportFormClient({
             <div key={index} className="grid gap-3 rounded-xl border border-slate-100 p-3 md:grid-cols-12">
               <div className="md:col-span-4">
                 <select value={item.productId} onChange={(event) => updateItem(index, "productId", event.target.value)} className={inputClassName}>
-                  <option value="">Select product</option>
+                  <option value="">{t("selectProduct")}</option>
                   {products.map((product) => (
                     <option key={product.id} value={product.id}>
                       {product.compoundId} — {product.name}
@@ -217,23 +220,23 @@ export function DefectReportFormClient({
               </div>
               <div className="md:col-span-3">
                 <select value={item.reasonId} onChange={(event) => updateItem(index, "reasonId", event.target.value)} className={inputClassName}>
-                  <option value="">Select reason</option>
+                  <option value="">{t("selectReason")}</option>
                   {reasons.map((reason) => (
                     <option key={reason.id} value={reason.id}>
-                      {reason.name} ({reason.faultType})
+                      {reason.name} ({t(`faultType.${reason.faultType}` as "faultType.VENDOR")})
                     </option>
                   ))}
                 </select>
               </div>
               <div className="md:col-span-2">
-                <input type="number" min={1} value={item.quantity} onChange={(event) => updateItem(index, "quantity", event.target.value)} className={inputClassName} placeholder="Qty" />
+                <input type="number" min={1} value={item.quantity} onChange={(event) => updateItem(index, "quantity", event.target.value)} className={inputClassName} placeholder={t("qty")} />
               </div>
               <div className="md:col-span-2">
-                <input value={item.notes} onChange={(event) => updateItem(index, "notes", event.target.value)} className={inputClassName} placeholder="Item notes" />
+                <input value={item.notes} onChange={(event) => updateItem(index, "notes", event.target.value)} className={inputClassName} placeholder={t("itemNotes")} />
               </div>
               <div className="md:col-span-1">
                 <button type="button" onClick={() => removeItem(index)} disabled={items.length === 1} className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50">
-                  Remove
+                  {tc("remove")}
                 </button>
               </div>
             </div>
@@ -244,10 +247,10 @@ export function DefectReportFormClient({
 
         <div className="flex justify-end gap-3">
           <Link href={`/${locale}/defects`} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
-            Cancel
+            {tc("cancel")}
           </Link>
           <button onClick={() => void submit()} disabled={saving || !canSave || (source === "PRE_PRODUCTION" && !fromLocationId) || (source === "PRODUCTION" && !machineId)} className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60">
-            {saving ? "Submitting..." : "Submit for Review"}
+            {saving ? t("submitting") : t("submit")}
           </button>
         </div>
       </div>

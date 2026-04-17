@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export function DefectReasonsSectionClient({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("Settings");
   const router = useRouter();
   const [syncing, setSyncing] = useState(false);
   const [message, setMessage] = useState("");
@@ -20,11 +22,11 @@ export function DefectReasonsSectionClient({ children }: { children: React.React
     setSyncing(false);
 
     if (!response.ok) {
-      setMessage(payload.error ?? "Failed to sync defect reasons.");
+      setMessage(payload.error ?? t("errors.syncReasonsFailed"));
       return;
     }
 
-    setMessage(payload.message ?? "Defect reasons synced.");
+    setMessage(payload.message ?? t("reasonsSynced"));
     router.refresh();
   };
 
@@ -32,9 +34,9 @@ export function DefectReasonsSectionClient({ children }: { children: React.React
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">Defect Reasons</h2>
+          <h2 className="text-xl font-semibold text-slate-900">{t("reasonsTitle")}</h2>
           <p className="mt-1 text-sm text-slate-500">
-            Synced/manual reasons used in Session 16 defect reporting and review.
+            {t("reasonsSubtitle")}
           </p>
         </div>
         <button
@@ -43,7 +45,7 @@ export function DefectReasonsSectionClient({ children }: { children: React.React
           disabled={syncing}
           className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60"
         >
-          {syncing ? "Syncing..." : "Sync from ERPIX"}
+          {syncing ? t("syncing") : t("syncFromErpix")}
         </button>
       </div>
 

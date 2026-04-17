@@ -1,8 +1,10 @@
 import { unstable_noStore as noStore } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import prisma from "@/lib/prisma";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ params }: { params: { locale: string } }) {
   noStore();
+  const t = await getTranslations({ locale: params.locale, namespace: "Dashboard" });
 
   const [
     totalProducts,
@@ -65,49 +67,49 @@ export default async function DashboardPage() {
     <div className="p-6 lg:p-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
-          <p className="mt-1 text-slate-500">Operational summary and active alerts.</p>
+          <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
+          <p className="mt-1 text-slate-500">{t("description")}</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard title="Total Products" value={String(totalProducts)} />
-          <StatCard title="Low Stock Alerts" value={String(lowStockAlerts.length)} />
-          <StatCard title="Open POs" value={String(openPoCount)} />
-          <StatCard title="Pending Defects" value={String(pendingDefects)} />
+          <StatCard title={t("totalProducts")} value={String(totalProducts)} />
+          <StatCard title={t("lowStock")} value={String(lowStockAlerts.length)} />
+          <StatCard title={t("openPos")} value={String(openPoCount)} />
+          <StatCard title={t("pendingDefects")} value={String(pendingDefects)} />
         </div>
 
         <div className="grid gap-4 lg:grid-cols-3">
-          <AlertCard title="Low stock items">
+          <AlertCard title={t("lowStockItems")}>
             {lowStockAlerts.length === 0 ? (
-              <p className="text-sm text-slate-400">No low stock alerts.</p>
+              <p className="text-sm text-slate-400">{t("noLowStockAlerts")}</p>
             ) : (
               lowStockAlerts.map((row) => (
                 <p key={row.id} className="text-sm text-slate-700">
-                  {row.product.compoundId} @ {row.location.name}: {row.quantity} (min {row.product.minStock})
+                  {row.product.compoundId} @ {row.location.name}: {row.quantity} ({t("min")} {row.product.minStock})
                 </p>
               ))
             )}
           </AlertCard>
 
-          <AlertCard title="Overdue purchase orders">
+          <AlertCard title={t("overduePo")}>
             {overduePos.length === 0 ? (
-              <p className="text-sm text-slate-400">No overdue POs.</p>
+              <p className="text-sm text-slate-400">{t("noOverduePo")}</p>
             ) : (
               overduePos.map((po) => (
                 <p key={po.id} className="text-sm text-slate-700">
-                  {po.poNumber} — {po.vendor.name} (expected {po.expectedDate?.toISOString().slice(0, 10)})
+                  {po.poNumber} — {po.vendor.name} ({t("expected")} {po.expectedDate?.toISOString().slice(0, 10)})
                 </p>
               ))
             )}
           </AlertCard>
 
-          <AlertCard title="Wrong-location events">
+          <AlertCard title={t("wrongLocationEvents")}>
             {wrongLocationEvents.length === 0 ? (
-              <p className="text-sm text-slate-400">No recent wrong-location events.</p>
+              <p className="text-sm text-slate-400">{t("noWrongLocationEvents")}</p>
             ) : (
               wrongLocationEvents.map((event) => (
                 <p key={event.id} className="text-sm text-slate-700">
-                  {event.machine.name}: {event.product.compoundId} qty {event.quantity}
+                  {event.machine.name}: {event.product.compoundId} {t("qty")} {event.quantity}
                 </p>
               ))
             )}
@@ -116,20 +118,20 @@ export default async function DashboardPage() {
 
         <div className="grid gap-4 lg:grid-cols-2">
           <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Recent Activity</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t("recentActivity")}</h2>
             <div className="mt-3 space-y-2">
               {recentActivity.map((entry) => (
                 <p key={entry.id} className="text-sm text-slate-700">
-                  <span className="font-medium">{entry.action}</span> — {entry.entityType} by {entry.user?.name ?? "System"} at {entry.createdAt.toISOString().slice(0, 16).replace("T", " ")}
+                  <span className="font-medium">{entry.action}</span> — {entry.entityType} {t("by")} {entry.user?.name ?? t("system")} {t("at")} {entry.createdAt.toISOString().slice(0, 16).replace("T", " ")}
                 </p>
               ))}
             </div>
           </section>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Active Operations</h2>
-            <p className="mt-3 text-sm text-slate-700">Active count sessions: {activeCounts}</p>
-            <p className="mt-1 text-sm text-slate-700">Active transfers: {activeTransfers}</p>
+            <h2 className="text-lg font-semibold text-slate-900">{t("activeOps")}</h2>
+            <p className="mt-3 text-sm text-slate-700">{t("activeCountSessions")}: {activeCounts}</p>
+            <p className="mt-1 text-sm text-slate-700">{t("activeTransfers")}: {activeTransfers}</p>
           </section>
         </div>
       </div>

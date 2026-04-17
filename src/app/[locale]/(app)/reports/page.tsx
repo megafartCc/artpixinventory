@@ -1,20 +1,21 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
-const reportLinks = [
-  { href: "stock-levels", title: "Stock Levels", description: "Current stock by location, index, and category." },
-  { href: "po-aging", title: "PO Aging", description: "Open purchase orders, age, and overdue visibility." },
-  { href: "defects", title: "Defects", description: "Defect trends and vendor/internal split." },
-  { href: "production", title: "Production Daily", description: "Machine consumption with defect rate." },
-  { href: "qbo-export", title: "QBO Export", description: "CSV export for accounting and inventory cost flow." },
-];
-
-export default function ReportsHubPage({ params }: { params: { locale: string } }) {
+export default async function ReportsHubPage({ params }: { params: { locale: string } }) {
+  const t = await getTranslations({ locale: params.locale, namespace: "ReportsHub" });
+  const reportLinks = [
+    { href: "stock-levels", title: t("cards.stock.title"), description: t("cards.stock.description") },
+    { href: "po-aging", title: t("cards.poAging.title"), description: t("cards.poAging.description") },
+    { href: "defects", title: t("cards.defects.title"), description: t("cards.defects.description") },
+    { href: "production", title: t("cards.production.title"), description: t("cards.production.description") },
+    { href: "qbo-export", title: t("cards.qbo.title"), description: t("cards.qbo.description") },
+  ];
   return (
     <div className="p-6 lg:p-8">
       <div className="mx-auto max-w-6xl space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Reports</h1>
-          <p className="mt-1 text-slate-500">Select a report below.</p>
+          <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
+          <p className="mt-1 text-slate-500">{t("subtitle")}</p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">

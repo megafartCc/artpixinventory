@@ -1,8 +1,10 @@
 import { unstable_noStore as noStore } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import prisma from "@/lib/prisma";
 
-export default async function QboExportPage() {
+export default async function QboExportPage({ params }: { params: { locale: string } }) {
   noStore();
+  const t = await getTranslations({ locale: params.locale, namespace: "ReportsQbo" });
 
   const adjustments = await prisma.stockAdjustment.findMany({
     orderBy: { createdAt: "desc" },
@@ -34,12 +36,12 @@ export default async function QboExportPage() {
     <div className="p-6 lg:p-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">QBO Export</h1>
-          <p className="mt-1 text-slate-500">CSV preview for adjustments/defect scraps.</p>
+          <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
+          <p className="mt-1 text-slate-500">{t("subtitle")}</p>
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Copy this CSV into QuickBooks import workflow.</p>
+          <p className="text-sm text-slate-500">{t("copyHint")}</p>
           <pre className="mt-3 max-h-96 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100">{csvPreview}</pre>
         </div>
       </div>

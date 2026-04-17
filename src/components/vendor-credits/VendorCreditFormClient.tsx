@@ -83,8 +83,8 @@ export function VendorCreditFormClient({
 
           <label className="space-y-1 text-sm text-slate-600">
             <span className="font-medium text-slate-700">{t("linkedPo")}</span>
-            <select value={purchaseOrderId} onChange={(e) => setPurchaseOrderId(e.target.value)} className={inputClassName}>
-              <option value="">None</option>
+              <select value={purchaseOrderId} onChange={(e) => setPurchaseOrderId(e.target.value)} className={inputClassName}>
+              <option value="">{t("none")}</option>
               {vendorPoOptions.map((po) => (
                 <option key={po.id} value={po.id}>{po.poNumber}</option>
               ))}
@@ -115,13 +115,13 @@ export function VendorCreditFormClient({
           {items.map((item, index) => (
             <div key={index} className="grid gap-3 md:grid-cols-12">
               <select value={item.productId} onChange={(e) => setItems((current) => current.map((entry, idx) => idx === index ? { ...entry, productId: e.target.value } : entry))} className={`${inputClassName} md:col-span-5`}>
-                <option value="">Select product</option>
+                <option value="">{t("selectProduct")}</option>
                 {products.map((product) => (
                   <option key={product.id} value={product.id}>{product.compoundId} — {product.name}</option>
                 ))}
               </select>
-              <input type="number" min={1} value={item.quantity} onChange={(e) => setItems((current) => current.map((entry, idx) => idx === index ? { ...entry, quantity: e.target.value } : entry))} className={`${inputClassName} md:col-span-2`} placeholder="Qty" />
-              <input type="number" min={0.01} step={0.01} value={item.unitCost} onChange={(e) => setItems((current) => current.map((entry, idx) => idx === index ? { ...entry, unitCost: e.target.value } : entry))} className={`${inputClassName} md:col-span-2`} placeholder="Unit Cost" />
+              <input type="number" min={1} value={item.quantity} onChange={(e) => setItems((current) => current.map((entry, idx) => idx === index ? { ...entry, quantity: e.target.value } : entry))} className={`${inputClassName} md:col-span-2`} placeholder={t("qty")} />
+              <input type="number" min={0.01} step={0.01} value={item.unitCost} onChange={(e) => setItems((current) => current.map((entry, idx) => idx === index ? { ...entry, unitCost: e.target.value } : entry))} className={`${inputClassName} md:col-span-2`} placeholder={t("unitCost")} />
               <input value={item.notes} onChange={(e) => setItems((current) => current.map((entry, idx) => idx === index ? { ...entry, notes: e.target.value } : entry))} className={`${inputClassName} md:col-span-2`} placeholder={t("notes")} />
               <button type="button" onClick={() => setItems((current) => current.filter((_, idx) => idx !== index))} className="rounded-lg border border-slate-200 px-3 py-2 text-sm md:col-span-1">{tc("remove")}</button>
             </div>

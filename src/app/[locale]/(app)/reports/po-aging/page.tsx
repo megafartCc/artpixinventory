@@ -1,13 +1,15 @@
 import { unstable_noStore as noStore } from "next/cache";
 import { POStatus } from "@prisma/client";
+import { getTranslations } from "next-intl/server";
 import prisma from "@/lib/prisma";
 
 function daysBetween(date: Date, from = new Date()) {
   return Math.floor((from.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-export default async function PoAgingReportPage() {
+export default async function PoAgingReportPage({ params }: { params: { locale: string } }) {
   noStore();
+  const t = await getTranslations({ locale: params.locale, namespace: "ReportsPoAging" });
 
   const openPoStatuses: POStatus[] = ["PENDING_APPROVAL", "APPROVED", "ORDERED", "PARTIALLY_RECEIVED"];
 
@@ -44,8 +46,8 @@ export default async function PoAgingReportPage() {
     <div className="p-6 lg:p-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">PO Aging Report</h1>
-          <p className="mt-1 text-slate-500">Open purchase orders sorted by overdue days.</p>
+          <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
+          <p className="mt-1 text-slate-500">{t("subtitle")}</p>
         </div>
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -53,13 +55,13 @@ export default async function PoAgingReportPage() {
             <table className="min-w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">PO#</th>
-                  <th className="px-4 py-3">Vendor</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Order Date</th>
-                  <th className="px-4 py-3">Expected Date</th>
-                  <th className="px-4 py-3">Days In Status</th>
-                  <th className="px-4 py-3">Overdue</th>
+                  <th className="px-4 py-3">{t("columns.po")}</th>
+                  <th className="px-4 py-3">{t("columns.vendor")}</th>
+                  <th className="px-4 py-3">{t("columns.status")}</th>
+                  <th className="px-4 py-3">{t("columns.orderDate")}</th>
+                  <th className="px-4 py-3">{t("columns.expectedDate")}</th>
+                  <th className="px-4 py-3">{t("columns.daysInStatus")}</th>
+                  <th className="px-4 py-3">{t("columns.overdue")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">

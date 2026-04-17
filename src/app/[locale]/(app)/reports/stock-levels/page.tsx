@@ -1,8 +1,10 @@
 import { unstable_noStore as noStore } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import prisma from "@/lib/prisma";
 
-export default async function StockLevelsReportPage() {
+export default async function StockLevelsReportPage({ params }: { params: { locale: string } }) {
   noStore();
+  const t = await getTranslations({ locale: params.locale, namespace: "ReportsStockLevels" });
 
   const levels = await prisma.stockLevel.findMany({
     include: {
@@ -24,8 +26,8 @@ export default async function StockLevelsReportPage() {
     <div className="p-6 lg:p-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Stock Levels Report</h1>
-          <p className="mt-1 text-slate-500">Current stock snapshot (first 500 rows).</p>
+          <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
+          <p className="mt-1 text-slate-500">{t("subtitle")}</p>
         </div>
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -33,12 +35,12 @@ export default async function StockLevelsReportPage() {
             <table className="min-w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">Compound ID</th>
-                  <th className="px-4 py-3">Product</th>
-                  <th className="px-4 py-3">Index</th>
-                  <th className="px-4 py-3">Location</th>
-                  <th className="px-4 py-3">Qty</th>
-                  <th className="px-4 py-3">Min</th>
+                  <th className="px-4 py-3">{t("columns.compoundId")}</th>
+                  <th className="px-4 py-3">{t("columns.product")}</th>
+                  <th className="px-4 py-3">{t("columns.index")}</th>
+                  <th className="px-4 py-3">{t("columns.location")}</th>
+                  <th className="px-4 py-3">{t("columns.qty")}</th>
+                  <th className="px-4 py-3">{t("columns.min")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">

@@ -2,6 +2,7 @@
 
 import { startTransition, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export function ProductionQueueClient({
   rows,
@@ -19,6 +20,8 @@ export function ProductionQueueClient({
   }>;
   lastSynced: string;
 }) {
+  const t = useTranslations("Production");
+  const tc = useTranslations("CommonExtended");
   const router = useRouter();
   const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState("");
@@ -31,7 +34,7 @@ export function ProductionQueueClient({
     setSyncing(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Failed to sync production queue.");
+      setError(payload.error ?? t("errors.syncFailed"));
       return;
     }
 
@@ -43,16 +46,16 @@ export function ProductionQueueClient({
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Production Queue</h1>
-            <p className="mt-1 text-slate-500">Placeholder ERPIX-driven restock requirements per machine.</p>
-            <p className="mt-1 text-xs text-slate-400">Last synced: {lastSynced}</p>
+            <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
+            <p className="mt-1 text-slate-500">{t("subtitle")}</p>
+            <p className="mt-1 text-xs text-slate-400">{t("lastSynced")}: {lastSynced}</p>
           </div>
           <button
             onClick={() => void syncNow()}
             disabled={syncing}
             className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
           >
-            {syncing ? "Syncing..." : "Sync Now"}
+            {syncing ? t("syncing") : tc("syncNow")}
           </button>
         </div>
 
@@ -63,18 +66,18 @@ export function ProductionQueueClient({
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">Machine</th>
-                  <th className="px-4 py-3">Product</th>
-                  <th className="px-4 py-3">Needed</th>
-                  <th className="px-4 py-3">In Stock</th>
-                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">{t("machine")}</th>
+                  <th className="px-4 py-3">{t("product")}</th>
+                  <th className="px-4 py-3">{t("needed")}</th>
+                  <th className="px-4 py-3">{t("inStock")}</th>
+                  <th className="px-4 py-3">{t("status")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                 {rows.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-4 py-16 text-center text-slate-400">
-                      No production queue records yet. Click “Sync Now” to generate placeholder data.
+                      {t("noRows")}
                     </td>
                   </tr>
                 ) : (
@@ -90,7 +93,7 @@ export function ProductionQueueClient({
                             row.sufficient ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
                           }`}
                         >
-                          {row.sufficient ? "Sufficient" : "Restock Needed"}
+                          {row.sufficient ? t("sufficient") : t("restock")}
                         </span>
                       </td>
                     </tr>

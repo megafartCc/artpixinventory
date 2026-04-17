@@ -24,7 +24,21 @@
     "openPos": "Відкриті PO",
     "pendingDefects": "Дефекти на перевірці",
     "recentActivity": "Остання активність",
-    "activeOps": "Активні операції"
+    "activeOps": "Активні операції",
+    "lowStockItems": "Товари з низьким залишком",
+    "noLowStockAlerts": "Немає попереджень про низький залишок.",
+    "min": "мін",
+    "overduePo": "Прострочені PO",
+    "noOverduePo": "Немає прострочених PO.",
+    "expected": "очікувалось",
+    "wrongLocationEvents": "Події неправильної локації",
+    "noWrongLocationEvents": "Немає нещодавніх подій неправильної локації.",
+    "qty": "к-сть",
+    "by": "користувач",
+    "at": "о",
+    "system": "Система",
+    "activeCountSessions": "Активні перерахунки",
+    "activeTransfers": "Активні переміщення"
   },
   "Common": {
     "cancel": "Скасувати",
@@ -54,7 +68,25 @@
     "create": "Створити кредит",
     "status": "Статус",
     "set": "Встановити",
-    "detailBack": "Назад до кредитів"
+    "detailBack": "Назад до кредитів",
+    "none": "Немає",
+    "selectProduct": "Оберіть товар",
+    "qty": "К-сть",
+    "unitCost": "Ціна за од.",
+    "noNotes": "Без нотаток.",
+    "columns": {
+      "credit": "Кредит#",
+      "po": "PO#",
+      "total": "Разом",
+      "date": "Дата",
+      "product": "Товар",
+      "qty": "К-сть",
+      "unitCost": "Ціна за од.",
+      "notes": "Нотатки"
+    },
+    "errors": {
+      "updateStatus": "Не вдалося оновити статус."
+    }
   },
   "Production": {
     "title": "Виробнича черга",
@@ -67,10 +99,249 @@
     "inStock": "В наявності",
     "status": "Статус",
     "sufficient": "Достатньо",
-    "restock": "Потрібно поповнити"
+    "restock": "Потрібно поповнити",
+    "syncing": "Синхронізація...",
+    "errors": {
+      "syncFailed": "Не вдалося синхронізувати виробничу чергу."
+    }
   },
   "Reports": {
     "title": "Звіти",
     "subtitle": "Оберіть звіт нижче."
+  },
+  "Defects": {
+    "title": "Дефекти",
+    "subtitle": "Пакетна звітність про дефекти для pre-production і production.",
+    "reviewQueue": "Черга перевірки",
+    "newReport": "Новий звіт про дефекти",
+    "empty": "Звітів про дефекти ще немає.",
+    "columns": {
+      "report": "Звіт",
+      "source": "Джерело",
+      "status": "Статус",
+      "items": "Позиції",
+      "qty": "К-сть",
+      "faultSummary": "Зведення причин",
+      "createdBy": "Створив",
+      "created": "Створено"
+    },
+    "source": {
+      "PRE_PRODUCTION": "Pre-production",
+      "PRODUCTION": "Production"
+    },
+    "status": {
+      "PENDING_REVIEW": "Очікує перевірки",
+      "CONFIRMED": "Підтверджено",
+      "REJECTED": "Відхилено"
+    },
+    "faultType": {
+      "VENDOR": "Постачальник",
+      "INTERNAL": "Внутрішній"
+    }
+  },
+  "DefectReview": {
+    "title": "Черга перевірки дефектів",
+    "subtitle": "Підтверджуйте звіти для списання залишків і рекомендацій кредиту постачальника.",
+    "back": "Назад до дефектів",
+    "empty": "Немає звітів, що очікують перевірки.",
+    "sourceLabel": "Джерело",
+    "createdBy": "Створено користувачем",
+    "machine": "Верстат",
+    "fromLocation": "З локації",
+    "reject": "Відхилити",
+    "confirm": "Підтвердити",
+    "columns": {
+      "product": "Товар",
+      "reason": "Причина",
+      "faultType": "Тип причини",
+      "qty": "К-сть"
+    },
+    "faultType": {
+      "VENDOR": "Постачальник",
+      "INTERNAL": "Внутрішній"
+    },
+    "source": {
+      "PRE_PRODUCTION": "Pre-production",
+      "PRODUCTION": "Production"
+    },
+    "errors": {
+      "reviewFailed": "Помилка дії перевірки."
+    }
+  },
+  "DefectForm": {
+    "back": "Назад до дефектів",
+    "title": "Новий звіт про дефекти",
+    "subtitle": "Надішліть пакетний звіт для перевірки менеджером.",
+    "source": "Джерело",
+    "sourceOptions": {
+      "preProduction": "Pre-production",
+      "production": "Production"
+    },
+    "machine": "Верстат",
+    "selectMachine": "Оберіть верстат",
+    "fromLocation": "З локації",
+    "selectLocation": "Оберіть локацію",
+    "defectiveLocation": "Локація браку",
+    "erpixOrderId": "ERPIX Order ID (необов’язково)",
+    "operatorName": "Ім’я оператора (необов’язково)",
+    "notes": "Нотатки",
+    "itemsTitle": "Позиції дефекту",
+    "selectProduct": "Оберіть товар",
+    "selectReason": "Оберіть причину",
+    "qty": "К-сть",
+    "itemNotes": "Нотатки позиції",
+    "submitting": "Надсилання...",
+    "submit": "Надіслати на перевірку",
+    "faultType": {
+      "VENDOR": "Постачальник",
+      "INTERNAL": "Внутрішній"
+    },
+    "errors": {
+      "createFailed": "Не вдалося створити звіт про дефект."
+    }
+  },
+  "Labels": {
+    "title": "Друк етикеток",
+    "subtitle": "Генерація ZPL для штрихкоду товару, QR локації та палет.",
+    "tabs": {
+      "products": "Етикетки товарів",
+      "locations": "Етикетки локацій",
+      "pallets": "Етикетки палет"
+    },
+    "selectProducts": "Оберіть товари та кількість для кожного товару.",
+    "selectLocations": "Оберіть локації для друку QR-етикеток.",
+    "recentPallets": "Останні READY палети:",
+    "previewTitle": "Попередній перегляд ZPL",
+    "copyZpl": "Копіювати ZPL",
+    "previewEmpty": "Оберіть елементи вище, щоб згенерувати попередній перегляд ZPL."
+  },
+  "Settings": {
+    "title": "Налаштування",
+    "subtitle": "Системна конфігурація та довідники.",
+    "accessDenied": "Для перегляду налаштувань потрібні права адміністратора.",
+    "notConfigured": "Не налаштовано",
+    "systemTitle": "Системні налаштування",
+    "systemSubtitle": "Конфігурація лише для адміна: приймання, нумерація, Slack і ERPIX.",
+    "defaultReceivingLocation": "Локація приймання за замовчуванням",
+    "selectLocation": "Оберіть локацію",
+    "poPrefix": "Префікс номера PO",
+    "slackInventory": "Webhook Slack #inventory-alerts",
+    "slackPurchasing": "Webhook Slack #purchasing",
+    "slackQuality": "Webhook Slack #quality",
+    "slackWarehouseOps": "Webhook Slack #warehouse-ops",
+    "slackSystemErrors": "Webhook Slack #system-errors",
+    "erpixMasked": "ERPIX API Key (замаскований):",
+    "saveSettings": "Зберегти налаштування",
+    "saved": "Налаштування збережено.",
+    "reasonsTitle": "Причини дефектів",
+    "reasonsSubtitle": "Синхронізовані/ручні причини для звітності та перевірки дефектів.",
+    "syncFromErpix": "Синхронізувати з ERPIX",
+    "syncing": "Синхронізація...",
+    "reasonsSynced": "Причини дефектів синхронізовано.",
+    "columns": {
+      "reason": "Причина",
+      "faultType": "Тип причини",
+      "erpixId": "ERPIX ID"
+    },
+    "noActiveReasons": "Активних причин дефектів не знайдено.",
+    "errors": {
+      "saveFailed": "Не вдалося зберегти налаштування.",
+      "syncReasonsFailed": "Не вдалося синхронізувати причини дефектів."
+    }
+  },
+  "ReportsHub": {
+    "title": "Звіти",
+    "subtitle": "Оберіть звіт нижче.",
+    "cards": {
+      "stock": {
+        "title": "Залишки",
+        "description": "Поточні залишки за локаціями, індексами та категоріями."
+      },
+      "poAging": {
+        "title": "Старіння PO",
+        "description": "Відкриті закупівельні замовлення, вік і прострочка."
+      },
+      "defects": {
+        "title": "Дефекти",
+        "description": "Тренди дефектів і частка постачальник/внутрішній."
+      },
+      "production": {
+        "title": "Виробництво за день",
+        "description": "Споживання по верстатах із відсотком дефекту."
+      },
+      "qbo": {
+        "title": "QBO Експорт",
+        "description": "CSV-експорт для обліку та собівартості складу."
+      }
+    }
+  },
+  "ReportsStockLevels": {
+    "title": "Звіт по залишках",
+    "subtitle": "Поточний зріз залишків (перші 500 рядків).",
+    "columns": {
+      "compoundId": "Compound ID",
+      "product": "Товар",
+      "index": "Індекс",
+      "location": "Локація",
+      "qty": "К-сть",
+      "min": "Мін"
+    }
+  },
+  "ReportsPoAging": {
+    "title": "Звіт по старінню PO",
+    "subtitle": "Відкриті закупівельні замовлення, відсортовані за прострочкою.",
+    "columns": {
+      "po": "PO#",
+      "vendor": "Постачальник",
+      "status": "Статус",
+      "orderDate": "Дата замовлення",
+      "expectedDate": "Очікувана дата",
+      "daysInStatus": "Днів у статусі",
+      "overdue": "Прострочка"
+    }
+  },
+  "ReportsProduction": {
+    "title": "Щоденний звіт виробництва",
+    "date": "Дата",
+    "metrics": {
+      "totalConsumed": "Всього спожито",
+      "totalDefective": "Всього дефектів",
+      "defectRate": "Відсоток дефекту %"
+    },
+    "columns": {
+      "time": "Час",
+      "machine": "Верстат",
+      "product": "Товар",
+      "qty": "К-сть",
+      "operator": "Оператор"
+    }
+  },
+  "ReportsDefects": {
+    "title": "Звіт по дефектах",
+    "subtitle": "Останні дефектні позиції та розподіл причин.",
+    "metrics": {
+      "totalDefects": "Всього дефектів",
+      "vendorFault": "Провина постачальника",
+      "internalFault": "Внутрішня провина",
+      "topProduct": "Топ товар"
+    },
+    "columns": {
+      "report": "Звіт#",
+      "date": "Дата",
+      "product": "Товар",
+      "reason": "Причина",
+      "faultType": "Тип причини",
+      "qty": "К-сть",
+      "machine": "Верстат"
+    },
+    "faultType": {
+      "VENDOR": "Постачальник",
+      "INTERNAL": "Внутрішній"
+    }
+  },
+  "ReportsQbo": {
+    "title": "QBO Експорт",
+    "subtitle": "CSV-перегляд для коригувань/списань браку.",
+    "copyHint": "Скопіюйте цей CSV у процес імпорту QuickBooks."
   }
 }

@@ -24,7 +24,21 @@
     "openPos": "Открытые PO",
     "pendingDefects": "Дефекты на проверке",
     "recentActivity": "Последняя активность",
-    "activeOps": "Активные операции"
+    "activeOps": "Активные операции",
+    "lowStockItems": "Товары с низким остатком",
+    "noLowStockAlerts": "Нет предупреждений по остатку.",
+    "min": "мин",
+    "overduePo": "Просроченные PO",
+    "noOverduePo": "Нет просроченных PO.",
+    "expected": "ожидалось",
+    "wrongLocationEvents": "События неверной локации",
+    "noWrongLocationEvents": "Нет недавних событий неверной локации.",
+    "qty": "кол-во",
+    "by": "пользователь",
+    "at": "в",
+    "system": "Система",
+    "activeCountSessions": "Активные пересчеты",
+    "activeTransfers": "Активные перемещения"
   },
   "Common": {
     "cancel": "Отмена",
@@ -54,7 +68,25 @@
     "create": "Создать кредит",
     "status": "Статус",
     "set": "Установить",
-    "detailBack": "Назад к кредитам"
+    "detailBack": "Назад к кредитам",
+    "none": "Нет",
+    "selectProduct": "Выберите товар",
+    "qty": "Кол-во",
+    "unitCost": "Цена за ед.",
+    "noNotes": "Без заметок.",
+    "columns": {
+      "credit": "Кредит#",
+      "po": "PO#",
+      "total": "Итого",
+      "date": "Дата",
+      "product": "Товар",
+      "qty": "Кол-во",
+      "unitCost": "Цена за ед.",
+      "notes": "Заметки"
+    },
+    "errors": {
+      "updateStatus": "Не удалось обновить статус."
+    }
   },
   "Production": {
     "title": "Производственная очередь",
@@ -67,10 +99,249 @@
     "inStock": "В наличии",
     "status": "Статус",
     "sufficient": "Достаточно",
-    "restock": "Нужно пополнить"
+    "restock": "Нужно пополнить",
+    "syncing": "Синхронизация...",
+    "errors": {
+      "syncFailed": "Не удалось синхронизировать очередь производства."
+    }
   },
   "Reports": {
     "title": "Отчеты",
     "subtitle": "Выберите отчет ниже."
+  },
+  "Defects": {
+    "title": "Дефекты",
+    "subtitle": "Пакетные отчеты о дефектах для pre-production и production.",
+    "reviewQueue": "Очередь проверки",
+    "newReport": "Новый отчет о дефектах",
+    "empty": "Отчетов о дефектах пока нет.",
+    "columns": {
+      "report": "Отчет",
+      "source": "Источник",
+      "status": "Статус",
+      "items": "Позиции",
+      "qty": "Кол-во",
+      "faultSummary": "Сводка причин",
+      "createdBy": "Создал",
+      "created": "Создан"
+    },
+    "source": {
+      "PRE_PRODUCTION": "Pre-production",
+      "PRODUCTION": "Production"
+    },
+    "status": {
+      "PENDING_REVIEW": "Ожидает проверки",
+      "CONFIRMED": "Подтвержден",
+      "REJECTED": "Отклонен"
+    },
+    "faultType": {
+      "VENDOR": "Поставщик",
+      "INTERNAL": "Внутренний"
+    }
+  },
+  "DefectReview": {
+    "title": "Очередь проверки дефектов",
+    "subtitle": "Подтверждайте отчеты для списания остатков и рекомендаций по кредитам поставщика.",
+    "back": "Назад к дефектам",
+    "empty": "Нет отчетов на проверку.",
+    "sourceLabel": "Источник",
+    "createdBy": "Создано пользователем",
+    "machine": "Станок",
+    "fromLocation": "Из локации",
+    "reject": "Отклонить",
+    "confirm": "Подтвердить",
+    "columns": {
+      "product": "Товар",
+      "reason": "Причина",
+      "faultType": "Тип причины",
+      "qty": "Кол-во"
+    },
+    "faultType": {
+      "VENDOR": "Поставщик",
+      "INTERNAL": "Внутренний"
+    },
+    "source": {
+      "PRE_PRODUCTION": "Pre-production",
+      "PRODUCTION": "Production"
+    },
+    "errors": {
+      "reviewFailed": "Ошибка действия проверки."
+    }
+  },
+  "DefectForm": {
+    "back": "Назад к дефектам",
+    "title": "Новый отчет о дефектах",
+    "subtitle": "Отправьте пакетный отчет для проверки менеджером.",
+    "source": "Источник",
+    "sourceOptions": {
+      "preProduction": "Pre-production",
+      "production": "Production"
+    },
+    "machine": "Станок",
+    "selectMachine": "Выберите станок",
+    "fromLocation": "Из локации",
+    "selectLocation": "Выберите локацию",
+    "defectiveLocation": "Локация брака",
+    "erpixOrderId": "ERPIX Order ID (необязательно)",
+    "operatorName": "Имя оператора (необязательно)",
+    "notes": "Заметки",
+    "itemsTitle": "Позиции дефекта",
+    "selectProduct": "Выберите товар",
+    "selectReason": "Выберите причину",
+    "qty": "Кол-во",
+    "itemNotes": "Заметки по позиции",
+    "submitting": "Отправка...",
+    "submit": "Отправить на проверку",
+    "faultType": {
+      "VENDOR": "Поставщик",
+      "INTERNAL": "Внутренний"
+    },
+    "errors": {
+      "createFailed": "Не удалось создать отчет о дефекте."
+    }
+  },
+  "Labels": {
+    "title": "Печать этикеток",
+    "subtitle": "Генерация ZPL для штрихкода товара, QR локации и паллет.",
+    "tabs": {
+      "products": "Этикетки товаров",
+      "locations": "Этикетки локаций",
+      "pallets": "Этикетки паллет"
+    },
+    "selectProducts": "Выберите товары и количество по каждому товару.",
+    "selectLocations": "Выберите локации для печати QR-этикеток.",
+    "recentPallets": "Последние READY паллеты:",
+    "previewTitle": "Предпросмотр ZPL",
+    "copyZpl": "Копировать ZPL",
+    "previewEmpty": "Выберите объекты выше для генерации предпросмотра ZPL."
+  },
+  "Settings": {
+    "title": "Настройки",
+    "subtitle": "Системная конфигурация и справочники.",
+    "accessDenied": "Для просмотра настроек требуются права администратора.",
+    "notConfigured": "Не настроено",
+    "systemTitle": "Системные настройки",
+    "systemSubtitle": "Конфигурация только для админа: приемка, нумерация, Slack и ERPIX.",
+    "defaultReceivingLocation": "Локация приемки по умолчанию",
+    "selectLocation": "Выберите локацию",
+    "poPrefix": "Префикс номера PO",
+    "slackInventory": "Webhook Slack #inventory-alerts",
+    "slackPurchasing": "Webhook Slack #purchasing",
+    "slackQuality": "Webhook Slack #quality",
+    "slackWarehouseOps": "Webhook Slack #warehouse-ops",
+    "slackSystemErrors": "Webhook Slack #system-errors",
+    "erpixMasked": "ERPIX API Key (маскирован):",
+    "saveSettings": "Сохранить настройки",
+    "saved": "Настройки сохранены.",
+    "reasonsTitle": "Причины дефектов",
+    "reasonsSubtitle": "Синхронизируемые/ручные причины для отчетов и проверки дефектов.",
+    "syncFromErpix": "Синхронизировать из ERPIX",
+    "syncing": "Синхронизация...",
+    "reasonsSynced": "Причины дефектов синхронизированы.",
+    "columns": {
+      "reason": "Причина",
+      "faultType": "Тип причины",
+      "erpixId": "ERPIX ID"
+    },
+    "noActiveReasons": "Активных причин дефектов не найдено.",
+    "errors": {
+      "saveFailed": "Не удалось сохранить настройки.",
+      "syncReasonsFailed": "Не удалось синхронизировать причины дефектов."
+    }
+  },
+  "ReportsHub": {
+    "title": "Отчеты",
+    "subtitle": "Выберите отчет ниже.",
+    "cards": {
+      "stock": {
+        "title": "Остатки",
+        "description": "Текущие остатки по локациям, индексам и категориям."
+      },
+      "poAging": {
+        "title": "Старение PO",
+        "description": "Открытые закупочные заказы, возраст и просрочка."
+      },
+      "defects": {
+        "title": "Дефекты",
+        "description": "Тренды дефектов и доля поставщик/внутренний."
+      },
+      "production": {
+        "title": "Производство за день",
+        "description": "Расход по станкам с процентом дефекта."
+      },
+      "qbo": {
+        "title": "QBO Экспорт",
+        "description": "CSV-экспорт для учета и себестоимости склада."
+      }
+    }
+  },
+  "ReportsStockLevels": {
+    "title": "Отчет по остаткам",
+    "subtitle": "Текущий срез остатков (первые 500 строк).",
+    "columns": {
+      "compoundId": "Compound ID",
+      "product": "Товар",
+      "index": "Индекс",
+      "location": "Локация",
+      "qty": "Кол-во",
+      "min": "Мин"
+    }
+  },
+  "ReportsPoAging": {
+    "title": "Отчет по старению PO",
+    "subtitle": "Открытые закупочные заказы, отсортированные по просрочке.",
+    "columns": {
+      "po": "PO#",
+      "vendor": "Поставщик",
+      "status": "Статус",
+      "orderDate": "Дата заказа",
+      "expectedDate": "Ожидаемая дата",
+      "daysInStatus": "Дней в статусе",
+      "overdue": "Просрочка"
+    }
+  },
+  "ReportsProduction": {
+    "title": "Дневной отчет производства",
+    "date": "Дата",
+    "metrics": {
+      "totalConsumed": "Всего израсходовано",
+      "totalDefective": "Всего дефектов",
+      "defectRate": "Процент дефекта %"
+    },
+    "columns": {
+      "time": "Время",
+      "machine": "Станок",
+      "product": "Товар",
+      "qty": "Кол-во",
+      "operator": "Оператор"
+    }
+  },
+  "ReportsDefects": {
+    "title": "Отчет по дефектам",
+    "subtitle": "Последние дефектные позиции и распределение причин.",
+    "metrics": {
+      "totalDefects": "Всего дефектов",
+      "vendorFault": "Вина поставщика",
+      "internalFault": "Внутренняя вина",
+      "topProduct": "Топ товар"
+    },
+    "columns": {
+      "report": "Отчет#",
+      "date": "Дата",
+      "product": "Товар",
+      "reason": "Причина",
+      "faultType": "Тип причины",
+      "qty": "Кол-во",
+      "machine": "Станок"
+    },
+    "faultType": {
+      "VENDOR": "Поставщик",
+      "INTERNAL": "Внутренний"
+    }
+  },
+  "ReportsQbo": {
+    "title": "QBO Экспорт",
+    "subtitle": "CSV-превью для корректировок/списаний дефектов.",
+    "copyHint": "Скопируйте этот CSV в процесс импорта QuickBooks."
   }
 }

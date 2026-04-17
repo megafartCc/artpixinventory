@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 type SettingsMap = Record<string, string>;
 
@@ -17,6 +18,8 @@ export function SystemSettingsClient({
   locationOptions: Array<{ id: string; name: string }>;
   erpixApiKeyMasked: string;
 }) {
+  const t = useTranslations("Settings");
+  const tc = useTranslations("CommonExtended");
   const router = useRouter();
   const [form, setForm] = useState<SettingsMap>(initialValues);
   const [saving, setSaving] = useState(false);
@@ -36,28 +39,28 @@ export function SystemSettingsClient({
     setSaving(false);
 
     if (!response.ok) {
-      setMessage(payload.error ?? "Failed to save settings.");
+      setMessage(payload.error ?? t("errors.saveFailed"));
       return;
     }
 
-    setMessage(payload.message ?? "Settings saved.");
+    setMessage(payload.message ?? t("saved"));
     router.refresh();
   };
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="text-xl font-semibold text-slate-900">System Settings</h2>
-      <p className="mt-1 text-sm text-slate-500">Admin-only configuration for receiving, numbering, Slack, and ERPIX.</p>
+      <h2 className="text-xl font-semibold text-slate-900">{t("systemTitle")}</h2>
+      <p className="mt-1 text-sm text-slate-500">{t("systemSubtitle")}</p>
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <label className="space-y-1 text-sm text-slate-600">
-          <span className="font-medium text-slate-700">Default receiving location</span>
+          <span className="font-medium text-slate-700">{t("defaultReceivingLocation")}</span>
           <select
             className={inputClassName}
             value={form.default_receiving_location ?? ""}
             onChange={(event) => setForm((current) => ({ ...current, default_receiving_location: event.target.value }))}
           >
-            <option value="">Select location</option>
+            <option value="">{t("selectLocation")}</option>
             {locationOptions.map((location) => (
               <option key={location.id} value={location.id}>
                 {location.name}
@@ -67,7 +70,7 @@ export function SystemSettingsClient({
         </label>
 
         <label className="space-y-1 text-sm text-slate-600">
-          <span className="font-medium text-slate-700">PO number prefix</span>
+          <span className="font-medium text-slate-700">{t("poPrefix")}</span>
           <input
             className={inputClassName}
             value={form.po_number_prefix ?? ""}
@@ -76,7 +79,7 @@ export function SystemSettingsClient({
         </label>
 
         <label className="space-y-1 text-sm text-slate-600">
-          <span className="font-medium text-slate-700">Slack #inventory-alerts webhook</span>
+          <span className="font-medium text-slate-700">{t("slackInventory")}</span>
           <input
             className={inputClassName}
             value={form.slack_webhook_inventory_alerts ?? ""}
@@ -85,7 +88,7 @@ export function SystemSettingsClient({
         </label>
 
         <label className="space-y-1 text-sm text-slate-600">
-          <span className="font-medium text-slate-700">Slack #purchasing webhook</span>
+          <span className="font-medium text-slate-700">{t("slackPurchasing")}</span>
           <input
             className={inputClassName}
             value={form.slack_webhook_purchasing ?? ""}
@@ -94,7 +97,7 @@ export function SystemSettingsClient({
         </label>
 
         <label className="space-y-1 text-sm text-slate-600">
-          <span className="font-medium text-slate-700">Slack #quality webhook</span>
+          <span className="font-medium text-slate-700">{t("slackQuality")}</span>
           <input
             className={inputClassName}
             value={form.slack_webhook_quality ?? ""}
@@ -103,7 +106,7 @@ export function SystemSettingsClient({
         </label>
 
         <label className="space-y-1 text-sm text-slate-600">
-          <span className="font-medium text-slate-700">Slack #warehouse-ops webhook</span>
+          <span className="font-medium text-slate-700">{t("slackWarehouseOps")}</span>
           <input
             className={inputClassName}
             value={form.slack_webhook_warehouse_ops ?? ""}
@@ -112,7 +115,7 @@ export function SystemSettingsClient({
         </label>
 
         <label className="space-y-1 text-sm text-slate-600 md:col-span-2">
-          <span className="font-medium text-slate-700">Slack #system-errors webhook</span>
+          <span className="font-medium text-slate-700">{t("slackSystemErrors")}</span>
           <input
             className={inputClassName}
             value={form.slack_webhook_system_errors ?? ""}
@@ -121,7 +124,7 @@ export function SystemSettingsClient({
         </label>
 
         <div className="md:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
-          <p className="text-sm text-slate-600">ERPIX API Key (masked):</p>
+          <p className="text-sm text-slate-600">{t("erpixMasked")}</p>
           <p className="mt-1 font-mono text-xs text-slate-800">{erpixApiKeyMasked}</p>
         </div>
       </div>
@@ -135,7 +138,7 @@ export function SystemSettingsClient({
           disabled={saving}
           className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
         >
-          {saving ? "Saving..." : "Save Settings"}
+          {saving ? tc("saving") : t("saveSettings")}
         </button>
       </div>
     </section>
