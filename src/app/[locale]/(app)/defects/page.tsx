@@ -19,6 +19,7 @@ export default async function DefectsPage({
         select: {
           id: true,
           quantity: true,
+          faultType: true,
         },
       },
     },
@@ -39,6 +40,13 @@ export default async function DefectsPage({
         createdAt: defect.createdAt.toISOString().slice(0, 16).replace("T", " "),
         itemCount: defect.items.length,
         totalQuantity: defect.items.reduce((total, item) => total + item.quantity, 0),
+        faultSummary: defect.items.reduce(
+          (summary, item) => {
+            summary[item.faultType] = (summary[item.faultType] ?? 0) + item.quantity;
+            return summary;
+          },
+          {} as Record<string, number>
+        ),
       }))}
     />
   );

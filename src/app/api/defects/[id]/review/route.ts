@@ -81,6 +81,8 @@ export async function POST(
         throw new Error("Defect report has no source location to deduct stock from.");
       }
 
+      let vendorSuggestedCount = 0;
+
       for (const item of report.items) {
         const existing = await tx.stockLevel.findUnique({
           where: {
@@ -110,6 +112,18 @@ export async function POST(
           },
         });
 
+        await tx.stockAdjustment.create({
+          data: {
+            productId: item.productId,
+            locationId: sourceLocationId,
+            previousQty,
+            newQty: nextQty,
+            reason: "DEFECT_SCRAP",
+            notes: `Defect report ${report.reportNumber}`,
+            adjustedById: session.user.id,
+          },
+        });
+
         await tx.activityLog.create({
           data: {
             action: "DEFECT_CONFIRMED",
@@ -132,7 +146,7 @@ export async function POST(
         }
       }
 
-      await tx.defectItem.updateMany({
+      const vendorSuggestionResult = await tx.defectItem.updateMany({
         where: {
           defectReportId: report.id,
           faultType: "VENDOR",
@@ -141,6 +155,8 @@ export async function POST(
           vendorCreditSuggested: true,
         },
       });
+
+      vendorSuggestedCount = vendorSuggestionResult.count;
 
       const confirmed = await tx.defectReport.update({
         where: { id: report.id },
@@ -152,15 +168,29 @@ export async function POST(
         },
       });
 
-      return confirmed;
+      return { confirmed, vendorSuggestedCount };
     });
+
+    if (parsed.data.action === "CONFIRM") {
+      const confirmedResult = result as {
+        confirmed: {
+          id: string;
+        };
+        vendorSuggestedCount: number;
+      };
+
+      return NextResponse.json({
+        data: confirmedResult.confirmed,
+        message:
+          confirmedResult.vendorSuggestedCount > 0
+            ? `Defect report confirmed and stock deducted. Suggest creating vendor credit for ${confirmedResult.vendorSuggestedCount} item(s).`
+            : "Defect report confirmed and stock deducted.",
+      });
+    }
 
     return NextResponse.json({
       data: result,
-      message:
-        parsed.data.action === "CONFIRM"
-          ? "Defect report confirmed and stock deducted."
-          : "Defect report rejected.",
+      message: "Defect report rejected.",
     });
   } catch (error) {
     console.error("POST /api/defects/[id]/review failed", error);

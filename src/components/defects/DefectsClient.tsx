@@ -11,6 +11,7 @@ type DefectRow = {
   createdAt: string;
   itemCount: number;
   totalQuantity: number;
+  faultSummary: Record<string, number>;
 };
 
 export function DefectsClient({
@@ -58,6 +59,7 @@ export function DefectsClient({
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Items</th>
                   <th className="px-4 py-3">Qty</th>
+                  <th className="px-4 py-3">Fault Summary</th>
                   <th className="px-4 py-3">Created By</th>
                   <th className="px-4 py-3">Created</th>
                 </tr>
@@ -65,7 +67,7 @@ export function DefectsClient({
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                 {defects.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-16 text-center text-slate-400">
+                    <td colSpan={8} className="px-4 py-16 text-center text-slate-400">
                       No defect reports yet.
                     </td>
                   </tr>
@@ -81,6 +83,11 @@ export function DefectsClient({
                       </td>
                       <td className="px-4 py-4">{defect.itemCount}</td>
                       <td className="px-4 py-4">{defect.totalQuantity}</td>
+                      <td className="px-4 py-4">
+                        {Object.entries(defect.faultSummary)
+                          .map(([faultType, quantity]) => `${faultType}: ${quantity}`)
+                          .join(" • ") || "-"}
+                      </td>
                       <td className="px-4 py-4">{defect.createdBy}</td>
                       <td className="px-4 py-4">{defect.createdAt}</td>
                     </tr>
