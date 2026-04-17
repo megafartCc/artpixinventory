@@ -1,117 +1,278 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import QRCode from "react-qr-code";
-import { ChevronRight, ChevronDown, Plus, Package, MapPin, Layers, Box, QrCode } from "lucide-react";
-import { Location } from "@prisma/client";
+import {
+  ChevronDown,
+  ChevronRight,
+  MapPin,
+  Pencil,
+  Plus,
+  Power,
+  X,
+} from "lucide-react";
+import { type LocationType } from "@prisma/client";
+import {
+  LOCATION_HIERARCHY_RULES,
+  buildLocationQrCode,
+  collectDescendantIds,
+  flattenLocationsForSelect,
+  locationTypeLabels,
+} from "@/lib/location-utils";
+import { canManageLocations } from "@/lib/permissions";
 
-interface LocationTreeProps {
-  locations: Location[];
-}
+type LocationRecord = {
+  id: string;
+  name: string;
+  type: LocationType;
+  parentId: string | null;
+  qrCode: string | null;
+  description: string | null;
+  active: boolean;
+};
 
-export function LocationManager({ locations }: LocationTreeProps) {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({});
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: "", type: "", description: "" });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+type FormState = {
+  name: string;
+  type: LocationType;
+  parentId: string;
+  description: string;
+  active: boolean;
+};
 
-  // Derive active location
-  const selectedNode = locations.find((l) => l.id === selectedId) || null;
+const inputClassName =
+  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-200";
 
-  const toggleExpand = (id: string, forceExpandState?: boolean) => {
-    setExpandedNodes(prev => ({
-      ...prev,
-      [id]: forceExpandState !== undefined ? forceExpandState : !prev[id]
-    }));
-  };
+const typeBadgeStyles: Record<LocationType, string> = {
+  WAREHOUSE: "bg-slate-900 text-white",
+  ZONE: "bg-blue-100 text-blue-700",
+  SHELF: "bg-cyan-100 text-cyan-700",
+  BIN: "bg-slate-100 text-slate-700",
+  PRODUCTION: "bg-amber-100 text-amber-700",
+  SHIPPING: "bg-indigo-100 text-indigo-700",
+  QUARANTINE: "bg-rose-100 text-rose-700",
+  DEFECTIVE: "bg-red-100 text-red-700",
+  RECEIVING: "bg-emerald-100 text-emerald-700",
+  OTHER: "bg-violet-100 text-violet-700",
+};
 
-  const getIconForType = (type: string) => {
-    switch (type) {
-      case 'WAREHOUSE': return <MapPin className="w-4 h-4 text-emerald-600" />;
-      case 'ZONE': return <Layers className="w-4 h-4 text-orange-500" />;
-      case 'SHELF': return <Package className="w-4 h-4 text-blue-500" />;
-      case 'BIN': return <Box className="w-4 h-4 text-slate-500" />;
-      default: return <MapPin className="w-4 h-4 text-slate-400" />;
+export function LocationManager({
+  locations,
+}: {
+  locations: LocationRecord[];
+}) {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const canManage = canManageLocations(session?.user?.role);
+  const [selectedId, setSelectedId] = useState<string | null>(locations[0]?.id ?? null);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(
+      locations
+        .filter((location) => location.parentId === null)
+        .map((location) => [location.id, true])
+    )
+  );
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<FormState>({
+    name: "",
+    type: "WAREHOUSE",
+    parentId: "",
+    description: "",
+    active: true,
+  });
+  const [feedback, setFeedback] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const selectedLocation =
+    locations.find((location) => location.id === selectedId) ?? null;
+  const flattenedOptions = useMemo(
+    () => flattenLocationsForSelect(locations),
+    [locations]
+  );
+  const selectedLocationAllowedChildren = selectedLocation
+    ? LOCATION_HIERARCHY_RULES[selectedLocation.type]
+    : [];
+
+  const childCount = (locationId: string) =>
+    locations.filter((location) => location.parentId === locationId).length;
+
+  const refresh = () => startTransition(() => router.refresh());
+
+  const availableParentOptions = editingId
+    ? flattenedOptions.filter(
+        (option) =>
+          !collectDescendantIds(locations, editingId).has(option.id) &&
+          option.id !== editingId
+      )
+    : flattenedOptions;
+
+  const resolveAllowedTypes = (parentId: string): LocationType[] => {
+    if (!parentId) {
+      return ["WAREHOUSE"];
     }
+
+    const parent = locations.find((location) => location.id === parentId);
+    return parent ? LOCATION_HIERARCHY_RULES[parent.type] : ["WAREHOUSE"];
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      const res = await fetch("/api/locations", {
-        method: "POST",
+  const allowedTypes = resolveAllowedTypes(form.parentId);
+
+  const openCreate = (parentId?: string) => {
+    const nextParentId = parentId ?? "";
+    const nextAllowedTypes = resolveAllowedTypes(nextParentId);
+    setEditingId(null);
+    setForm({
+      name: "",
+      type: nextAllowedTypes[0],
+      parentId: nextParentId,
+      description: "",
+      active: true,
+    });
+    setDrawerOpen(true);
+    setError("");
+    setFeedback("");
+  };
+
+  const openEdit = (location: LocationRecord) => {
+    setEditingId(location.id);
+    setForm({
+      name: location.name,
+      type: location.type,
+      parentId: location.parentId ?? "",
+      description: location.description ?? "",
+      active: location.active,
+    });
+    setDrawerOpen(true);
+    setError("");
+    setFeedback("");
+  };
+
+  const submit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setError("");
+    setFeedback("");
+
+    const payload = {
+      ...form,
+      parentId: form.parentId || null,
+    };
+
+    const response = await fetch(
+      editingId ? `/api/locations/${editingId}` : "/api/locations",
+      {
+        method: editingId ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name,
-          type: formData.type || (selectedId ? "ZONE" : "WAREHOUSE"),
-          description: formData.description,
-          parentId: selectedId,
-        }),
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        alert("Error: " + errorText);
-        return;
+        body: JSON.stringify(payload),
       }
+    );
 
-      setIsAddOpen(false);
-      setFormData({ name: "", type: "", description: "" });
-      // In a real app we'd trigger a router.refresh() or mutate SWR here.
-      window.location.reload(); 
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
+    const result = (await response.json()) as { error?: string; message?: string };
+    if (!response.ok) {
+      setSubmitting(false);
+      setError(result.error ?? "Save failed.");
+      return;
     }
+
+    setSubmitting(false);
+    setFeedback(result.message ?? "Location saved.");
+    setDrawerOpen(false);
+    refresh();
   };
 
-  // Build the recursive hierarchy rendering function
+  const toggleActive = async (location: LocationRecord) => {
+    const response = await fetch(`/api/locations/${location.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: location.name,
+        type: location.type,
+        parentId: location.parentId,
+        description: location.description ?? "",
+        active: !location.active,
+      }),
+    });
+
+    const result = (await response.json()) as { error?: string; message?: string };
+    if (!response.ok) {
+      setError(result.error ?? "Update failed.");
+      return;
+    }
+
+    setFeedback(result.message ?? "Location updated.");
+    refresh();
+  };
+
+  const toggleExpand = (locationId: string) => {
+    setExpanded((current) => ({ ...current, [locationId]: !current[locationId] }));
+  };
+
   const renderTree = (parentId: string | null = null, depth = 0) => {
-    const children = locations.filter((loc) => loc.parentId === parentId);
-    if (children.length === 0) return null;
+    const items = locations
+      .filter((location) => location.parentId === parentId)
+      .sort((left, right) => left.name.localeCompare(right.name));
+
+    if (items.length === 0) {
+      return null;
+    }
 
     return (
-      <ul className={`flex flex-col space-y-1 ${depth > 0 ? "ml-4 pl-2 border-l border-slate-200 mt-1" : ""}`}>
-        {children.map((child) => {
-          const hasChildren = locations.some((l) => l.parentId === child.id);
-          const isExpanded = !!expandedNodes[child.id];
-          const isSelected = selectedId === child.id;
+      <ul className={`${depth > 0 ? "ml-4 border-l border-slate-200 pl-3" : ""}`}>
+        {items.map((location) => {
+          const hasChildren = childCount(location.id) > 0;
+          const isExpanded = expanded[location.id] ?? depth < 1;
+          const isSelected = selectedId === location.id;
 
           return (
-            <li key={child.id} className="relative">
-              <div 
-                onClick={() => setSelectedId(child.id)}
-                className={`flex items-center gap-2 py-1.5 px-2 text-sm rounded-md cursor-pointer transition-colors ${
-                  isSelected ? "bg-indigo-50 text-indigo-700" : "hover:bg-slate-50 text-slate-700"
+            <li key={location.id} className="py-1">
+              <button
+                onClick={() => setSelectedId(location.id)}
+                className={`flex w-full items-start gap-2 rounded-xl px-3 py-2 text-left transition ${
+                  isSelected
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "hover:bg-slate-100 text-slate-700"
                 }`}
               >
-                {/* Expand Toggle */}
-                <span 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (hasChildren) toggleExpand(child.id);
+                <span
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (hasChildren) {
+                      toggleExpand(location.id);
+                    }
                   }}
-                  className={`w-4 h-4 flex items-center justify-center rounded hover:bg-slate-200 ${!hasChildren && "invisible"}`}
+                  className={`mt-0.5 flex h-5 w-5 items-center justify-center rounded ${
+                    hasChildren ? "hover:bg-white" : "invisible"
+                  }`}
                 >
-                  {isExpanded ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+                  {isExpanded ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
                 </span>
-
-                {getIconForType(child.type)}
-                <span className="font-medium mr-2">{child.name}</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium tracking-wider">
-                  {child.type}
-                </span>
-              </div>
-              
-              {/* Recursive Children Drop */}
-              {hasChildren && isExpanded && (
-                <div className="overflow-hidden">
-                  {renderTree(child.id, depth + 1)}
+                <div className="flex min-w-0 flex-1 flex-col gap-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-medium">{location.name}</span>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${typeBadgeStyles[location.type]}`}
+                    >
+                      {location.type}
+                    </span>
+                    {!location.active && (
+                      <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+                        Inactive
+                      </span>
+                    )}
+                  </div>
+                  <span className="truncate text-xs text-slate-400">
+                    {location.qrCode ?? buildLocationQrCode(location.name)}
+                  </span>
                 </div>
-              )}
+              </button>
+              {hasChildren && isExpanded && renderTree(location.id, depth + 1)}
             </li>
           );
         })}
@@ -119,189 +280,295 @@ export function LocationManager({ locations }: LocationTreeProps) {
     );
   };
 
-  const allowedChildTypes = (parentType: string) => {
-    switch (parentType) {
-       case 'WAREHOUSE': return ['ZONE', 'PRODUCTION', 'SHIPPING', 'QUARANTINE', 'DEFECTIVE', 'RECEIVING', 'OTHER'];
-       case 'ZONE': return ['SHELF', 'BIN', 'OTHER'];
-       case 'SHELF': return ['BIN'];
-       case 'BIN': return [];
-       default: return ['BIN'];
-    }
-  };
-
   return (
-    <div className="flex h-[calc(100vh-12rem)] min-h-[600px] border border-slate-200 rounded-xl bg-white overflow-hidden shadow-sm">
-      
-      {/* Left Pane - Tree View */}
-      <div className="w-1/3 min-w-[300px] border-r border-slate-200 flex flex-col bg-slate-50/50">
-        <div className="p-4 border-b border-slate-200 flex justify-between items-center bg-white">
-          <h2 className="font-semibold text-slate-800">Hierarchy Map</h2>
-          <button 
-            onClick={() => { setSelectedId(null); setIsAddOpen(true); }}
-            className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
-            title="Add Top-Level Warehouse"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="p-4 flex-1 overflow-auto">
-          {locations.length === 0 ? (
-            <div className="text-center p-8 text-slate-400 text-sm border-2 border-dashed border-slate-200 rounded-xl">
-              No mapped locations. Add a Warehouse to originate physical tracking.
-            </div>
-          ) : (
-            renderTree(null, 0)
+    <div className="flex h-[calc(100vh-12rem)] min-h-[640px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="w-full max-w-md border-r border-slate-200 bg-slate-50/60">
+        <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-4">
+          <div>
+            <h2 className="font-semibold text-slate-900">Location Tree</h2>
+            <p className="text-xs text-slate-500">
+              Warehouse {"->"} zone {"->"} shelf {"->"} bin
+            </p>
+          </div>
+          {canManage && (
+            <button
+              onClick={() => openCreate()}
+              className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Root
+            </button>
           )}
         </div>
+        <div className="h-full overflow-y-auto p-4">{renderTree()}</div>
       </div>
 
-      {/* Right Pane - Details */}
-      <div className="flex-1 flex flex-col bg-white">
-        {selectedNode ? (
-          <div className="flex-1 flex flex-col">
-            {/* Context Header */}
-            <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-start">
-               <div>
-                  <div className="flex items-center gap-3 mb-1">
-                     {getIconForType(selectedNode.type)}
-                     <span className="text-xs font-bold tracking-widest text-slate-400 uppercase">{selectedNode.type}</span>
-                  </div>
-                  <h1 className="text-2xl font-bold text-slate-800">{selectedNode.name}</h1>
-                  {selectedNode.description && (
-                    <p className="text-slate-500 mt-2 text-sm max-w-xl">{selectedNode.description}</p>
+      <div className="flex-1 bg-white">
+        {selectedLocation ? (
+          <div className="flex h-full flex-col">
+            <div className="flex items-start justify-between border-b border-slate-200 px-8 py-6">
+              <div>
+                <div className="flex items-center gap-3">
+                  <MapPin className="h-5 w-5 text-slate-400" />
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${typeBadgeStyles[selectedLocation.type]}`}
+                  >
+                    {locationTypeLabels[selectedLocation.type]}
+                  </span>
+                  {!selectedLocation.active && (
+                    <span className="rounded-full bg-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                      Inactive
+                    </span>
                   )}
-               </div>
-               
-               <div className="flex gap-2 text-sm">
-                  <button className="px-4 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 font-medium transition-colors">
-                    Edit Location
+                </div>
+                <h1 className="mt-3 text-3xl font-bold text-slate-900">
+                  {selectedLocation.name}
+                </h1>
+                <p className="mt-2 max-w-2xl text-sm text-slate-500">
+                  {selectedLocation.description || "No location description yet."}
+                </p>
+              </div>
+
+              {canManage && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => openEdit(selectedLocation)}
+                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                  >
+                    <Pencil className="h-4 w-4" />
+                    Edit
                   </button>
-                  {allowedChildTypes(selectedNode.type).length > 0 && (
-                    <button 
-                      onClick={() => setIsAddOpen(true)}
-                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm font-medium transition-colors flex items-center gap-2"
+                  {selectedLocationAllowedChildren.length > 0 && (
+                    <button
+                      onClick={() => openCreate(selectedLocation.id)}
+                      className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
                     >
-                      <Plus className="w-4 h-4" /> Add Child
+                      <Plus className="h-4 w-4" />
+                      Add Child
                     </button>
                   )}
-               </div>
+                </div>
+              )}
             </div>
 
-            {/* Dashboard grid for this location */}
-            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 flex-1 overflow-auto bg-slate-50/50">
-               {/* Identity Card */}
-               <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col items-center">
-                  <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-6 flex items-center gap-2 w-full border-b border-slate-100 pb-4">
-                    <QrCode className="w-4 h-4 text-indigo-500" /> Print Identity Label
-                  </h3>
-                  
-                  <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-inner max-w-[200px] w-full aspect-square flex items-center justify-center mb-4">
-                     <QRCode 
-                        value={selectedNode.qrCode || selectedNode.id} 
-                        size={160}
-                        style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                     />
-                  </div>
-                  <p className="text-xs text-slate-500 font-mono bg-slate-100 px-3 py-1.5 rounded-md">
-                     {selectedNode.qrCode || "No QR generated"}
-                  </p>
-                  <button className="mt-6 w-full py-2 bg-slate-800 hover:bg-slate-900 text-white text-sm font-medium rounded-lg transition-colors">
-                    Send to Thermal Printer (USB)
-                  </button>
-               </div>
+            {(error || feedback) && (
+              <div
+                className={`mx-8 mt-6 rounded-xl border px-4 py-3 text-sm ${
+                  error
+                    ? "border-rose-200 bg-rose-50 text-rose-700"
+                    : "border-emerald-200 bg-emerald-50 text-emerald-700"
+                }`}
+              >
+                {error || feedback}
+              </div>
+            )}
 
-               {/* Metrics Placeholder */}
-               <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-                  <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-6 border-b border-slate-100 pb-4">
-                    Location Metrics
-                  </h3>
-                  <div className="flex flex-col gap-4 text-center items-center justify-center h-48 text-slate-400">
-                     <Package className="w-8 h-8 opacity-50 mb-2" />
-                     <p className="text-sm">Stock levels will manifest here once Transfer Engine is online.</p>
+            <div className="grid flex-1 gap-6 p-8 lg:grid-cols-[0.95fr_1.05fr]">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                <h2 className="text-lg font-semibold text-slate-900">QR Identity</h2>
+                <div className="mt-5 flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <QRCode
+                    value={selectedLocation.qrCode ?? buildLocationQrCode(selectedLocation.name)}
+                    size={180}
+                    style={{ height: "auto", width: "100%", maxWidth: 180 }}
+                  />
+                  <div className="mt-4 rounded-lg bg-slate-100 px-3 py-2 font-mono text-xs text-slate-600">
+                    {selectedLocation.qrCode ?? buildLocationQrCode(selectedLocation.name)}
                   </div>
-               </div>
+                </div>
+                <div className="mt-6 space-y-3 text-sm text-slate-600">
+                  <p>
+                    <strong>Children:</strong> {childCount(selectedLocation.id)}
+                  </p>
+                  <p>
+                    <strong>Parent:</strong>{" "}
+                    {locations.find(
+                      (location) => location.id === selectedLocation.parentId
+                    )?.name ?? "Top level"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 className="text-lg font-semibold text-slate-900">Management</h2>
+                <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Type
+                    </p>
+                    <p className="mt-2 text-base font-semibold text-slate-900">
+                      {locationTypeLabels[selectedLocation.type]}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Status
+                    </p>
+                    <p className="mt-2 text-base font-semibold text-slate-900">
+                      {selectedLocation.active ? "Active" : "Inactive"}
+                    </p>
+                  </div>
+                </div>
+
+                {canManage && (
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <button
+                      onClick={() => openEdit(selectedLocation)}
+                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                    >
+                      <Pencil className="h-4 w-4" />
+                      Edit Location
+                    </button>
+                    <button
+                      onClick={() => toggleActive(selectedLocation)}
+                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                    >
+                      <Power className="h-4 w-4" />
+                      {selectedLocation.active ? "Deactivate" : "Reactivate"}
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-slate-400">
-             <MapPin className="w-12 h-12 mb-4 opacity-50 text-indigo-300" />
-             <h3 className="text-lg font-medium text-slate-600">No Location Selected</h3>
-             <p className="text-sm mt-1 max-w-sm text-center">Click a node on the layout tree to view capabilities, scan QR mappings, or append sub-locations.</p>
+          <div className="flex h-full items-center justify-center text-slate-400">
+            Select a location to inspect and manage it.
           </div>
         )}
       </div>
 
-      {/* Creation Modal (Very naive implementation for speed) */}
-      {isAddOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md border border-slate-100 overflow-hidden">
-             <div className="bg-slate-50 px-6 py-4 border-b border-slate-100">
-               <h3 className="text-lg font-bold text-slate-800">
-                 {selectedId && selectedNode ? `Add component into ${selectedNode.name}` : "Establish Top-Level Warehouse"}
-               </h3>
-             </div>
-             
-             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-               <div>
-                 <label className="block text-sm font-medium text-slate-700 mb-1">Entity Name</label>
-                 <input 
-                   required
-                   type="text" 
-                   value={formData.name}
-                   onChange={e => setFormData({ ...formData, name: e.target.value })}
-                   className="w-full px-4 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                   placeholder="e.g. Rack A7 or Central Warehouse"
-                 />
-               </div>
+      {drawerOpen && (
+        <div className="fixed inset-0 z-[70] flex justify-end bg-slate-950/35">
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(false)}
+            className="h-full flex-1 cursor-default"
+          />
+          <div className="flex h-full w-full max-w-lg flex-col border-l border-slate-200 bg-white shadow-2xl">
+            <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900">
+                  {editingId ? "Edit Location" : "Create Location"}
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  QR codes are generated automatically from the location name.
+                </p>
+              </div>
+              <button
+                onClick={() => setDrawerOpen(false)}
+                className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
-               <div>
-                 <label className="block text-sm font-medium text-slate-700 mb-1">Entity Type</label>
-                 <select
-                   required
-                   value={formData.type}
-                   onChange={e => setFormData({ ...formData, type: e.target.value })}
-                   className="w-full px-4 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                 >
-                   <option value="" disabled>Select scale format...</option>
-                   {!selectedId ? (
-                      <option value="WAREHOUSE">Primary Warehouse</option>
-                   ) : (
-                      allowedChildTypes(selectedNode!.type).map(t => (
-                        <option key={t} value={t}>{t}</option>
-                      ))
-                   )}
-                 </select>
-               </div>
+            <form onSubmit={submit} className="flex flex-1 flex-col">
+              <div className="grid flex-1 gap-5 overflow-y-auto px-6 py-5">
+                <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
+                  <span>Name</span>
+                  <input
+                    value={form.name}
+                    onChange={(event) =>
+                      setForm((current) => ({ ...current, name: event.target.value }))
+                    }
+                    className={inputClassName}
+                    required
+                  />
+                </label>
 
-               <div>
-                 <label className="block text-sm font-medium text-slate-700 mb-1">Description (Optional)</label>
-                 <textarea 
-                   rows={3}
-                   value={formData.description}
-                   onChange={e => setFormData({ ...formData, description: e.target.value })}
-                   className="w-full px-4 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none"
-                   placeholder="A brief layout description..."
-                 />
-               </div>
+                <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
+                  <span>Parent</span>
+                  <select
+                    value={form.parentId}
+                    onChange={(event) => {
+                      const nextParentId = event.target.value;
+                      const nextAllowedTypes = resolveAllowedTypes(nextParentId);
+                      setForm((current) => ({
+                        ...current,
+                        parentId: nextParentId,
+                        type: nextAllowedTypes.includes(current.type)
+                          ? current.type
+                          : nextAllowedTypes[0],
+                      }));
+                    }}
+                    className={inputClassName}
+                  >
+                    <option value="">Top level</option>
+                    {availableParentOptions.map((option) => (
+                      <option key={option.id} value={option.id}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
 
-               <div className="pt-4 flex justify-end gap-3 border-t border-slate-100">
-                  <button 
-                    type="button" 
-                    onClick={() => setIsAddOpen(false)}
-                    className="px-4 py-2 text-slate-600 hover:bg-slate-50 font-medium rounded-lg transition-colors text-sm"
+                <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
+                  <span>Type</span>
+                  <select
+                    value={form.type}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        type: event.target.value as LocationType,
+                      }))
+                    }
+                    className={inputClassName}
+                  >
+                    {allowedTypes.map((type) => (
+                      <option key={type} value={type}>
+                        {locationTypeLabels[type]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
+                  <span>Description</span>
+                  <textarea
+                    value={form.description}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        description: event.target.value,
+                      }))
+                    }
+                    className={`${inputClassName} min-h-28 resize-y`}
+                  />
+                </label>
+
+                <label className="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={form.active}
+                    onChange={(event) =>
+                      setForm((current) => ({ ...current, active: event.target.checked }))
+                    }
+                  />
+                  Active
+                </label>
+              </div>
+
+              <div className="border-t border-slate-200 px-6 py-4">
+                <div className="flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setDrawerOpen(false)}
+                    className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
                   >
                     Cancel
                   </button>
-                  <button 
-                    type="submit" 
-                    disabled={isSubmitting}
-                    className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors text-sm shadow-sm disabled:opacity-50"
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                   >
-                    {isSubmitting ? "Committing..." : "Forge Entity"}
+                    {editingId ? "Save Changes" : "Create Location"}
                   </button>
-               </div>
-             </form>
-           </div>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

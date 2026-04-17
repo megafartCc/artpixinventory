@@ -1,6 +1,7 @@
 "use client";
 
 import { startTransition, useDeferredValue, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Loader2, PackagePlus, Pencil, Power, Search, X } from "lucide-react";
@@ -255,12 +256,23 @@ export function ProductsClient({
             <h1 className="text-2xl font-bold text-slate-900">Products</h1>
             <p className="mt-1 text-slate-500">Interactive catalog with live create, edit, and deactivate actions.</p>
           </div>
-          {canManageProducts && (
-            <button onClick={openCreate} className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800">
-              <PackagePlus className="h-4 w-4" />
-              Add Product
-            </button>
-          )}
+          <div className="flex flex-wrap gap-3">
+            <Link href="../indexes" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
+              Indexes
+            </Link>
+            <Link href="../categories" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
+              Categories
+            </Link>
+            <Link href="./import" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
+              CSV Import
+            </Link>
+            {canManageProducts && (
+              <button onClick={openCreate} className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800">
+                <PackagePlus className="h-4 w-4" />
+                Add Product
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-4">

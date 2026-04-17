@@ -1,70 +1,119 @@
-import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import prisma from '@/lib/prisma';
-import { LocationType } from '@prisma/client';
+import { NextResponse } from "next/server";
+import { Prisma, type LocationType } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { z } from "zod";
+import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import {
+  LOCATION_HIERARCHY_RULES,
+  buildLocationQrCode,
+} from "@/lib/location-utils";
+import { canManageLocations } from "@/lib/permissions";
 
-const HIERARCHY_RULES: Record<LocationType, LocationType[]> = {
-  WAREHOUSE: ['ZONE', 'PRODUCTION', 'SHIPPING', 'QUARANTINE', 'DEFECTIVE', 'RECEIVING', 'OTHER'],
-  ZONE: ['SHELF', 'BIN', 'OTHER'],
-  SHELF: ['BIN'],
-  BIN: [],
-  PRODUCTION: ['BIN'], // E.g., machine buffer bins
-  SHIPPING: ['BIN'],
-  QUARANTINE: ['BIN'],
-  DEFECTIVE: ['BIN'],
-  RECEIVING: ['BIN'],
-  OTHER: ['OTHER', 'BIN'],
+const emptyToNull = (value: unknown) => {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (typeof value === "string" && value.trim() === "") {
+    return null;
+  }
+
+  return value;
 };
+
+const locationMutationSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(191),
+  type: z.string().trim().min(1, "Type is required"),
+  parentId: z.preprocess(emptyToNull, z.string().trim().nullable()),
+  description: z.preprocess(
+    emptyToNull,
+    z.string().trim().max(1000).nullable()
+  ),
+  active: z.boolean().default(true),
+});
+
+async function getUniqueQrCode(name: string) {
+  let suffix = 0;
+
+  while (suffix < 100) {
+    const candidate = buildLocationQrCode(name, suffix);
+    const existing = await prisma.location.findUnique({
+      where: { qrCode: candidate },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      return candidate;
+    }
+
+    suffix += 1;
+  }
+
+  throw new Error("Unable to generate a unique QR code.");
+}
 
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) return new NextResponse("Unauthorized", { status: 401 });
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const locations = await prisma.location.findMany({
-      orderBy: { name: 'asc' }
+      orderBy: { name: "asc" },
     });
 
-    return NextResponse.json(locations);
+    return NextResponse.json({ data: locations });
   } catch (error) {
     console.error("[LOCATIONS_GET]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    return NextResponse.json({ error: "Internal error." }, { status: 500 });
   }
 }
 
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || ((session.user as { role?: string })?.role !== 'ADMIN' && (session.user as { role?: string })?.role !== 'MANAGER')) {
-      return new NextResponse("Forbidden", { status: 403 });
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!canManageLocations(session.user.role)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const body = await req.json();
-    const { name, type, parentId, description } = body;
+    const parsed = locationMutationSchema.safeParse(body);
 
-    if (!name || !type) {
-      return new NextResponse("Missing required fields", { status: 400 });
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? "Invalid payload." },
+        { status: 400 }
+      );
     }
 
-    // Validate Hierarchy
+    const { name, type, parentId, description, active } = parsed.data;
+
     if (parentId) {
       const parent = await prisma.location.findUnique({ where: { id: parentId } });
-      if (!parent) return new NextResponse("Parent not found", { status: 404 });
+      if (!parent) {
+        return NextResponse.json({ error: "Parent not found." }, { status: 404 });
+      }
 
-      const allowedChildren = HIERARCHY_RULES[parent.type as LocationType] || [];
+      const allowedChildren =
+        LOCATION_HIERARCHY_RULES[parent.type as LocationType] ?? [];
       if (!allowedChildren.includes(type as LocationType)) {
-        return new NextResponse(`Invalid hierarchy: Cannot place ${type} inside ${parent.type}`, { status: 400 });
+        return NextResponse.json(
+          { error: `Invalid hierarchy: cannot place ${type} inside ${parent.type}.` },
+          { status: 400 }
+        );
       }
-    } else {
-      // Must be a top-level WAREHOUSE if there's no parent, though we could allow isolated zones if needed.
-      if (type !== 'WAREHOUSE') {
-         return new NextResponse("Top-level locations must be of type WAREHOUSE", { status: 400 });
-      }
+    } else if (type !== "WAREHOUSE") {
+      return NextResponse.json(
+        { error: "Top-level locations must be of type WAREHOUSE." },
+        { status: 400 }
+      );
     }
-
-    // Generate unique generic QR code prefix string (usually we would generate this, e.g. LOC-XYZ)
-    const qrCodeString = `LOC-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
 
     const location = await prisma.location.create({
       data: {
@@ -72,13 +121,26 @@ export async function POST(req: Request) {
         type: type as LocationType,
         parentId,
         description,
-        qrCode: qrCodeString,
-      }
+        active,
+        qrCode: await getUniqueQrCode(name),
+      },
     });
 
-    return NextResponse.json(location);
+    return NextResponse.json(
+      { data: location, message: "Location created." },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("[LOCATIONS_POST]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return NextResponse.json(
+        { error: "A sibling location with this name already exists." },
+        { status: 409 }
+      );
+    }
+    return NextResponse.json({ error: "Internal error." }, { status: 500 });
   }
 }

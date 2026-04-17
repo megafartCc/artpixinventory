@@ -1,11 +1,68 @@
-export default function MachinesPage() {
+import { unstable_noStore as noStore } from "next/cache";
+import prisma from "@/lib/prisma";
+import { MachinesClient } from "@/components/machines/MachinesClient";
+import {
+  collectDescendantIds,
+  flattenLocationsForSelect,
+} from "@/lib/location-utils";
+
+export default async function MachinesPage({
+  params,
+}: {
+  params: { locale: string };
+}) {
+  noStore();
+
+  const [machines, locations] = await Promise.all([
+    prisma.machine.findMany({
+      orderBy: { name: "asc" },
+      include: {
+        location: {
+          select: { id: true, name: true },
+        },
+      },
+    }),
+    prisma.location.findMany({
+      where: { active: true },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, parentId: true, type: true },
+    }),
+  ]);
+
+  const flattenedLocations = flattenLocationsForSelect(locations);
+  const productionRootIds = locations
+    .filter((location) => location.type === "PRODUCTION")
+    .map((location) => location.id);
+  const allowedLocationIds = new Set<string>(productionRootIds);
+
+  for (const rootId of productionRootIds) {
+    for (const descendantId of Array.from(
+      collectDescendantIds(locations, rootId)
+    )) {
+      allowedLocationIds.add(descendantId);
+    }
+  }
+
   return (
-    <div className="p-6 lg:p-8">
-      <h1 className="text-2xl font-bold text-slate-800">Machines</h1>
-      <p className="text-slate-500 mt-1">Machine monitoring — Coming in Session 6</p>
-      <div className="mt-8 bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-400">
-        <p>STN and Vitro machine status, consumption tracking will be built here.</p>
-      </div>
-    </div>
+    <MachinesClient
+      locale={params.locale}
+      initialMachines={machines.map((machine) => ({
+        id: machine.id,
+        name: machine.name,
+        type: machine.type,
+        erpixMachineId: machine.erpixMachineId,
+        active: machine.active,
+        notes: machine.notes,
+        locationId: machine.location.id,
+        locationName: machine.location.name,
+      }))}
+      locationOptions={flattenedLocations
+        .filter((location) => allowedLocationIds.has(location.id))
+        .map((location) => ({
+          id: location.id,
+          label: location.label,
+          type: location.type,
+        }))}
+    />
   );
 }
