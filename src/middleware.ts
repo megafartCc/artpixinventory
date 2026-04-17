@@ -10,6 +10,12 @@ const publicPages = ['/login'];
 export default async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
 
+  if (pathname === "/uk" || pathname.startsWith("/uk/")) {
+    const redirected = new URL(req.url);
+    redirected.pathname = pathname.replace("/uk", "/ua");
+    return NextResponse.redirect(redirected);
+  }
+
   // Check if this is a public page (strip locale prefix for matching)
   const pathnameWithoutLocale = routing.locales.reduce(
     (path, locale) => path.replace(`/${locale}`, ''),
@@ -43,5 +49,5 @@ export default async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/(en|ru|uk)/:path*', '/((?!api|_next|_vercel|.*\\..*).*)']
+  matcher: ['/', '/(en|ru|ua)/:path*', '/((?!api|_next|_vercel|.*\\..*).*)']
 };

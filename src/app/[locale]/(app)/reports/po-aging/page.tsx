@@ -1,0 +1,88 @@
+import { unstable_noStore as noStore } from "next/cache";
+import { POStatus } from "@prisma/client";
+import { getTranslations } from "next-intl/server";
+import prisma from "@/lib/prisma";
+
+function daysBetween(date: Date, from = new Date()) {
+  return Math.floor((from.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+export default async function PoAgingReportPage({ params }: { params: { locale: string } }) {
+  noStore();
+  const t = await getTranslations({ locale: params.locale, namespace: "ReportsPoAging" });
+
+  const openPoStatuses: POStatus[] = ["PENDING_APPROVAL", "APPROVED", "ORDERED", "PARTIALLY_RECEIVED"];
+
+  const orders = await prisma.purchaseOrder.findMany({
+    where: { status: { in: openPoStatuses } },
+    orderBy: { orderDate: "asc" },
+  });
+
+  const vendorIds = Array.from(new Set(orders.map((order) => order.vendorId)));
+  const vendors = await prisma.vendor.findMany({
+    where: { id: { in: vendorIds } },
+    select: { id: true, name: true },
+  });
+  const vendorById = new Map(vendors.map((vendor) => [vendor.id, vendor.name]));
+
+  const rows = orders
+    .map((order) => {
+      const daysInStatus = daysBetween(order.updatedAt);
+      const overdueDays = order.expectedDate ? Math.max(0, daysBetween(order.expectedDate)) : 0;
+      return {
+        id: order.id,
+        poNumber: order.poNumber,
+        vendorName: vendorById.get(order.vendorId) ?? order.vendorId,
+        status: order.status,
+        orderDate: order.orderDate.toISOString().slice(0, 10),
+        expectedDate: order.expectedDate?.toISOString().slice(0, 10) ?? "-",
+        daysInStatus,
+        overdueDays,
+      };
+    })
+    .sort((a, b) => b.overdueDays - a.overdueDays);
+
+  return (
+    <div className="p-6 lg:p-8">
+      <div className="mx-auto max-w-7xl space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
+          <p className="mt-1 text-slate-500">{t("subtitle")}</p>
+        </div>
+
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200 text-sm">
+              <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th className="px-4 py-3">{t("columns.po")}</th>
+                  <th className="px-4 py-3">{t("columns.vendor")}</th>
+                  <th className="px-4 py-3">{t("columns.status")}</th>
+                  <th className="px-4 py-3">{t("columns.orderDate")}</th>
+                  <th className="px-4 py-3">{t("columns.expectedDate")}</th>
+                  <th className="px-4 py-3">{t("columns.daysInStatus")}</th>
+                  <th className="px-4 py-3">{t("columns.overdue")}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-slate-700">
+                {rows.map((row) => (
+                  <tr key={row.id}>
+                    <td className="px-4 py-3">{row.poNumber}</td>
+                    <td className="px-4 py-3">{row.vendorName}</td>
+                    <td className="px-4 py-3">{row.status}</td>
+                    <td className="px-4 py-3">{row.orderDate}</td>
+                    <td className="px-4 py-3">{row.expectedDate}</td>
+                    <td className="px-4 py-3">{row.daysInStatus}</td>
+                    <td className={`px-4 py-3 font-medium ${row.overdueDays > 0 ? "text-red-600" : "text-slate-500"}`}>
+                      {row.overdueDays}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

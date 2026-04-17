@@ -23,6 +23,10 @@ import {
   Boxes,
   Users,
   FileText,
+  Printer,
+  Factory,
+  BarChart3,
+  Receipt,
 } from "lucide-react";
 
 const navItems = [
@@ -36,6 +40,10 @@ const navItems = [
   { key: "receiving", href: "/receiving", icon: Truck },
   { key: "transfers", href: "/transfers", icon: ArrowLeftRight },
   { key: "defects", href: "/defects", icon: AlertTriangle },
+  { key: "labels", href: "/labels", icon: Printer },
+  { key: "production", href: "/production", icon: Factory },
+  { key: "credits", href: "/credits", icon: Receipt },
+  { key: "reports", href: "/reports", icon: BarChart3 },
   { key: "settings", href: "/settings", icon: Settings },
 ];
 
@@ -158,7 +166,7 @@ export function AppShell({
           <div className="flex items-center gap-3">
             {/* Locale Switcher */}
             <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-0.5">
-              {["en", "ru", "uk"].map((loc) => (
+              {["en", "ru", "ua"].map((loc) => (
                 <Link
                   key={loc}
                   href={`/${loc}${pathname}`}

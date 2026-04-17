@@ -10,16 +10,338 @@
     "receiving": "Receiving",
     "transfers": "Transfers",
     "defects": "Defects",
-    "settings": "Settings"
+    "settings": "Settings",
+    "labels": "Labels",
+    "production": "Production",
+    "reports": "Reports",
+    "credits": "Credits"
   },
   "Dashboard": {
-    "title": "Welcome to ArtPix 3D",
-    "description": "Warehouse Management System"
+    "title": "Dashboard",
+    "description": "Operational summary and active alerts.",
+    "totalProducts": "Total Products",
+    "lowStock": "Low Stock Alerts",
+    "openPos": "Open POs",
+    "pendingDefects": "Pending Defects",
+    "recentActivity": "Recent Activity",
+    "activeOps": "Active Operations",
+    "lowStockItems": "Low stock items",
+    "noLowStockAlerts": "No low stock alerts.",
+    "min": "min",
+    "overduePo": "Overdue purchase orders",
+    "noOverduePo": "No overdue POs.",
+    "expected": "expected",
+    "wrongLocationEvents": "Wrong-location events",
+    "noWrongLocationEvents": "No recent wrong-location events.",
+    "qty": "qty",
+    "by": "by",
+    "at": "at",
+    "system": "System",
+    "activeCountSessions": "Active count sessions",
+    "activeTransfers": "Active transfers"
   },
   "Common": {
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit"
+  },
+  "CommonExtended": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "save": "Save",
+    "remove": "Remove",
+    "addItem": "Add Item",
+    "syncNow": "Sync Now",
+    "saving": "Saving..."
+  },
+  "Credits": {
+    "title": "Vendor Credits",
+    "subtitle": "Track supplier credit claims and lifecycle.",
+    "new": "New Credit",
+    "newTitle": "New Vendor Credit",
+    "vendor": "Vendor",
+    "linkedPo": "Linked PO (optional)",
+    "reason": "Reason",
+    "notes": "Notes",
+    "lineItems": "Line Items",
+    "create": "Create Credit",
+    "status": "Status",
+    "set": "Set",
+    "detailBack": "Back to Credits",
+    "none": "None",
+    "selectProduct": "Select product",
+    "qty": "Qty",
+    "unitCost": "Unit Cost",
+    "noNotes": "No notes.",
+    "columns": {
+      "credit": "Credit#",
+      "po": "PO#",
+      "total": "Total",
+      "date": "Date",
+      "product": "Product",
+      "qty": "Qty",
+      "unitCost": "Unit Cost",
+      "notes": "Notes"
+    },
+    "errors": {
+      "updateStatus": "Failed to update status."
+    }
+  },
+  "Production": {
+    "title": "Production Queue",
+    "subtitle": "Placeholder ERPIX-driven restock requirements per machine.",
+    "lastSynced": "Last synced",
+    "noRows": "No production queue records yet. Click “Sync Now” to generate placeholder data.",
+    "machine": "Machine",
+    "product": "Product",
+    "needed": "Needed",
+    "inStock": "In Stock",
+    "status": "Status",
+    "sufficient": "Sufficient",
+    "restock": "Restock Needed",
+    "syncing": "Syncing...",
+    "errors": {
+      "syncFailed": "Failed to sync production queue."
+    }
+  },
+  "Reports": {
+    "title": "Reports",
+    "subtitle": "Select a report below."
+  },
+  "Defects": {
+    "title": "Defects",
+    "subtitle": "Batch defect reporting for pre-production and production workflows.",
+    "reviewQueue": "Review Queue",
+    "newReport": "New Defect Report",
+    "empty": "No defect reports yet.",
+    "columns": {
+      "report": "Report",
+      "source": "Source",
+      "status": "Status",
+      "items": "Items",
+      "qty": "Qty",
+      "faultSummary": "Fault Summary",
+      "createdBy": "Created By",
+      "created": "Created"
+    },
+    "source": {
+      "PRE_PRODUCTION": "Pre-production",
+      "PRODUCTION": "Production"
+    },
+    "status": {
+      "PENDING_REVIEW": "Pending Review",
+      "CONFIRMED": "Confirmed",
+      "REJECTED": "Rejected"
+    },
+    "faultType": {
+      "VENDOR": "Vendor",
+      "INTERNAL": "Internal"
+    }
+  },
+  "DefectReview": {
+    "title": "Defect Review Queue",
+    "subtitle": "Confirm reports to deduct stock and flag vendor credit suggestions.",
+    "back": "Back to Defects",
+    "empty": "No reports waiting for review.",
+    "sourceLabel": "Source",
+    "createdBy": "Created by",
+    "machine": "Machine",
+    "fromLocation": "From location",
+    "reject": "Reject",
+    "confirm": "Confirm",
+    "columns": {
+      "product": "Product",
+      "reason": "Reason",
+      "faultType": "Fault Type",
+      "qty": "Qty"
+    },
+    "faultType": {
+      "VENDOR": "Vendor",
+      "INTERNAL": "Internal"
+    },
+    "source": {
+      "PRE_PRODUCTION": "Pre-production",
+      "PRODUCTION": "Production"
+    },
+    "errors": {
+      "reviewFailed": "Review action failed."
+    }
+  },
+  "DefectForm": {
+    "back": "Back to Defects",
+    "title": "New Defect Report",
+    "subtitle": "Submit a batch defect report for manager review.",
+    "source": "Source",
+    "sourceOptions": {
+      "preProduction": "Pre-production",
+      "production": "Production"
+    },
+    "machine": "Machine",
+    "selectMachine": "Select machine",
+    "fromLocation": "From location",
+    "selectLocation": "Select location",
+    "defectiveLocation": "Defective holding location",
+    "erpixOrderId": "ERPIX Order ID (optional)",
+    "operatorName": "Operator name (optional)",
+    "notes": "Notes",
+    "itemsTitle": "Defect Items",
+    "selectProduct": "Select product",
+    "selectReason": "Select reason",
+    "qty": "Qty",
+    "itemNotes": "Item notes",
+    "submitting": "Submitting...",
+    "submit": "Submit for Review",
+    "faultType": {
+      "VENDOR": "Vendor",
+      "INTERNAL": "Internal"
+    },
+    "errors": {
+      "createFailed": "Failed to create defect report."
+    }
+  },
+  "Labels": {
+    "title": "Label Printing",
+    "subtitle": "Generate ZPL for product barcode, location QR, and pallet labels.",
+    "tabs": {
+      "products": "Product Labels",
+      "locations": "Location Labels",
+      "pallets": "Pallet Labels"
+    },
+    "selectProducts": "Select products and quantity per product.",
+    "selectLocations": "Select locations to print QR labels.",
+    "recentPallets": "Recent READY pallets:",
+    "previewTitle": "ZPL Preview",
+    "copyZpl": "Copy ZPL",
+    "previewEmpty": "Select items above to generate ZPL preview."
+  },
+  "Settings": {
+    "title": "Settings",
+    "subtitle": "System configuration and lookup tables.",
+    "accessDenied": "Admin access is required to view settings.",
+    "notConfigured": "Not configured",
+    "systemTitle": "System Settings",
+    "systemSubtitle": "Admin-only configuration for receiving, numbering, Slack, and ERPIX.",
+    "defaultReceivingLocation": "Default receiving location",
+    "selectLocation": "Select location",
+    "poPrefix": "PO number prefix",
+    "slackInventory": "Slack #inventory-alerts webhook",
+    "slackPurchasing": "Slack #purchasing webhook",
+    "slackQuality": "Slack #quality webhook",
+    "slackWarehouseOps": "Slack #warehouse-ops webhook",
+    "slackSystemErrors": "Slack #system-errors webhook",
+    "erpixMasked": "ERPIX API Key (masked):",
+    "saveSettings": "Save Settings",
+    "saved": "Settings saved.",
+    "reasonsTitle": "Defect Reasons",
+    "reasonsSubtitle": "Synced/manual reasons used in defect reporting and review.",
+    "syncFromErpix": "Sync from ERPIX",
+    "syncing": "Syncing...",
+    "reasonsSynced": "Defect reasons synced.",
+    "columns": {
+      "reason": "Reason",
+      "faultType": "Fault Type",
+      "erpixId": "ERPIX ID"
+    },
+    "noActiveReasons": "No active defect reasons found.",
+    "errors": {
+      "saveFailed": "Failed to save settings.",
+      "syncReasonsFailed": "Failed to sync defect reasons."
+    }
+  },
+  "ReportsHub": {
+    "title": "Reports",
+    "subtitle": "Select a report below.",
+    "cards": {
+      "stock": {
+        "title": "Stock Levels",
+        "description": "Current stock by location, index, and category."
+      },
+      "poAging": {
+        "title": "PO Aging",
+        "description": "Open purchase orders, age, and overdue visibility."
+      },
+      "defects": {
+        "title": "Defects",
+        "description": "Defect trends and vendor/internal split."
+      },
+      "production": {
+        "title": "Production Daily",
+        "description": "Machine consumption with defect rate."
+      },
+      "qbo": {
+        "title": "QBO Export",
+        "description": "CSV export for accounting and inventory cost flow."
+      }
+    }
+  },
+  "ReportsStockLevels": {
+    "title": "Stock Levels Report",
+    "subtitle": "Current stock snapshot (first 500 rows).",
+    "columns": {
+      "compoundId": "Compound ID",
+      "product": "Product",
+      "index": "Index",
+      "location": "Location",
+      "qty": "Qty",
+      "min": "Min"
+    }
+  },
+  "ReportsPoAging": {
+    "title": "PO Aging Report",
+    "subtitle": "Open purchase orders sorted by overdue days.",
+    "columns": {
+      "po": "PO#",
+      "vendor": "Vendor",
+      "status": "Status",
+      "orderDate": "Order Date",
+      "expectedDate": "Expected Date",
+      "daysInStatus": "Days In Status",
+      "overdue": "Overdue"
+    }
+  },
+  "ReportsProduction": {
+    "title": "Production Daily Report",
+    "date": "Date",
+    "metrics": {
+      "totalConsumed": "Total Consumed",
+      "totalDefective": "Total Defective",
+      "defectRate": "Defect Rate %"
+    },
+    "columns": {
+      "time": "Time",
+      "machine": "Machine",
+      "product": "Product",
+      "qty": "Qty",
+      "operator": "Operator"
+    }
+  },
+  "ReportsDefects": {
+    "title": "Defects Report",
+    "subtitle": "Latest defect items and fault distribution.",
+    "metrics": {
+      "totalDefects": "Total Defects",
+      "vendorFault": "Vendor Fault",
+      "internalFault": "Internal Fault",
+      "topProduct": "Top Product"
+    },
+    "columns": {
+      "report": "Report#",
+      "date": "Date",
+      "product": "Product",
+      "reason": "Reason",
+      "faultType": "Fault Type",
+      "qty": "Qty",
+      "machine": "Machine"
+    },
+    "faultType": {
+      "VENDOR": "Vendor",
+      "INTERNAL": "Internal"
+    }
+  },
+  "ReportsQbo": {
+    "title": "QBO Export",
+    "subtitle": "CSV preview for adjustments/defect scraps.",
+    "copyHint": "Copy this CSV into QuickBooks import workflow."
   }
 }
