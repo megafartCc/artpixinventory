@@ -1,4 +1,5 @@
 import { NextAuthOptions } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "@/lib/prisma";
@@ -13,6 +14,21 @@ export const authOptions: NextAuthOptions = {
     signIn: '/login',
   },
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      allowDangerousEmailAccountLinking: true,
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+          // Assign ADMIN to specific emails, default to WAREHOUSE
+          role: profile.email === "da204@users.noreply.github.com" || profile.email === "csgotest2027@gmail.com" ? "ADMIN" : "WAREHOUSE",
+        };
+      }
+    }),
     CredentialsProvider({
       name: "Mock Account",
       credentials: {
