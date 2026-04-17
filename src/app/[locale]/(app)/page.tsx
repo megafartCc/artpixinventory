@@ -1,49 +1,156 @@
-"use client";
+import { unstable_noStore as noStore } from "next/cache";
+import prisma from "@/lib/prisma";
 
-import { useTranslations } from "next-intl";
+export default async function DashboardPage() {
+  noStore();
 
-function DashboardContent() {
-  const t = useTranslations("Dashboard");
+  const [
+    totalProducts,
+    allStockRows,
+    openPoCount,
+    pendingDefects,
+    overduePos,
+    wrongLocationEvents,
+    recentActivity,
+    activeCounts,
+    activeTransfers,
+  ] = await Promise.all([
+    prisma.product.count({ where: { active: true } }),
+    prisma.stockLevel.findMany({
+      where: { product: { active: true } },
+      include: {
+        product: { select: { compoundId: true, name: true, minStock: true } },
+        location: { select: { name: true } },
+      },
+    }),
+    prisma.purchaseOrder.count({
+      where: {
+        status: { in: ["PENDING_APPROVAL", "APPROVED", "ORDERED", "PARTIALLY_RECEIVED"] },
+      },
+    }),
+    prisma.defectReport.count({ where: { status: "PENDING_REVIEW" } }),
+    prisma.purchaseOrder.findMany({
+      where: {
+        expectedDate: { not: null, lt: new Date() },
+        status: { in: ["PENDING_APPROVAL", "APPROVED", "ORDERED", "PARTIALLY_RECEIVED"] },
+      },
+      include: { vendor: { select: { name: true } } },
+      orderBy: { expectedDate: "asc" },
+      take: 8,
+    }),
+    prisma.machineConsumption.findMany({
+      where: { isCorrectLocation: false },
+      include: {
+        machine: { select: { name: true } },
+        product: { select: { compoundId: true } },
+      },
+      orderBy: { consumedAt: "desc" },
+      take: 8,
+    }),
+    prisma.activityLog.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { user: { select: { name: true } } },
+      take: 20,
+    }),
+    prisma.countSession.count({ where: { status: { in: ["IN_PROGRESS", "SUBMITTED", "REVIEWING"] } } }),
+    prisma.transfer.count({ where: { status: { in: ["COLLECTING", "DROPPING"] } } }),
+  ]);
+
+  const lowStockAlerts = allStockRows
+    .filter((row) => row.quantity <= row.product.minStock)
+    .sort((a, b) => a.quantity - b.quantity)
+    .slice(0, 8);
+
   return (
     <div className="p-6 lg:p-8">
-      <div className="max-w-4xl">
-        <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
-          {t("title")}
-        </h1>
-        <p className="text-slate-500 mt-1 mb-8">{t("description")}</p>
-
-        {/* Quick stats placeholder */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {[
-            { label: "Total Products", value: "10", color: "from-indigo-500 to-purple-500" },
-            { label: "Locations", value: "15", color: "from-emerald-500 to-teal-500" },
-            { label: "Machines", value: "44", color: "from-amber-500 to-orange-500" },
-            { label: "Open POs", value: "0", color: "from-rose-500 to-pink-500" },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <p className="text-sm text-slate-500 mb-1">{stat.label}</p>
-              <p className={`text-3xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
-                {stat.value}
-              </p>
-            </div>
-          ))}
+      <div className="mx-auto max-w-7xl space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
+          <p className="mt-1 text-slate-500">Operational summary and active alerts.</p>
         </div>
 
-        {/* Activity feed placeholder */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-700 mb-4">Recent Activity</h2>
-          <div className="text-center py-12 text-slate-400">
-            <p className="text-sm">Activity feed will appear here once operations begin.</p>
-          </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard title="Total Products" value={String(totalProducts)} />
+          <StatCard title="Low Stock Alerts" value={String(lowStockAlerts.length)} />
+          <StatCard title="Open POs" value={String(openPoCount)} />
+          <StatCard title="Pending Defects" value={String(pendingDefects)} />
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-3">
+          <AlertCard title="Low stock items">
+            {lowStockAlerts.length === 0 ? (
+              <p className="text-sm text-slate-400">No low stock alerts.</p>
+            ) : (
+              lowStockAlerts.map((row) => (
+                <p key={row.id} className="text-sm text-slate-700">
+                  {row.product.compoundId} @ {row.location.name}: {row.quantity} (min {row.product.minStock})
+                </p>
+              ))
+            )}
+          </AlertCard>
+
+          <AlertCard title="Overdue purchase orders">
+            {overduePos.length === 0 ? (
+              <p className="text-sm text-slate-400">No overdue POs.</p>
+            ) : (
+              overduePos.map((po) => (
+                <p key={po.id} className="text-sm text-slate-700">
+                  {po.poNumber} — {po.vendor.name} (expected {po.expectedDate?.toISOString().slice(0, 10)})
+                </p>
+              ))
+            )}
+          </AlertCard>
+
+          <AlertCard title="Wrong-location events">
+            {wrongLocationEvents.length === 0 ? (
+              <p className="text-sm text-slate-400">No recent wrong-location events.</p>
+            ) : (
+              wrongLocationEvents.map((event) => (
+                <p key={event.id} className="text-sm text-slate-700">
+                  {event.machine.name}: {event.product.compoundId} qty {event.quantity}
+                </p>
+              ))
+            )}
+          </AlertCard>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-900">Recent Activity</h2>
+            <div className="mt-3 space-y-2">
+              {recentActivity.map((entry) => (
+                <p key={entry.id} className="text-sm text-slate-700">
+                  <span className="font-medium">{entry.action}</span> — {entry.entityType} by {entry.user?.name ?? "System"} at {entry.createdAt.toISOString().slice(0, 16).replace("T", " ")}
+                </p>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-900">Active Operations</h2>
+            <p className="mt-3 text-sm text-slate-700">Active count sessions: {activeCounts}</p>
+            <p className="mt-1 text-sm text-slate-700">Active transfers: {activeTransfers}</p>
+          </section>
         </div>
       </div>
     </div>
   );
 }
 
-export default function DashboardPage() {
-  return <DashboardContent />;
+function StatCard({ title, value }: { title: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <p className="text-xs uppercase tracking-wide text-slate-500">{title}</p>
+      <p className="mt-2 text-2xl font-semibold text-slate-900">{value}</p>
+    </div>
+  );
+}
+
+function AlertCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+      <div className="mt-3 space-y-1">{children}</div>
+    </section>
+  );
 }
