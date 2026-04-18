@@ -3,6 +3,7 @@
 import { startTransition, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 
 export function ProductionQueueClient({
   rows,
@@ -25,6 +26,7 @@ export function ProductionQueueClient({
   const router = useRouter();
   const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState("");
+  useToastFeedback(error);
 
   const syncNow = async () => {
     setSyncing(true);
@@ -42,8 +44,8 @@ export function ProductionQueueClient({
   };
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mx-auto max-w-7xl space-y-6">
+    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="flex w-full flex-col gap-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
@@ -58,9 +60,6 @@ export function ProductionQueueClient({
             {syncing ? t("syncing") : tc("syncNow")}
           </button>
         </div>
-
-        {error ? <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p> : null}
-
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-slate-200">

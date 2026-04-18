@@ -22,8 +22,8 @@ export function VendorCreditsClient({
   const t = useTranslations("Credits");
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mx-auto max-w-7xl space-y-6">
+    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="flex w-full flex-col gap-6">
         <div className="flex items-center justify-between gap-3">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>

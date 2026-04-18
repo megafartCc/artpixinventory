@@ -11,14 +11,14 @@ export default async function ReportsHubPage({ params }: { params: { locale: str
     { href: "qbo-export", title: t("cards.qbo.title"), description: t("cards.qbo.description") },
   ];
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mx-auto max-w-6xl space-y-6">
+    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="flex w-full flex-col gap-6">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
           <p className="mt-1 text-slate-500">{t("subtitle")}</p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {reportLinks.map((report) => (
             <Link
               key={report.href}

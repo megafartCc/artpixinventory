@@ -3,16 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 
 export function DefectReasonsSectionClient({ children }: { children: React.ReactNode }) {
   const t = useTranslations("Settings");
   const router = useRouter();
   const [syncing, setSyncing] = useState(false);
-  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [feedback, setFeedback] = useState("");
+  useToastFeedback(error, feedback);
 
   const syncSample = async () => {
     setSyncing(true);
-    setMessage("");
+    setError("");
+    setFeedback("");
 
     const response = await fetch("/api/defect-reasons/sync-sample", {
       method: "POST",
@@ -22,11 +26,11 @@ export function DefectReasonsSectionClient({ children }: { children: React.React
     setSyncing(false);
 
     if (!response.ok) {
-      setMessage(payload.error ?? t("errors.syncReasonsFailed"));
+      setError(payload.error ?? t("errors.syncReasonsFailed"));
       return;
     }
 
-    setMessage(payload.message ?? t("reasonsSynced"));
+    setFeedback(payload.message ?? t("reasonsSynced"));
     router.refresh();
   };
 
@@ -48,8 +52,6 @@ export function DefectReasonsSectionClient({ children }: { children: React.React
           {syncing ? t("syncing") : t("syncFromErpix")}
         </button>
       </div>
-
-      {message ? <p className="mt-3 text-sm text-slate-600">{message}</p> : null}
       <div className="mt-4">{children}</div>
     </section>
   );

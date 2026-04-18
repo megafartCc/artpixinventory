@@ -28,8 +28,8 @@ export default async function ProductionDailyReportPage({ params }: { params: { 
   const defectRate = totalConsumed > 0 ? ((totalDefective / totalConsumed) * 100).toFixed(2) : "0.00";
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mx-auto max-w-7xl space-y-6">
+    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="flex w-full flex-col gap-6">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
           <p className="mt-1 text-slate-500">{t("date")}: {start.toISOString().slice(0, 10)}</p>

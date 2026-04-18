@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 
 const statuses = ["PENDING", "APPROVED", "APPLIED", "CLOSED"];
 
@@ -28,6 +29,7 @@ export function VendorCreditDetailClient({
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  useToastFeedback(error);
 
   const updateStatus = async (status: string) => {
     setBusy(true);
@@ -49,8 +51,8 @@ export function VendorCreditDetailClient({
   };
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mx-auto max-w-6xl space-y-6">
+    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="flex w-full flex-col gap-6">
         <div>
           <Link href={`/${locale}/credits`} className="text-sm text-slate-500 hover:text-slate-700">{t("detailBack")}</Link>
           <h1 className="mt-2 text-3xl font-bold text-slate-900">{credit.creditNumber}</h1>
@@ -69,7 +71,6 @@ export function VendorCreditDetailClient({
               </button>
             ))}
           </div>
-          {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
         </div>
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">

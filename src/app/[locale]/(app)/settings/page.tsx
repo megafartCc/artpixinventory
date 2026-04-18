@@ -24,8 +24,8 @@ export default async function SettingsPage({ params }: { params: { locale: strin
   const session = await getServerSession(authOptions);
   if (!session?.user || !canAccessSettings(session.user.role)) {
     return (
-      <div className="p-6 lg:p-8">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
+      <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
           {t("accessDenied")}
         </div>
       </div>
@@ -55,8 +55,8 @@ export default async function SettingsPage({ params }: { params: { locale: strin
     : t("notConfigured");
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mx-auto max-w-6xl space-y-6">
+    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="flex w-full flex-col gap-6">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
           <p className="mt-1 text-slate-500">{t("subtitle")}</p>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 
 const inputClassName =
   "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-200";
@@ -31,6 +32,7 @@ export function VendorCreditFormClient({
   const [items, setItems] = useState([{ productId: "", quantity: "1", unitCost: "0", notes: "" }]);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  useToastFeedback(error);
 
   const vendorPoOptions = purchaseOrders.filter((po) => po.vendorId === vendorId);
 
@@ -63,8 +65,8 @@ export function VendorCreditFormClient({
   };
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mx-auto max-w-5xl space-y-6">
+    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="flex w-full flex-col gap-6">
         <div>
           <Link href={`/${locale}/credits`} className="text-sm text-slate-500 hover:text-slate-700">{t("detailBack")}</Link>
           <h1 className="mt-2 text-3xl font-bold text-slate-900">{t("newTitle")}</h1>
@@ -127,9 +129,6 @@ export function VendorCreditFormClient({
             </div>
           ))}
         </div>
-
-        {error ? <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p> : null}
-
         <div className="flex justify-end gap-3">
           <Link href={`/${locale}/credits`} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm">{tc("cancel")}</Link>
           <button disabled={saving || !vendorId} onClick={() => void submit()} className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60">

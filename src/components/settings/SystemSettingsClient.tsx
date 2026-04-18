@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 
 type SettingsMap = Record<string, string>;
 
@@ -23,11 +24,14 @@ export function SystemSettingsClient({
   const router = useRouter();
   const [form, setForm] = useState<SettingsMap>(initialValues);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [feedback, setFeedback] = useState("");
+  useToastFeedback(error, feedback);
 
   const save = async () => {
     setSaving(true);
-    setMessage("");
+    setError("");
+    setFeedback("");
 
     const response = await fetch("/api/settings", {
       method: "PATCH",
@@ -39,11 +43,11 @@ export function SystemSettingsClient({
     setSaving(false);
 
     if (!response.ok) {
-      setMessage(payload.error ?? t("errors.saveFailed"));
+      setError(payload.error ?? t("errors.saveFailed"));
       return;
     }
 
-    setMessage(payload.message ?? t("saved"));
+    setFeedback(payload.message ?? t("saved"));
     router.refresh();
   };
 
@@ -128,9 +132,6 @@ export function SystemSettingsClient({
           <p className="mt-1 font-mono text-xs text-slate-800">{erpixApiKeyMasked}</p>
         </div>
       </div>
-
-      {message ? <p className="mt-4 text-sm text-slate-600">{message}</p> : null}
-
       <div className="mt-4 flex justify-end">
         <button
           type="button"
