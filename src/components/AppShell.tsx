@@ -48,8 +48,9 @@ const navItems = [
   { key: "production", href: "/production", icon: Factory },
   { key: "credits", href: "/credits", icon: Receipt },
   { key: "reports", href: "/reports", icon: BarChart3 },
-  { key: "settings", href: "/settings", icon: Settings },
 ];
+
+const settingsNavItem = { key: "settings", href: "/settings", icon: Settings };
 
 const mobileNavItems = [
   { key: "dashboard", href: "/", icon: Home },
@@ -217,7 +218,7 @@ export function AppShell({
           ${collapsed ? "w-[68px]" : "w-[240px]"}
         `}
       >
-        <div className="flex h-16 items-center border-b border-slate-100 px-4">
+        <div className="flex h-16 items-center border-b border-slate-200 px-4">
           <div className="flex items-center gap-2 overflow-hidden">
             <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-sky-500">
               <span className="text-sm font-bold text-white">A</span>
@@ -230,49 +231,69 @@ export function AppShell({
           </div>
         </div>
 
-        <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-4">
-          {navItems.map((item) => {
-            const isActive =
-              item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-4">
+            {navItems.map((item) => {
+              const isActive =
+                item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
 
-            return (
-              <Link
-                key={item.key}
-                href={`/${locale}${item.href}`}
-                className={`
-                  flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all
-                  ${
-                    isActive
-                      ? "bg-indigo-50 text-indigo-700"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                  }
-                `}
-                title={collapsed ? t(item.key) : undefined}
-              >
-                <item.icon className="h-5 w-5 flex-shrink-0" />
-                {!collapsed && <span>{t(item.key)}</span>}
-              </Link>
-            );
-          })}
-        </nav>
+              return (
+                <Link
+                  key={item.key}
+                  href={`/${locale}${item.href}`}
+                  className={`
+                    flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all
+                    ${
+                      isActive
+                        ? "bg-indigo-50 text-indigo-700"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                    }
+                  `}
+                  title={collapsed ? t(item.key) : undefined}
+                >
+                  <item.icon className="h-5 w-5 flex-shrink-0" />
+                  {!collapsed && <span>{t(item.key)}</span>}
+                </Link>
+              );
+            })}
+          </nav>
 
-        <div className="border-t border-slate-100 p-2">
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="flex w-full items-center justify-center rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-          >
-            {collapsed ? (
-              <ChevronRight className="h-5 w-5" />
-            ) : (
-              <ChevronLeft className="h-5 w-5" />
-            )}
-          </button>
+          <div className="border-t border-slate-200 px-2 py-3">
+            <Link
+              href={`/${locale}${settingsNavItem.href}`}
+              className={`
+                flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all
+                ${
+                  pathname.startsWith(settingsNavItem.href)
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                }
+              `}
+              title={collapsed ? t(settingsNavItem.key) : undefined}
+            >
+              <settingsNavItem.icon className="h-5 w-5 flex-shrink-0" />
+              {!collapsed && <span>{t(settingsNavItem.key)}</span>}
+            </Link>
+          </div>
+
+          <div className="border-t border-slate-200 p-2">
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className="flex w-full items-center justify-center rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            >
+              {collapsed ? (
+                <ChevronRight className="h-5 w-5" />
+              ) : (
+                <ChevronLeft className="h-5 w-5" />
+              )}
+            </button>
+          </div>
         </div>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex-shrink-0 border-b border-slate-200 bg-white px-3 py-3 sm:px-4 lg:px-6">
-          <div className="flex flex-wrap items-center gap-3 lg:grid lg:grid-cols-[auto,minmax(320px,560px),auto] lg:gap-4">
+        <header className="flex h-16 flex-shrink-0 items-center border-b border-slate-200 bg-white px-3 sm:px-4 lg:px-6">
+          <div className="flex w-full flex-wrap items-center gap-3 lg:grid lg:grid-cols-[auto,minmax(320px,560px),auto] lg:gap-4">
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -315,7 +336,7 @@ export function AppShell({
                             key={item.href}
                             type="button"
                             onClick={() => navigateFromSearch(item.href)}
-                          className="flex w-full items-center justify-between rounded-lg px-3 py-3 text-left transition hover:bg-slate-50"
+                            className="flex w-full items-center justify-between rounded-lg px-3 py-3 text-left transition hover:bg-slate-50"
                           >
                             <span>
                               <span className="block text-sm font-medium text-slate-800">
