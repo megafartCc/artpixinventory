@@ -5,7 +5,6 @@ import {
   ArrowLeftRight,
   Boxes,
   FileText,
-  LayoutDashboard,
   Package,
 } from "lucide-react";
 import prisma from "@/lib/prisma";
@@ -92,42 +91,16 @@ export default async function DashboardPage({ params }: { params: { locale: stri
   const recentActivityItems = recentActivity.slice(0, 10);
 
   return (
-    <div className="px-4 py-5 sm:px-6 lg:px-10 xl:px-12">
-      <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-6">
-        <section className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 shadow-xl shadow-slate-300/40">
-          <div className="absolute inset-y-0 right-0 w-1/2 bg-[radial-gradient(circle_at_top_right,_rgba(99,102,241,0.38),_transparent_60%)]" />
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-[linear-gradient(to_top,_rgba(255,255,255,0.05),_transparent)]" />
-
-          <div className="relative grid gap-6 px-6 py-6 sm:px-7 lg:grid-cols-[minmax(0,1.7fr)_minmax(320px,1fr)] lg:px-8 lg:py-8 xl:px-10 xl:py-10">
-            <div className="space-y-5">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-100">
-                <LayoutDashboard className="h-4 w-4" />
-                {t("title")}
-              </div>
-
-              <div className="max-w-3xl">
-                <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl xl:text-[3.4rem] xl:leading-[1.05]">
-                  {t("title")}
-                </h1>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-                  {t("description")}
-                </p>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                <HeroMetric label={t("lowStock")} value={String(lowStockRows.length)} />
-                <HeroMetric label={t("activeCountSessions")} value={String(activeCounts)} />
-                <HeroMetric label={t("activeTransfers")} value={String(activeTransfers)} />
-              </div>
-            </div>
-
-            <div className="grid gap-3 rounded-[24px] border border-white/10 bg-white/10 p-4 backdrop-blur-sm sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
-              <QuickOverviewItem label={t("totalProducts")} value={String(totalProducts)} />
-              <QuickOverviewItem label={t("openPos")} value={String(openPoCount)} />
-              <QuickOverviewItem label={t("pendingDefects")} value={String(pendingDefects)} />
-            </div>
-          </div>
-        </section>
+    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="flex w-full flex-col gap-6">
+        <div className="px-1 sm:px-2">
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+            {t("title")}
+          </h1>
+          <p className="mt-2 max-w-3xl text-sm text-slate-500 sm:text-base">
+            {t("description")}
+          </p>
+        </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
@@ -255,24 +228,6 @@ export default async function DashboardPage({ params }: { params: { locale: stri
           </section>
         </div>
       </div>
-    </div>
-  );
-}
-
-function HeroMetric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-4 backdrop-blur-sm">
-      <p className="text-xs uppercase tracking-[0.2em] text-slate-300">{label}</p>
-      <p className="mt-3 text-3xl font-semibold text-white">{value}</p>
-    </div>
-  );
-}
-
-function QuickOverviewItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-slate-950/20 px-4 py-4">
-      <p className="text-sm text-slate-300">{label}</p>
-      <p className="mt-2 text-3xl font-semibold text-white">{value}</p>
     </div>
   );
 }
