@@ -21,6 +21,7 @@ import {
   flattenLocationsForSelect,
   locationTypeLabels,
 } from "@/lib/location-utils";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { canManageLocations } from "@/lib/permissions";
 
 type LocationRecord = {
@@ -85,6 +86,7 @@ export function LocationManager({
   const [feedback, setFeedback] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  useToastFeedback(error, feedback);
 
   const selectedLocation =
     locations.find((location) => location.id === selectedId) ?? null;
@@ -350,18 +352,6 @@ export function LocationManager({
                 </div>
               )}
             </div>
-
-            {(error || feedback) && (
-              <div
-                className={`mx-8 mt-6 rounded-xl border px-4 py-3 text-sm ${
-                  error
-                    ? "border-rose-200 bg-rose-50 text-rose-700"
-                    : "border-emerald-200 bg-emerald-50 text-emerald-700"
-                }`}
-              >
-                {error || feedback}
-              </div>
-            )}
 
             <div className="grid flex-1 gap-6 p-8 lg:grid-cols-[0.95fr_1.05fr]">
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Trash2 } from "lucide-react";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { canManagePurchaseOrders } from "@/lib/permissions";
 import { calculatePurchaseOrder } from "@/lib/purchase-order-utils";
 
@@ -110,6 +111,7 @@ export function PurchaseOrderFormClient({
     "draft" | "submit" | null
   >(null);
   const [error, setError] = useState("");
+  useToastFeedback(error);
 
   const selectedVendor = useMemo(
     () => vendors.find((vendor) => vendor.id === form.vendorId) ?? null,
@@ -348,12 +350,6 @@ export function PurchaseOrderFormClient({
             </p>
           </div>
         </div>
-
-        {error && (
-          <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-            {error}
-          </div>
-        )}
 
         <div className="grid gap-6 2xl:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-6">

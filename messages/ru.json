@@ -38,7 +38,9 @@
     "at": "в",
     "system": "Система",
     "activeCountSessions": "Активные пересчеты",
-    "activeTransfers": "Активные перемещения"
+    "activeTransfers": "Активные перемещения",
+    "recentActivitySearch": "Поиск активности",
+    "noRecentActivityMatch": "По вашему запросу ничего не найдено."
   },
   "Common": {
     "cancel": "Отмена",

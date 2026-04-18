@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Trash2 } from "lucide-react";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { canManageVendors } from "@/lib/permissions";
 
 type ProductOption = {
@@ -94,6 +95,7 @@ export function VendorDetailClient({
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  useToastFeedback(error, feedback);
 
   const filteredProducts = useMemo(() => {
     const normalized = productSearch.trim().toLowerCase();
@@ -207,18 +209,6 @@ export function VendorDetailClient({
             Container Templates
           </Link>
         </div>
-
-        {(error || feedback) && (
-          <div
-            className={`rounded-xl border px-4 py-3 text-sm ${
-              error
-                ? "border-rose-200 bg-rose-50 text-rose-700"
-                : "border-emerald-200 bg-emerald-50 text-emerald-700"
-            }`}
-          >
-            {error || feedback}
-          </div>
-        )}
 
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

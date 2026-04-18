@@ -4,6 +4,7 @@ import { startTransition, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 
 type ReviewRow = {
   id: string;
@@ -33,6 +34,7 @@ export function DefectReviewClient({
   const router = useRouter();
   const [error, setError] = useState("");
   const [pendingId, setPendingId] = useState<string | null>(null);
+  useToastFeedback(error);
 
   const review = async (reportId: string, action: "CONFIRM" | "REJECT") => {
     setError("");
@@ -70,8 +72,6 @@ export function DefectReviewClient({
             {t("back")}
           </Link>
         </div>
-
-        {error ? <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p> : null}
 
         {reports.length === 0 ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-16 text-center text-slate-400">

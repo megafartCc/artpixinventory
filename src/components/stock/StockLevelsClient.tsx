@@ -4,6 +4,7 @@ import { startTransition, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Download, Search, X } from "lucide-react";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { canAdjustStock } from "@/lib/permissions";
 import { stockAdjustmentReasonOptions } from "@/lib/stock-schemas";
 
@@ -102,6 +103,7 @@ export function StockLevelsClient({
   const [locationFilter, setLocationFilter] = useState("all");
   const [feedback, setFeedback] = useState("");
   const [error, setError] = useState("");
+  useToastFeedback(error, feedback);
   const [adjustmentTarget, setAdjustmentTarget] = useState<AdjustmentTarget | null>(
     null
   );
@@ -318,18 +320,6 @@ export function StockLevelsClient({
             ))}
           </select>
         </div>
-
-        {(error || feedback) && (
-          <div
-            className={`rounded-xl border px-4 py-3 text-sm ${
-              error
-                ? "border-rose-200 bg-rose-50 text-rose-700"
-                : "border-emerald-200 bg-emerald-50 text-emerald-700"
-            }`}
-          >
-            {error || feedback}
-          </div>
-        )}
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="overflow-x-auto">

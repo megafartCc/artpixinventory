@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { canManageVendors } from "@/lib/permissions";
 
 type TemplateRecord = {
@@ -57,6 +58,7 @@ export function ContainerTemplatesClient({
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  useToastFeedback(error, feedback);
 
   const filteredTemplates = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -189,18 +191,6 @@ export function ContainerTemplatesClient({
             className={inputClassName}
           />
         </div>
-
-        {(error || feedback) && (
-          <div
-            className={`rounded-xl border px-4 py-3 text-sm ${
-              error
-                ? "border-rose-200 bg-rose-50 text-rose-700"
-                : "border-emerald-200 bg-emerald-50 text-emerald-700"
-            }`}
-          >
-            {error || feedback}
-          </div>
-        )}
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="overflow-x-auto">

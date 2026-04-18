@@ -38,7 +38,9 @@
     "at": "at",
     "system": "System",
     "activeCountSessions": "Active count sessions",
-    "activeTransfers": "Active transfers"
+    "activeTransfers": "Active transfers",
+    "recentActivitySearch": "Search activity",
+    "noRecentActivityMatch": "No activity matches your search."
   },
   "Common": {
     "cancel": "Cancel",

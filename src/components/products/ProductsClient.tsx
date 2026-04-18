@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Loader2, PackagePlus, Pencil, Power, Search, X } from "lucide-react";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { productUnits } from "@/lib/product-schemas";
 
 type ProductRecord = {
@@ -97,6 +98,7 @@ export function ProductsClient({
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
+  useToastFeedback(errorMessage, statusMessage);
   const deferredSearch = useDeferredValue(search);
 
   let filteredProducts = [...initialProducts];
@@ -294,12 +296,6 @@ export function ProductsClient({
             <option value="all">All Statuses</option>
           </select>
         </div>
-
-        {(errorMessage || statusMessage) && (
-          <div className={`rounded-xl border px-4 py-3 text-sm ${errorMessage ? "border-rose-200 bg-rose-50 text-rose-700" : "border-emerald-200 bg-emerald-50 text-emerald-700"}`}>
-            {errorMessage || statusMessage}
-          </div>
-        )}
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="overflow-x-auto">

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Cog, Pencil, Plus, RefreshCcw, X } from "lucide-react";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { canManageMachines } from "@/lib/permissions";
 
 type MachineRecord = {
@@ -55,6 +56,7 @@ export function MachinesClient({
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [error, setError] = useState("");
+  useToastFeedback(error, feedback);
   const [form, setForm] = useState<FormState>({
     name: "",
     type: "STN",
@@ -186,18 +188,6 @@ export function MachinesClient({
             className={inputClassName}
           />
         </div>
-
-        {(error || feedback) && (
-          <div
-            className={`rounded-xl border px-4 py-3 text-sm ${
-              error
-                ? "border-rose-200 bg-rose-50 text-rose-700"
-                : "border-emerald-200 bg-emerald-50 text-emerald-700"
-            }`}
-          >
-            {error || feedback}
-          </div>
-        )}
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="overflow-x-auto">

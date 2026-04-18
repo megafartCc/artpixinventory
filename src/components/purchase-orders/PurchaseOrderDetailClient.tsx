@@ -4,6 +4,7 @@ import { ChangeEvent, startTransition, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 import {
   canApprovePurchaseOrders,
   canManagePurchaseOrders,
@@ -81,6 +82,7 @@ export function PurchaseOrderDetailClient({
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  useToastFeedback(error, feedback);
 
   const refresh = () => startTransition(() => router.refresh());
 
@@ -258,18 +260,6 @@ export function PurchaseOrderDetailClient({
             )}
           </div>
         </div>
-
-        {(error || feedback) && (
-          <div
-            className={`rounded-xl border px-4 py-3 text-sm ${
-              error
-                ? "border-rose-200 bg-rose-50 text-rose-700"
-                : "border-emerald-200 bg-emerald-50 text-emerald-700"
-            }`}
-          >
-            {error || feedback}
-          </div>
-        )}
 
         <div className="grid gap-6 2xl:grid-cols-[0.95fr_1.05fr]">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

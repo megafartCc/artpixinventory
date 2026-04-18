@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Upload, FileSpreadsheet } from "lucide-react";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { parseCsv } from "@/lib/csv";
 import { canImportCatalog } from "@/lib/permissions";
 
@@ -96,6 +97,7 @@ export function CsvImportClient({ locale }: { locale: string }) {
   } | null>(null);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  useToastFeedback(error, result ? `Created ${result.created}, skipped ${result.skipped}.` : "");
 
   const requiredMapped = mappingTargets
     .filter((target) => target.required)

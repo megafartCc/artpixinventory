@@ -7,6 +7,7 @@ import {
   FileText,
   Package,
 } from "lucide-react";
+import { RecentActivityPanel } from "@/components/dashboard/RecentActivityPanel";
 import prisma from "@/lib/prisma";
 
 export default async function DashboardPage({ params }: { params: { locale: string } }) {
@@ -174,32 +175,19 @@ export default async function DashboardPage({ params }: { params: { locale: stri
         </div>
 
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,1fr)]">
-          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900">{t("recentActivity")}</h2>
-              <p className="mt-1 text-sm text-slate-500">{t("description")}</p>
-            </div>
-
-            <div className="mt-5 space-y-3">
-              {recentActivityItems.map((entry) => (
-                <div
-                  key={entry.id}
-                  className="flex items-start gap-3 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3"
-                >
-                  <div className="mt-1.5 h-2.5 w-2.5 rounded-full bg-indigo-500" />
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-900">
-                      {entry.action} / {entry.entityType}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-500">
-                      {t("by")} {entry.user?.name ?? t("system")} / {t("at")}{" "}
-                      {dateTimeFormatter.format(entry.createdAt)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+          <RecentActivityPanel
+            title={t("recentActivity")}
+            description={t("description")}
+            searchPlaceholder={t("recentActivitySearch")}
+            emptyMessage={t("noRecentActivityMatch")}
+            items={recentActivityItems.map((entry) => ({
+              id: entry.id,
+              action: entry.action,
+              entityType: entry.entityType,
+              actor: `${t("by")} ${entry.user?.name ?? t("system")}`,
+              timestamp: `${t("at")} ${dateTimeFormatter.format(entry.createdAt)}`,
+            }))}
+          />
 
           <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <h2 className="text-lg font-semibold text-slate-900">{t("activeOps")}</h2>

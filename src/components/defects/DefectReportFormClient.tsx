@@ -4,6 +4,7 @@ import { startTransition, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useToastFeedback } from "@/hooks/useToastFeedback";
 
 const inputClassName =
   "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-200";
@@ -68,6 +69,7 @@ export function DefectReportFormClient({
   ]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  useToastFeedback(error);
 
   const canSave = useMemo(
     () =>
@@ -242,8 +244,6 @@ export function DefectReportFormClient({
             </div>
           ))}
         </div>
-
-        {error ? <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p> : null}
 
         <div className="flex justify-end gap-3">
           <Link href={`/${locale}/defects`} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
