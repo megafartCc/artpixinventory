@@ -2,6 +2,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import { POStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import prisma from "@/lib/prisma";
+import { CsvExportButton } from "@/components/CsvExportButton";
 
 function daysBetween(date: Date, from = new Date()) {
   return Math.floor((from.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
@@ -42,12 +43,39 @@ export default async function PoAgingReportPage({ params }: { params: { locale: 
     })
     .sort((a, b) => b.overdueDays - a.overdueDays);
 
+  const csvHeaders = [
+    t("columns.po"),
+    t("columns.vendor"),
+    t("columns.status"),
+    t("columns.orderDate"),
+    t("columns.expectedDate"),
+    t("columns.daysInStatus"),
+    t("columns.overdue"),
+  ];
+
+  const csvRows = rows.map((row) => [
+    row.poNumber,
+    row.vendorName,
+    row.status,
+    row.orderDate,
+    row.expectedDate,
+    row.daysInStatus,
+    row.overdueDays,
+  ]);
+
   return (
     <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
       <div className="flex w-full flex-col gap-6">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
-          <p className="mt-1 text-slate-500">{t("subtitle")}</p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
+            <p className="mt-1 text-slate-500">{t("subtitle")}</p>
+          </div>
+          <CsvExportButton
+            filename={`po-aging-${new Date().toISOString().slice(0, 10)}.csv`}
+            headers={csvHeaders}
+            rows={csvRows}
+          />
         </div>
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">

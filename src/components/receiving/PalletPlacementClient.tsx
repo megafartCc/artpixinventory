@@ -101,6 +101,7 @@ export function PalletPlacementClient({
                   onChange={(event) => setPalletNumber(event.target.value)}
                   placeholder="PAL-YYYY-NNNN"
                   className={inputClassName}
+                  autoFocus
                 />
               </Field>
               <div className="flex flex-wrap gap-2">
@@ -138,11 +139,11 @@ export function PalletPlacementClient({
                   ))}
               </div>
 
-              <div className="flex justify-end">
+              <div className="fixed bottom-0 inset-x-0 p-4 bg-white border-t border-slate-200 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] flex flex-col sm:flex-row gap-3 z-50 lg:static lg:p-0 lg:border-none lg:bg-transparent lg:shadow-none lg:flex-row lg:justify-end">
                 <button
                   onClick={() => void place()}
                   disabled={submitting || !palletNumber || !locationQrCode}
-                  className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
+                  className="rounded-2xl bg-slate-900 px-4 py-4 text-base lg:py-2.5 lg:text-sm font-medium text-white disabled:opacity-60 flex-1 lg:flex-none"
                 >
                   Confirm Placement
                 </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ActivityTimeline } from "@/components/ActivityTimeline";
 
 export function TransferDetailClient({
   locale,
@@ -91,6 +92,11 @@ export function TransferDetailClient({
             </div>
           </section>
         </div>
+
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm mt-6">
+          <h2 className="text-lg font-semibold text-slate-900 mb-5">Activity history</h2>
+          <ActivityTimeline entityType="Transfer" entityId={transfer.id} />
+        </section>
       </div>
     </div>
   );

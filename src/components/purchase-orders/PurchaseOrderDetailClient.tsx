@@ -13,6 +13,7 @@ import {
   formatPoStatus,
   getPoStatusTone,
 } from "@/lib/purchase-order-utils";
+import { ActivityTimeline } from "@/components/ActivityTimeline";
 
 type PurchaseOrderDetail = {
   id: string;
@@ -529,6 +530,11 @@ export function PurchaseOrderDetailClient({
             )}
           </section>
         </div>
+
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm mt-6">
+          <h2 className="text-lg font-semibold text-slate-900 mb-5">Activity history</h2>
+          <ActivityTimeline entityType="PurchaseOrder" entityId={purchaseOrder.id} />
+        </section>
       </div>
     </div>
   );

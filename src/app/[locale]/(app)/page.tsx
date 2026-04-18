@@ -1,5 +1,4 @@
 import { unstable_noStore as noStore } from "next/cache";
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import {
   AlertTriangle,
@@ -8,8 +7,6 @@ import {
   ClipboardCheck,
   FileText,
   Package,
-  Printer,
-  Receipt,
   ShieldAlert,
   Truck,
 } from "lucide-react";
@@ -180,15 +177,6 @@ export default async function DashboardPage({ params }: { params: { locale: stri
   const todayReceiptQty = todayReceipts._sum.receivedQty ?? 0;
   const todayReceiptLines = todayReceipts._count.id;
 
-  const quickActions = [
-    { label: "New PO", href: `/${params.locale}/purchase-orders/new`, icon: FileText },
-    { label: "Receive", href: `/${params.locale}/receiving`, icon: Truck },
-    { label: "Transfer", href: `/${params.locale}/transfers/new`, icon: ArrowLeftRight },
-    { label: "Defect", href: `/${params.locale}/defects/new`, icon: AlertTriangle },
-    { label: "Labels", href: `/${params.locale}/labels`, icon: Printer },
-    { label: "Credit", href: `/${params.locale}/credits/new`, icon: Receipt },
-  ];
-
   return (
     <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
       <div className="flex w-full flex-col gap-6">
@@ -200,21 +188,6 @@ export default async function DashboardPage({ params }: { params: { locale: stri
             <p className="mt-2 max-w-3xl text-sm text-slate-500 sm:text-base">
               {t("description")}
             </p>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-3 xl:w-[620px]">
-            {quickActions.map((action) => (
-              <Link
-                key={action.label}
-                href={action.href}
-                className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50"
-              >
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
-                  <action.icon className="h-4 w-4" />
-                </span>
-                <span>{action.label}</span>
-              </Link>
-            ))}
           </div>
         </div>
 
@@ -247,57 +220,57 @@ export default async function DashboardPage({ params }: { params: { locale: stri
 
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)]">
           <InsightCard
-            title="Low stock severity"
-            subtitle="Critical items are out or nearly out of stock."
+            title={t("lowStockSeverityTitle")}
+            subtitle={t("lowStockSeveritySubtitle")}
             icon={ShieldAlert}
             iconClassName="bg-rose-100 text-rose-700"
             metrics={[
-              { label: "Critical", value: String(lowStockSeverity.critical) },
-              { label: "High", value: String(lowStockSeverity.high) },
-              { label: "Watch", value: String(lowStockSeverity.watch) },
+              { label: t("critical"), value: String(lowStockSeverity.critical) },
+              { label: t("high"), value: String(lowStockSeverity.high) },
+              { label: t("watch"), value: String(lowStockSeverity.watch) },
             ]}
           />
           <InsightCard
-            title="Overdue PO aging"
-            subtitle="Open overdue orders grouped by days overdue."
+            title={t("overduePoAgingTitle")}
+            subtitle={t("overduePoAgingSubtitle")}
             icon={ClipboardCheck}
             iconClassName="bg-amber-100 text-amber-700"
             metrics={[
-              { label: "1-3 days", value: String(poAgingBuckets.short) },
-              { label: "4-7 days", value: String(poAgingBuckets.medium) },
-              { label: "8+ days", value: String(poAgingBuckets.long) },
+              { label: t("days1to3"), value: String(poAgingBuckets.short) },
+              { label: t("days4to7"), value: String(poAgingBuckets.medium) },
+              { label: t("days8plus"), value: String(poAgingBuckets.long) },
             ]}
           />
           <InsightCard
-            title="Today and approvals"
-            subtitle="Inbound activity plus approval workload."
+            title={t("todayAndApprovalsTitle")}
+            subtitle={t("todayAndApprovalsSubtitle")}
             icon={Truck}
             iconClassName="bg-emerald-100 text-emerald-700"
             metrics={[
-              { label: "Received qty", value: String(todayReceiptQty) },
-              { label: "Receipt lines", value: String(todayReceiptLines) },
-              { label: "Pending approvals", value: String(pendingApprovals) },
+              { label: t("receivedQty"), value: String(todayReceiptQty) },
+              { label: t("receiptLines"), value: String(todayReceiptLines) },
+              { label: t("pendingApprovals"), value: String(pendingApprovals) },
             ]}
           />
         </div>
 
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1.3fr)_minmax(360px,0.9fr)]">
-          <DashboardPanel title="ERPIX sync health">
+          <DashboardPanel title={t("erpixSyncHealth")}>
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <SyncHealthCard
-                label="Production queue"
+                label={t("productionQueue")}
                 value={formatRelativeSync(latestProductionSync?.erpixSyncedAt ?? null)}
               />
               <SyncHealthCard
-                label="Defect reasons"
+                label={t("defectReasons")}
                 value={formatRelativeSync(latestReasonSync?.syncedAt ?? null)}
               />
               <SyncHealthCard
-                label="Mapped products"
+                label={t("mappedProducts")}
                 value={`${mappedProducts}/${totalProducts}`}
               />
               <SyncHealthCard
-                label="7d failures"
+                label={t("sevenDayFailures")}
                 value={String(erpixFailures)}
                 alert={erpixFailures > 0}
               />
@@ -305,10 +278,10 @@ export default async function DashboardPage({ params }: { params: { locale: stri
           </DashboardPanel>
 
           <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <h2 className="text-lg font-semibold text-slate-900">Approvals and receipts</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t("approvalsAndReceipts")}</h2>
             <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
-              <ActiveMetricCard title="Pending approvals" value={String(pendingApprovals)} icon={ClipboardCheck} />
-              <ActiveMetricCard title="Today receipts" value={String(todayReceiptQty)} icon={Truck} />
+              <ActiveMetricCard title={t("pendingApprovals")} value={String(pendingApprovals)} icon={ClipboardCheck} />
+              <ActiveMetricCard title={t("todayReceipts")} value={String(todayReceiptQty)} icon={Truck} />
             </div>
 
             <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-4">
@@ -399,10 +372,10 @@ export default async function DashboardPage({ params }: { params: { locale: stri
 
             <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-4">
               <div className="space-y-3">
-                <SummaryRow label="Pending approvals" value={String(pendingApprovals)} />
-                <SummaryRow label="Today receipt lines" value={String(todayReceiptLines)} />
-                <SummaryRow label="Mapped machines" value={String(mappedMachines)} />
-                <SummaryRow label="ERPIX failures (7d)" value={String(erpixFailures)} />
+                <SummaryRow label={t("pendingApprovals")} value={String(pendingApprovals)} />
+                <SummaryRow label={t("todayReceiptLines")} value={String(todayReceiptLines)} />
+                <SummaryRow label={t("mappedMachines")} value={String(mappedMachines)} />
+                <SummaryRow label={t("erpixFailures7d")} value={String(erpixFailures)} />
               </div>
             </div>
           </section>

@@ -1,6 +1,7 @@
 import { unstable_noStore as noStore } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import prisma from "@/lib/prisma";
+import { CsvExportButton } from "@/components/CsvExportButton";
 
 export default async function ProductionDailyReportPage({ params }: { params: { locale: string } }) {
   noStore();
@@ -27,12 +28,35 @@ export default async function ProductionDailyReportPage({ params }: { params: { 
   const totalDefective = defectReports.flatMap((report) => report.items).reduce((sum, item) => sum + item.quantity, 0);
   const defectRate = totalConsumed > 0 ? ((totalDefective / totalConsumed) * 100).toFixed(2) : "0.00";
 
+  const csvHeaders = [
+    t("columns.time"),
+    t("columns.machine"),
+    t("columns.product"),
+    t("columns.qty"),
+    t("columns.operator"),
+  ];
+
+  const csvRows = consumptions.map((entry) => [
+    entry.consumedAt.toISOString().slice(11, 16),
+    entry.machine.name,
+    entry.product.compoundId,
+    entry.quantity,
+    entry.operatorName ?? "-",
+  ]);
+
   return (
     <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
       <div className="flex w-full flex-col gap-6">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
-          <p className="mt-1 text-slate-500">{t("date")}: {start.toISOString().slice(0, 10)}</p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
+            <p className="mt-1 text-slate-500">{t("date")}: {start.toISOString().slice(0, 10)}</p>
+          </div>
+          <CsvExportButton
+            filename={`production-${start.toISOString().slice(0, 10)}.csv`}
+            headers={csvHeaders}
+            rows={csvRows}
+          />
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">

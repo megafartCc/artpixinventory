@@ -4,6 +4,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import { AlertTriangle, ArrowLeftRight, Boxes, Printer, Truck } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { buildProductLabelZpl } from "@/lib/zpl";
+import { ActivityTimeline } from "@/components/ActivityTimeline";
 
 function formatLocale(locale: string) {
   if (locale === "ru") return "ru-RU";
@@ -454,6 +455,11 @@ export default async function ProductDetailPage({
             )}
           </section>
         </div>
+
+        <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <h2 className="text-lg font-semibold text-slate-900 mb-5">Activity history</h2>
+          <ActivityTimeline entityType="Product" entityId={product.id} />
+        </section>
       </div>
     </div>
   );

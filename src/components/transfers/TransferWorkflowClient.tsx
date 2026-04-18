@@ -64,6 +64,7 @@ export function TransferWorkflowClient({
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [dropWarnings, setDropWarnings] = useState<string[]>([]);
   useToastFeedback(error, feedback);
 
   const refresh = () => startTransition(() => router.refresh());
@@ -200,6 +201,7 @@ export function TransferWorkflowClient({
 
     setSubmitting(true);
     setError("");
+    setDropWarnings([]);
 
     const response = await fetch(`/api/transfers/${currentTransfer.id}/drop`, {
       method: "POST",
@@ -210,12 +212,20 @@ export function TransferWorkflowClient({
         quantity: dropQty,
       }),
     });
-    const payload = (await response.json()) as { error?: string; message?: string };
+    const payload = (await response.json()) as {
+      error?: string;
+      message?: string;
+      warnings?: string[];
+    };
     setSubmitting(false);
 
     if (!response.ok) {
       setError(payload.error ?? "Failed to drop stock.");
       return;
+    }
+
+    if (payload.warnings && payload.warnings.length > 0) {
+      setDropWarnings(payload.warnings);
     }
 
     setFeedback(payload.message ?? "Stock dropped.");
@@ -306,6 +316,7 @@ export function TransferWorkflowClient({
                       onChange={(event) => setSourceQr(event.target.value)}
                       placeholder="Paste or scan source location QR"
                       className={inputClassName}
+                      autoFocus
                     />
                     <div className="flex max-h-24 flex-wrap gap-2 overflow-y-auto">
                       {locations.slice(0, 18).map((location) => (
@@ -355,23 +366,23 @@ export function TransferWorkflowClient({
                       <button
                         onClick={() => void collect()}
                         disabled={submitting || !sourceQr || !selectedProductId || !pickQty}
-                        className="rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                        className="rounded-2xl bg-sky-600 px-5 py-4 text-base lg:py-3 lg:text-sm font-semibold text-white disabled:opacity-60"
                       >
                         Add to Cart
                       </button>
                     </div>
 
-                    <div className="flex flex-wrap gap-3">
+                    <div className="fixed bottom-0 inset-x-0 p-4 bg-white border-t border-slate-200 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] flex flex-col sm:flex-row gap-3 z-50 lg:static lg:p-0 lg:border-none lg:bg-transparent lg:shadow-none lg:flex-row lg:flex-wrap">
                       <button
                         onClick={() => setSourceQr("")}
-                        className="rounded-2xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                        className="rounded-2xl border border-slate-200 px-4 py-4 text-base lg:py-2.5 lg:text-sm font-medium text-slate-700 hover:bg-slate-50 flex-1"
                       >
                         Scan Another Location
                       </button>
                       <button
                         onClick={() => void switchToDropoff()}
                         disabled={submitting || cartItems.length === 0}
-                        className="rounded-2xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+                        className="rounded-2xl bg-amber-500 px-4 py-4 text-base lg:py-2.5 lg:text-sm font-semibold text-white disabled:opacity-60 flex-1"
                       >
                         Switch to Drop-Off
                       </button>
@@ -402,6 +413,7 @@ export function TransferWorkflowClient({
                       onChange={(event) => setDestinationQr(event.target.value)}
                       placeholder="Paste or scan destination location QR"
                       className={inputClassName}
+                      autoFocus
                     />
                     <div className="flex max-h-24 flex-wrap gap-2 overflow-y-auto">
                       {locations
@@ -424,6 +436,31 @@ export function TransferWorkflowClient({
                         <p className="mt-1 text-xs text-slate-500">
                           {destinationLocation.qrCode}
                         </p>
+                      </div>
+                    )}
+
+                    {dropWarnings.length > 0 && (
+                      <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-3">
+                            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-200">
+                              <span className="text-sm">⚠️</span>
+                            </span>
+                            <div className="space-y-1">
+                              {dropWarnings.map((warning, index) => (
+                                <p key={index} className="text-sm font-medium text-amber-800">
+                                  {warning}
+                                </p>
+                              ))}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setDropWarnings([])}
+                            className="shrink-0 rounded-lg px-2 py-1 text-xs font-medium text-amber-600 hover:bg-amber-100"
+                          >
+                            Dismiss
+                          </button>
+                        </div>
                       </div>
                     )}
 
@@ -458,18 +495,20 @@ export function TransferWorkflowClient({
                       <button
                         onClick={() => void drop()}
                         disabled={submitting || !destinationQr || !dropProductId || !dropQty}
-                        className="rounded-2xl bg-amber-500 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                        className="rounded-2xl bg-amber-500 px-5 py-4 text-base lg:py-3 lg:text-sm font-semibold text-white disabled:opacity-60"
                       >
                         Drop
                       </button>
                     </div>
 
-                    <button
-                      onClick={() => setDestinationQr("")}
-                      className="rounded-2xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                    >
-                      Scan Another Destination
-                    </button>
+                    <div className="fixed bottom-0 inset-x-0 p-4 bg-white border-t border-slate-200 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] flex flex-col sm:flex-row gap-3 z-50 lg:static lg:p-0 lg:border-none lg:bg-transparent lg:shadow-none lg:flex-row lg:flex-wrap">
+                      <button
+                        onClick={() => setDestinationQr("")}
+                        className="rounded-2xl border border-slate-200 px-4 py-4 text-base lg:py-2.5 lg:text-sm font-medium text-slate-700 hover:bg-slate-50 flex-1"
+                      >
+                        Scan Another Destination
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}

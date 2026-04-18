@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { Trash2 } from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { canManageVendors } from "@/lib/permissions";
+import { ActivityTimeline } from "@/components/ActivityTimeline";
 
 type ProductOption = {
   id: string;
@@ -487,6 +488,11 @@ export function VendorDetailClient({
               </table>
             </div>
           )}
+        </section>
+
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-900 mb-5">Activity history</h2>
+          <ActivityTimeline entityType="Vendor" entityId={vendorId} />
         </section>
       </div>
     </div>

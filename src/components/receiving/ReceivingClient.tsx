@@ -7,7 +7,7 @@ import { Download } from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 
 const inputClassName =
-  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-200";
+  "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-200";
 
 type VendorOption = {
   id: string;
@@ -230,7 +230,7 @@ export function ReceivingClient({
           </div>
           <Link
             href={`/${locale}/receiving/place`}
-            className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="rounded-2xl border border-slate-200 px-5 py-3 text-base lg:text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             Pallet Placement
           </Link>
@@ -249,6 +249,7 @@ export function ReceivingClient({
                     setReceivingRows([]);
                   }}
                   className={inputClassName}
+                  autoFocus
                 >
                   <option value="">Choose vendor</option>
                   {vendors.map((vendor) => (
@@ -396,11 +397,11 @@ export function ReceivingClient({
               </Field>
             </div>
 
-            <div className="mt-6 flex justify-end">
+            <div className="fixed bottom-0 inset-x-0 p-4 bg-white border-t border-slate-200 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] flex gap-3 z-50 lg:static lg:mt-6 lg:p-0 lg:border-none lg:bg-transparent lg:shadow-none lg:justify-end">
               <button
                 onClick={() => void submitReceiving()}
                 disabled={submitting || !selectedPurchaseOrder}
-                className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
+                className="flex-1 lg:flex-initial rounded-2xl bg-slate-900 px-5 py-4 text-base lg:py-3 lg:text-sm font-semibold text-white disabled:opacity-60"
               >
                 Complete Receiving
               </button>
@@ -472,11 +473,11 @@ export function ReceivingClient({
                     )}
                   </div>
 
-                  <div className="mt-5 flex justify-end">
+                  <div className="fixed bottom-0 inset-x-0 p-4 bg-white border-t border-slate-200 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] flex gap-3 z-50 lg:static lg:mt-5 lg:p-0 lg:border-none lg:bg-transparent lg:shadow-none lg:justify-end">
                     <button
                       onClick={() => void createPallet()}
                       disabled={submitting || palletAvailability.length === 0}
-                      className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
+                      className="flex-1 lg:flex-initial rounded-2xl bg-slate-900 px-5 py-4 text-base lg:py-3 lg:text-sm font-semibold text-white disabled:opacity-60"
                     >
                       Create Pallet
                     </button>
