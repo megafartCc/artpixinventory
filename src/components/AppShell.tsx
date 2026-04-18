@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   ArrowLeftRight,
   BarChart3,
+  Bell,
   Boxes,
   Check,
   ChevronDown,
@@ -66,6 +67,20 @@ const localeOptions = [
   { value: "ua", label: "UA" },
 ];
 
+type StaticSearchItem = {
+  label: string;
+  href: string;
+  keywords: string[];
+};
+
+type EntitySearchItem = {
+  label: string;
+  href: string;
+  keywords: string[];
+  subtitle: string;
+  kind: string;
+};
+
 const roleBadgeColor: Record<string, string> = {
   ADMIN: "border-fuchsia-200 bg-fuchsia-100 text-fuchsia-700",
   MANAGER: "border-sky-200 bg-sky-100 text-sky-700",
@@ -108,9 +123,17 @@ function LocaleFlag({ locale }: { locale: string }) {
 export function AppShell({
   children,
   locale,
+  notificationItems,
 }: {
   children: React.ReactNode;
   locale: string;
+  notificationItems: Array<{
+    id: string;
+    title: string;
+    detail: string;
+    href: string;
+    tone: "amber" | "rose" | "slate";
+  }>;
 }) {
   const t = useTranslations("Navigation");
   const reportsStock = useTranslations("ReportsStockLevels");
@@ -125,11 +148,21 @@ export function AppShell({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [localeMenuOpen, setLocaleMenuOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [entityResults, setEntityResults] = useState<Array<{
+    id: string;
+    label: string;
+    subtitle: string;
+    href: string;
+    kind: string;
+  }>>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const localeMenuRef = useRef<HTMLDivElement>(null);
   const accountMenuRef = useRef<HTMLDivElement>(null);
+  const notificationMenuRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
 
   const role = (session?.user as { role?: string })?.role || "WAREHOUSE";
@@ -137,7 +170,7 @@ export function AppShell({
   const currentLocale =
     localeOptions.find((option) => option.value === locale) ?? localeOptions[0];
 
-  const searchItems = [
+  const searchItems: StaticSearchItem[] = [
     { label: t("dashboard"), href: "/", keywords: ["home", "overview", "panel"] },
     { label: t("products"), href: "/products", keywords: ["catalog", "items", "sku"] },
     { label: t("stock"), href: "/stock", keywords: ["inventory", "levels", "quantity"] },
@@ -181,13 +214,25 @@ export function AppShell({
   ];
 
   const normalizedSearch = deferredSearchQuery.trim().toLowerCase();
-  const filteredSearchItems = (
+  const filteredPageItems: StaticSearchItem[] = (
     normalizedSearch
       ? searchItems.filter((item) =>
           `${item.label} ${item.keywords.join(" ")}`.toLowerCase().includes(normalizedSearch)
         )
       : searchItems
-  ).slice(0, 8);
+  ).slice(0, normalizedSearch ? 5 : 8);
+  const filteredSearchItems: Array<StaticSearchItem | EntitySearchItem> = normalizedSearch
+    ? [
+        ...filteredPageItems,
+        ...entityResults.map((item) => ({
+          label: item.label,
+          href: item.href,
+          keywords: [item.kind, item.subtitle],
+          subtitle: item.subtitle,
+          kind: item.kind,
+        })),
+      ].slice(0, 10)
+    : filteredPageItems;
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -197,6 +242,9 @@ export function AppShell({
       }
       if (accountMenuRef.current && !accountMenuRef.current.contains(target)) {
         setAccountMenuOpen(false);
+      }
+      if (notificationMenuRef.current && !notificationMenuRef.current.contains(target)) {
+        setNotificationOpen(false);
       }
       if (searchRef.current && !searchRef.current.contains(target)) {
         setSearchOpen(false);
@@ -210,9 +258,47 @@ export function AppShell({
   useEffect(() => {
     setLocaleMenuOpen(false);
     setAccountMenuOpen(false);
+    setNotificationOpen(false);
     setSearchOpen(false);
     setMobileMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    const query = deferredSearchQuery.trim();
+    if (query.length < 2) {
+      setEntityResults([]);
+      setSearchLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    setSearchLoading(true);
+
+    fetch(`/api/search?q=${encodeURIComponent(query)}`, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Search failed");
+        }
+        const payload = (await response.json()) as {
+          items: Array<{
+            id: string;
+            label: string;
+            subtitle: string;
+            href: string;
+            kind: string;
+          }>;
+        };
+        setEntityResults(payload.items);
+      })
+      .catch((error) => {
+        if ((error as Error).name !== "AbortError") {
+          setEntityResults([]);
+        }
+      })
+      .finally(() => setSearchLoading(false));
+
+    return () => controller.abort();
+  }, [deferredSearchQuery]);
 
   const navigateFromSearch = (href: string) => {
     setSearchQuery("");
@@ -335,7 +421,7 @@ export function AppShell({
                       setSearchOpen(false);
                     }
                   }}
-                  placeholder="Search pages"
+                  placeholder="Search inventory"
                   className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-slate-300 focus:bg-white focus:ring-4 focus:ring-slate-100"
                 />
                 {searchOpen && (
@@ -354,11 +440,15 @@ export function AppShell({
                                 {item.label}
                               </span>
                               <span className="block text-xs text-slate-400">
-                                {item.href === "/" ? "/dashboard" : item.href}
+                                {"subtitle" in item
+                                  ? item.subtitle
+                                  : item.href === "/"
+                                    ? "/dashboard"
+                                    : item.href}
                               </span>
                             </span>
                             <span className="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium uppercase tracking-wide text-slate-500">
-                              Go
+                              {"kind" in item ? item.kind : "Go"}
                             </span>
                           </button>
                         ))}
@@ -368,12 +458,74 @@ export function AppShell({
                         No matching pages found.
                       </div>
                     )}
+                    {searchLoading && (
+                      <div className="border-t border-slate-200 px-4 py-3 text-xs text-slate-400">
+                        Searching...
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             </div>
 
             <div className="ml-auto flex items-center gap-2 sm:gap-3">
+              <div ref={notificationMenuRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setNotificationOpen((current) => !current)}
+                  className="relative flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700"
+                  aria-label="Notifications"
+                >
+                  <Bell className="h-4 w-4" />
+                  {notificationItems.length > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-semibold text-white">
+                      {notificationItems.length}
+                    </span>
+                  )}
+                </button>
+                {notificationOpen && (
+                  <div className="absolute right-0 top-[calc(100%+10px)] z-40 w-[320px] rounded-xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-200/60">
+                    <div className="px-3 py-2">
+                      <p className="text-sm font-semibold text-slate-900">Notifications</p>
+                      <p className="mt-1 text-xs text-slate-500">Alerts and operational attention items.</p>
+                    </div>
+                    <div className="mt-1 space-y-1">
+                      {notificationItems.length === 0 ? (
+                        <div className="rounded-lg px-3 py-4 text-sm text-slate-500">
+                          No alerts right now.
+                        </div>
+                      ) : (
+                        notificationItems.map((item) => (
+                          <Link
+                            key={item.id}
+                            href={`/${locale}${item.href}`}
+                            className="flex items-start gap-3 rounded-lg px-3 py-3 transition hover:bg-slate-50"
+                          >
+                            <span
+                              className={`mt-1 h-2.5 w-2.5 rounded-full ${
+                                item.tone === "rose"
+                                  ? "bg-rose-500"
+                                  : item.tone === "amber"
+                                    ? "bg-amber-500"
+                                    : "bg-slate-400"
+                              }`}
+                            />
+                            <span className="min-w-0">
+                              <span className="block text-sm font-medium text-slate-800">
+                                {item.title}
+                              </span>
+                              <span className="mt-1 block text-xs text-slate-500">
+                                {item.detail}
+                              </span>
+                            </span>
+                          </Link>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div ref={localeMenuRef} className="relative">
                 <button
                   type="button"

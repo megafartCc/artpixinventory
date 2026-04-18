@@ -76,10 +76,12 @@ const formatDimensions = (product: ProductRecord) =>
     : "-";
 
 export function ProductsClient({
+  locale,
   initialProducts,
   indexes,
   categories,
 }: {
+  locale: string;
   initialProducts: ProductRecord[];
   indexes: Option[];
   categories: Option[];
@@ -319,14 +321,22 @@ export function ProductsClient({
                   <tr><td colSpan={10} className="px-4 py-16 text-center text-slate-400">No products match the current filters.</td></tr>
                 ) : filteredProducts.map((product) => (
                   <tr key={product.id}>
-                    <td className="px-4 py-4 font-semibold text-slate-900">{product.compoundId}</td>
-                    <td className="px-4 py-4">{product.name}</td>
+                    <td className="px-4 py-4 font-semibold text-slate-900">
+                      <Link href={`/${locale}/products/${product.id}`} className="hover:text-slate-600">
+                        {product.compoundId}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-4">
+                      <Link href={`/${locale}/products/${product.id}`} className="hover:text-slate-600">
+                        {product.name}
+                      </Link>
+                    </td>
                     <td className="px-4 py-4">{product.indexName}</td>
                     <td className="px-4 py-4">
                       <div className="flex flex-wrap gap-1.5">
                         {product.categories.length ? product.categories.map((category) => (
                           <span key={`${product.id}-${category}`} className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">{category}</span>
-                        )) : <span className="text-slate-400">—</span>}
+                        )) : <span className="text-slate-400">-</span>}
                       </div>
                     </td>
                     <td className="px-4 py-4 text-slate-500">{formatDimensions(product)}</td>
@@ -336,6 +346,12 @@ export function ProductsClient({
                     <td className="px-4 py-4">{product.active ? "Yes" : "No"}</td>
                     <td className="px-4 py-4">
                       <div className="flex justify-end gap-2">
+                        <Link
+                          href={`/${locale}/products/${product.id}`}
+                          className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                        >
+                          View
+                        </Link>
                         {canManageProducts ? (
                           <>
                             <button onClick={() => openEdit(product)} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">

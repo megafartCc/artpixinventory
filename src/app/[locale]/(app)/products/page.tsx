@@ -2,7 +2,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import prisma from "@/lib/prisma";
 import { ProductsClient } from "@/components/products/ProductsClient";
 
-export default async function ProductsPage() {
+export default async function ProductsPage({ params }: { params: { locale: string } }) {
   noStore();
 
   const [products, indexes, categories] = await Promise.all([
@@ -33,6 +33,7 @@ export default async function ProductsPage() {
 
   return (
     <ProductsClient
+      locale={params.locale}
       initialProducts={products.map((product) => ({
         id: product.id,
         compoundId: product.compoundId,

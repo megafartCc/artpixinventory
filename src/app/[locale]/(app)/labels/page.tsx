@@ -2,7 +2,11 @@ import { unstable_noStore as noStore } from "next/cache";
 import prisma from "@/lib/prisma";
 import { LabelsClient } from "@/components/labels/LabelsClient";
 
-export default async function LabelsPage() {
+export default async function LabelsPage({
+  searchParams,
+}: {
+  searchParams?: { tab?: string; product?: string };
+}) {
   noStore();
 
   const [products, locations, pallets] = await Promise.all([
@@ -25,5 +29,20 @@ export default async function LabelsPage() {
     }),
   ]);
 
-  return <LabelsClient products={products} locations={locations.map((location) => ({ ...location, qrCode: location.qrCode ?? `LOC-${location.id.slice(0, 8).toUpperCase()}` }))} pallets={pallets} />;
+  return (
+    <LabelsClient
+      initialTab={
+        searchParams?.tab === "locations" || searchParams?.tab === "pallets"
+          ? searchParams.tab
+          : "products"
+      }
+      initialProductId={searchParams?.product ?? ""}
+      products={products}
+      locations={locations.map((location) => ({
+        ...location,
+        qrCode: location.qrCode ?? `LOC-${location.id.slice(0, 8).toUpperCase()}`,
+      }))}
+      pallets={pallets}
+    />
+  );
 }
