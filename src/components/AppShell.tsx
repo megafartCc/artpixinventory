@@ -73,17 +73,23 @@ const roleBadgeColor: Record<string, string> = {
 };
 
 function LocaleFlag({ locale }: { locale: string }) {
-  const styles: Record<string, string> = {
-    en: "bg-[linear-gradient(135deg,#1d4ed8_0%,#1d4ed8_50%,#dc2626_50%,#dc2626_100%)]",
-    ru: "bg-[linear-gradient(180deg,#ffffff_0%,#ffffff_33%,#2563eb_33%,#2563eb_66%,#dc2626_66%,#dc2626_100%)]",
-    ua: "bg-[linear-gradient(180deg,#2563eb_0%,#2563eb_50%,#facc15_50%,#facc15_100%)]",
-  };
-
   return (
     <span
-      className={`h-5 w-5 rounded-full border border-slate-200 shadow-sm ${styles[locale] ?? styles.en}`}
+      className="relative h-5 w-5 overflow-hidden rounded-full border border-slate-200 shadow-sm"
       aria-hidden="true"
-    />
+    >
+      {locale === "en" ? (
+        <>
+          <span className="absolute inset-0 bg-[repeating-linear-gradient(180deg,#dc2626_0_14%,#ffffff_14%_28%)]" />
+          <span className="absolute left-0 top-0 h-[58%] w-[58%] bg-[#1d4ed8]" />
+          <span className="absolute left-[14%] top-[16%] h-1 w-1 rounded-full bg-white shadow-[3px_0_0_0_white,6px_0_0_0_white,0_3px_0_0_white,3px_3px_0_0_white,6px_3px_0_0_white]" />
+        </>
+      ) : locale === "ru" ? (
+        <span className="absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#ffffff_33%,#2563eb_33%,#2563eb_66%,#dc2626_66%,#dc2626_100%)]" />
+      ) : (
+        <span className="absolute inset-0 bg-[linear-gradient(180deg,#2563eb_0%,#2563eb_50%,#facc15_50%,#facc15_100%)]" />
+      )}
+    </span>
   );
 }
 
@@ -298,10 +304,10 @@ export function AppShell({
                     }
                   }}
                   placeholder="Search pages"
-                  className="h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-slate-300 focus:bg-white focus:ring-4 focus:ring-slate-100"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-slate-300 focus:bg-white focus:ring-4 focus:ring-slate-100"
                 />
                 {searchOpen && (
-                  <div className="absolute inset-x-0 top-[calc(100%+10px)] z-40 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
+                  <div className="absolute inset-x-0 top-[calc(100%+10px)] z-40 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
                     {filteredSearchItems.length > 0 ? (
                       <div className="max-h-80 overflow-y-auto p-2">
                         {filteredSearchItems.map((item) => (
@@ -309,7 +315,7 @@ export function AppShell({
                             key={item.href}
                             type="button"
                             onClick={() => navigateFromSearch(item.href)}
-                            className="flex w-full items-center justify-between rounded-xl px-3 py-3 text-left transition hover:bg-slate-50"
+                          className="flex w-full items-center justify-between rounded-lg px-3 py-3 text-left transition hover:bg-slate-50"
                           >
                             <span>
                               <span className="block text-sm font-medium text-slate-800">
@@ -340,7 +346,7 @@ export function AppShell({
                 <button
                   type="button"
                   onClick={() => setLocaleMenuOpen((current) => !current)}
-                  className="flex h-11 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                  className="flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
                 >
                   <LocaleFlag locale={currentLocale.value} />
                   <span>{currentLocale.label}</span>
@@ -351,14 +357,14 @@ export function AppShell({
                   />
                 </button>
                 {localeMenuOpen && (
-                  <div className="absolute right-0 top-[calc(100%+10px)] z-40 min-w-[168px] rounded-2xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-200/60">
+                  <div className="absolute right-0 top-[calc(100%+10px)] z-40 min-w-[168px] rounded-xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-200/60">
                     {localeOptions.map((option) => {
                       const active = option.value === locale;
                       return (
                         <Link
                           key={option.value}
                           href={`/${option.value}${pathname}`}
-                          className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-sm transition ${
+                          className={`flex items-center justify-between rounded-lg px-3 py-2.5 text-sm transition ${
                             active
                               ? "bg-slate-100 font-medium text-slate-900"
                               : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
@@ -378,29 +384,34 @@ export function AppShell({
 
               {session?.user && (
                 <>
-                  <div className="hidden min-w-[104px] flex-col items-center justify-center gap-1 text-center sm:flex">
-                    <p className="text-base font-semibold leading-none text-slate-800">
-                      {session.user.name}
-                    </p>
-                    <span
-                      className={`inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] ${roleClassName}`}
-                    >
-                      {role}
-                    </span>
-                  </div>
-
                   <div ref={accountMenuRef} className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setAccountMenuOpen((current) => !current)}
-                      className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700"
-                      aria-label="Account"
-                    >
-                      <LogOut className="h-4 w-4" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <div className="hidden min-w-[104px] flex-col items-center justify-center gap-1 text-center sm:flex">
+                        <p className="text-base font-semibold leading-none text-slate-800">
+                          {session.user.name}
+                        </p>
+                        <span
+                          className={`inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] ${roleClassName}`}
+                        >
+                          {role}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setAccountMenuOpen((current) => !current)}
+                        className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700"
+                        aria-label="Account"
+                      >
+                        <ChevronDown
+                          className={`h-5 w-5 transition-transform ${
+                            accountMenuOpen ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+                    </div>
                     {accountMenuOpen && (
-                      <div className="absolute right-0 top-[calc(100%+10px)] z-40 min-w-[200px] rounded-2xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-200/60">
-                        <div className="rounded-xl bg-slate-50 px-3 py-3 sm:hidden">
+                      <div className="absolute right-0 top-[calc(100%+10px)] z-40 min-w-[200px] rounded-xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-200/60">
+                        <div className="rounded-lg bg-slate-50 px-3 py-3 sm:hidden">
                           <p className="text-sm font-semibold text-slate-800">
                             {session.user.name}
                           </p>
@@ -413,7 +424,7 @@ export function AppShell({
                         <button
                           type="button"
                           onClick={() => signOut({ callbackUrl: `/${locale}/login` })}
-                          className="mt-2 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-rose-50 hover:text-rose-600 sm:mt-0"
+                          className="mt-2 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-rose-50 hover:text-rose-600 sm:mt-0"
                         >
                           <LogOut className="h-4 w-4" />
                           <span>Sign out</span>
