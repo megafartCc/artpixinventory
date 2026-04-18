@@ -125,8 +125,8 @@ export function DefectReportFormClient({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-6">
-      <div className="mx-auto max-w-5xl space-y-6">
+    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="flex w-full flex-col gap-6">
         <div>
           <Link href={`/${locale}/defects`} className="text-sm font-medium text-slate-500 hover:text-slate-700">
             {t("back")}
@@ -135,7 +135,7 @@ export function DefectReportFormClient({
           <p className="mt-1 text-slate-500">{t("subtitle")}</p>
         </div>
 
-        <div className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 md:grid-cols-2">
+        <div className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 md:grid-cols-2 xl:grid-cols-3">
           <label className="space-y-1 text-sm text-slate-600">
             <span className="font-medium text-slate-700">{t("source")}</span>
             <select value={source} onChange={(event) => setSource(event.target.value as typeof source)} className={inputClassName}>
@@ -192,7 +192,7 @@ export function DefectReportFormClient({
             <input value={operatorName} onChange={(event) => setOperatorName(event.target.value)} className={inputClassName} />
           </label>
 
-          <label className="space-y-1 text-sm text-slate-600 md:col-span-2">
+          <label className="space-y-1 text-sm text-slate-600 md:col-span-2 xl:col-span-3">
             <span className="font-medium text-slate-700">{t("notes")}</span>
             <textarea value={notes} onChange={(event) => setNotes(event.target.value)} rows={3} className={inputClassName} />
           </label>

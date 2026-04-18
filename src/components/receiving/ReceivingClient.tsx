@@ -217,8 +217,8 @@ export function ReceivingClient({
   };
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mx-auto max-w-7xl space-y-6">
+    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="flex w-full flex-col gap-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">Receiving</h1>
@@ -246,7 +246,7 @@ export function ReceivingClient({
           </div>
         )}
 
-        <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="grid gap-6 2xl:grid-cols-[1.2fr_0.8fr]">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-slate-900">Receive PO</h2>
             <div className="mt-5 grid gap-4 md:grid-cols-2">

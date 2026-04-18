@@ -73,8 +73,8 @@ export function PalletPlacementClient({
   };
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mx-auto max-w-6xl space-y-6">
+    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="flex w-full flex-col gap-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <Link
@@ -102,7 +102,7 @@ export function PalletPlacementClient({
           </div>
         )}
 
-        <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+        <div className="grid gap-6 2xl:grid-cols-[0.95fr_1.05fr]">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="space-y-5">
               <Field label="Scan Pallet QR">

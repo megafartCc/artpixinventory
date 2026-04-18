@@ -248,8 +248,8 @@ export function TransferWorkflowClient({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-6">
-      <div className="mx-auto max-w-5xl space-y-6">
+    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="flex w-full flex-col gap-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <Link
@@ -292,7 +292,7 @@ export function TransferWorkflowClient({
         )}
 
         {currentTransfer && (
-          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="grid gap-6 2xl:grid-cols-[1.1fr_0.9fr]">
             <section className="space-y-6">
               {currentTransfer.status === "COLLECTING" && (
                 <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
