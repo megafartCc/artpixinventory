@@ -74,6 +74,10 @@ const roleBadgeColor: Record<string, string> = {
 };
 
 function LocaleFlag({ locale }: { locale: string }) {
+  const usRows = [
+    0, 14, 28, 42, 56, 70, 84,
+  ];
+
   return (
     <span
       className="relative h-5 w-5 overflow-hidden rounded-full border border-slate-200 shadow-sm"
@@ -81,9 +85,16 @@ function LocaleFlag({ locale }: { locale: string }) {
     >
       {locale === "en" ? (
         <>
-          <span className="absolute inset-0 bg-[repeating-linear-gradient(180deg,#dc2626_0_14%,#ffffff_14%_28%)]" />
-          <span className="absolute left-0 top-0 h-[58%] w-[58%] bg-[#1d4ed8]" />
-          <span className="absolute left-[14%] top-[16%] h-1 w-1 rounded-full bg-white shadow-[3px_0_0_0_white,6px_0_0_0_white,0_3px_0_0_white,3px_3px_0_0_white,6px_3px_0_0_white]" />
+          <span className="absolute inset-0 bg-white" />
+          {usRows.map((top) => (
+            <span
+              key={top}
+              className="absolute left-0 right-0 bg-[#b22234]"
+              style={{ top: `${top}%`, height: "8%" }}
+            />
+          ))}
+          <span className="absolute left-0 top-0 h-[54%] w-[58%] bg-[#3c3b6e]" />
+          <span className="absolute left-[10%] top-[10%] h-[6%] w-[6%] rounded-full bg-white shadow-[3px_0_0_0_white,6px_0_0_0_white,9px_0_0_0_white,12px_0_0_0_white,0_4px_0_0_white,3px_4px_0_0_white,6px_4px_0_0_white,9px_4px_0_0_white,12px_4px_0_0_white,0_8px_0_0_white,3px_8px_0_0_white,6px_8px_0_0_white,9px_8px_0_0_white,12px_8px_0_0_white]" />
         </>
       ) : locale === "ru" ? (
         <span className="absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#ffffff_33%,#2563eb_33%,#2563eb_66%,#dc2626_66%,#dc2626_100%)]" />
