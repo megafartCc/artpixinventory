@@ -1,5 +1,13 @@
 import { unstable_noStore as noStore } from "next/cache";
 import { getTranslations } from "next-intl/server";
+import {
+  AlertTriangle,
+  ArrowLeftRight,
+  Boxes,
+  FileText,
+  LayoutDashboard,
+  Package,
+} from "lucide-react";
 import prisma from "@/lib/prisma";
 
 export default async function DashboardPage({ params }: { params: { locale: string } }) {
@@ -58,80 +66,192 @@ export default async function DashboardPage({ params }: { params: { locale: stri
     prisma.transfer.count({ where: { status: { in: ["COLLECTING", "DROPPING"] } } }),
   ]);
 
-  const lowStockAlerts = allStockRows
+  const localeMap: Record<string, string> = {
+    en: "en-US",
+    ru: "ru-RU",
+    ua: "uk-UA",
+  };
+
+  const dateFormatter = new Intl.DateTimeFormat(localeMap[params.locale] ?? "en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const dateTimeFormatter = new Intl.DateTimeFormat(localeMap[params.locale] ?? "en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const lowStockRows = allStockRows
     .filter((row) => row.quantity <= row.product.minStock)
-    .sort((a, b) => a.quantity - b.quantity)
-    .slice(0, 8);
+    .sort((a, b) => a.quantity - b.quantity);
+  const lowStockAlerts = lowStockRows.slice(0, 8);
+  const recentActivityItems = recentActivity.slice(0, 10);
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mx-auto max-w-7xl space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
-          <p className="mt-1 text-slate-500">{t("description")}</p>
+    <div className="px-4 py-5 sm:px-6 lg:px-10 xl:px-12">
+      <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-6">
+        <section className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 shadow-xl shadow-slate-300/40">
+          <div className="absolute inset-y-0 right-0 w-1/2 bg-[radial-gradient(circle_at_top_right,_rgba(99,102,241,0.38),_transparent_60%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-[linear-gradient(to_top,_rgba(255,255,255,0.05),_transparent)]" />
+
+          <div className="relative grid gap-6 px-6 py-6 sm:px-7 lg:grid-cols-[minmax(0,1.7fr)_minmax(320px,1fr)] lg:px-8 lg:py-8 xl:px-10 xl:py-10">
+            <div className="space-y-5">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-100">
+                <LayoutDashboard className="h-4 w-4" />
+                {t("title")}
+              </div>
+
+              <div className="max-w-3xl">
+                <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl xl:text-[3.4rem] xl:leading-[1.05]">
+                  {t("title")}
+                </h1>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+                  {t("description")}
+                </p>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                <HeroMetric label={t("lowStock")} value={String(lowStockRows.length)} />
+                <HeroMetric label={t("activeCountSessions")} value={String(activeCounts)} />
+                <HeroMetric label={t("activeTransfers")} value={String(activeTransfers)} />
+              </div>
+            </div>
+
+            <div className="grid gap-3 rounded-[24px] border border-white/10 bg-white/10 p-4 backdrop-blur-sm sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+              <QuickOverviewItem label={t("totalProducts")} value={String(totalProducts)} />
+              <QuickOverviewItem label={t("openPos")} value={String(openPoCount)} />
+              <QuickOverviewItem label={t("pendingDefects")} value={String(pendingDefects)} />
+            </div>
+          </div>
+        </section>
+
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <StatCard
+            title={t("totalProducts")}
+            value={String(totalProducts)}
+            icon={Package}
+            iconClassName="bg-slate-900 text-white"
+          />
+          <StatCard
+            title={t("lowStock")}
+            value={String(lowStockRows.length)}
+            icon={Boxes}
+            iconClassName="bg-amber-100 text-amber-700"
+          />
+          <StatCard
+            title={t("openPos")}
+            value={String(openPoCount)}
+            icon={FileText}
+            iconClassName="bg-sky-100 text-sky-700"
+          />
+          <StatCard
+            title={t("pendingDefects")}
+            value={String(pendingDefects)}
+            icon={AlertTriangle}
+            iconClassName="bg-rose-100 text-rose-700"
+          />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard title={t("totalProducts")} value={String(totalProducts)} />
-          <StatCard title={t("lowStock")} value={String(lowStockAlerts.length)} />
-          <StatCard title={t("openPos")} value={String(openPoCount)} />
-          <StatCard title={t("pendingDefects")} value={String(pendingDefects)} />
-        </div>
-
-        <div className="grid gap-4 lg:grid-cols-3">
-          <AlertCard title={t("lowStockItems")}>
+        <div className="grid gap-5 xl:grid-cols-3">
+          <DashboardPanel title={t("lowStockItems")}>
             {lowStockAlerts.length === 0 ? (
-              <p className="text-sm text-slate-400">{t("noLowStockAlerts")}</p>
+              <EmptyState message={t("noLowStockAlerts")} />
             ) : (
               lowStockAlerts.map((row) => (
-                <p key={row.id} className="text-sm text-slate-700">
-                  {row.product.compoundId} @ {row.location.name}: {row.quantity} ({t("min")} {row.product.minStock})
-                </p>
+                <DashboardListItem
+                  key={row.id}
+                  title={`${row.product.compoundId} / ${row.location.name}`}
+                  detail={`${t("qty")} ${row.quantity} / ${t("min")} ${row.product.minStock}`}
+                />
               ))
             )}
-          </AlertCard>
+          </DashboardPanel>
 
-          <AlertCard title={t("overduePo")}>
+          <DashboardPanel title={t("overduePo")}>
             {overduePos.length === 0 ? (
-              <p className="text-sm text-slate-400">{t("noOverduePo")}</p>
+              <EmptyState message={t("noOverduePo")} />
             ) : (
               overduePos.map((po) => (
-                <p key={po.id} className="text-sm text-slate-700">
-                  {po.poNumber} — {po.vendor.name} ({t("expected")} {po.expectedDate?.toISOString().slice(0, 10)})
-                </p>
+                <DashboardListItem
+                  key={po.id}
+                  title={`${po.poNumber} / ${po.vendor.name}`}
+                  detail={`${t("expected")} ${po.expectedDate ? dateFormatter.format(po.expectedDate) : "-"}`}
+                />
               ))
             )}
-          </AlertCard>
+          </DashboardPanel>
 
-          <AlertCard title={t("wrongLocationEvents")}>
+          <DashboardPanel title={t("wrongLocationEvents")}>
             {wrongLocationEvents.length === 0 ? (
-              <p className="text-sm text-slate-400">{t("noWrongLocationEvents")}</p>
+              <EmptyState message={t("noWrongLocationEvents")} />
             ) : (
               wrongLocationEvents.map((event) => (
-                <p key={event.id} className="text-sm text-slate-700">
-                  {event.machine.name}: {event.product.compoundId} {t("qty")} {event.quantity}
-                </p>
+                <DashboardListItem
+                  key={event.id}
+                  title={`${event.machine.name} / ${event.product.compoundId}`}
+                  detail={`${t("qty")} ${event.quantity}`}
+                />
               ))
             )}
-          </AlertCard>
+          </DashboardPanel>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">{t("recentActivity")}</h2>
-            <div className="mt-3 space-y-2">
-              {recentActivity.map((entry) => (
-                <p key={entry.id} className="text-sm text-slate-700">
-                  <span className="font-medium">{entry.action}</span> — {entry.entityType} {t("by")} {entry.user?.name ?? t("system")} {t("at")} {entry.createdAt.toISOString().slice(0, 16).replace("T", " ")}
-                </p>
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,1fr)]">
+          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">{t("recentActivity")}</h2>
+              <p className="mt-1 text-sm text-slate-500">{t("description")}</p>
+            </div>
+
+            <div className="mt-5 space-y-3">
+              {recentActivityItems.map((entry) => (
+                <div
+                  key={entry.id}
+                  className="flex items-start gap-3 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3"
+                >
+                  <div className="mt-1.5 h-2.5 w-2.5 rounded-full bg-indigo-500" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-900">
+                      {entry.action} / {entry.entityType}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {t("by")} {entry.user?.name ?? t("system")} / {t("at")}{" "}
+                      {dateTimeFormatter.format(entry.createdAt)}
+                    </p>
+                  </div>
+                </div>
               ))}
             </div>
           </section>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <h2 className="text-lg font-semibold text-slate-900">{t("activeOps")}</h2>
-            <p className="mt-3 text-sm text-slate-700">{t("activeCountSessions")}: {activeCounts}</p>
-            <p className="mt-1 text-sm text-slate-700">{t("activeTransfers")}: {activeTransfers}</p>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+              <ActiveMetricCard
+                title={t("activeCountSessions")}
+                value={String(activeCounts)}
+                icon={Boxes}
+              />
+              <ActiveMetricCard
+                title={t("activeTransfers")}
+                value={String(activeTransfers)}
+                icon={ArrowLeftRight}
+              />
+            </div>
+
+            <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+              <div className="space-y-3">
+                <SummaryRow label={t("openPos")} value={String(openPoCount)} />
+                <SummaryRow label={t("pendingDefects")} value={String(pendingDefects)} />
+                <SummaryRow label={t("overduePo")} value={String(overduePos.length)} />
+                <SummaryRow label={t("wrongLocationEvents")} value={String(wrongLocationEvents.length)} />
+              </div>
+            </div>
           </section>
         </div>
       </div>
@@ -139,20 +259,104 @@ export default async function DashboardPage({ params }: { params: { locale: stri
   );
 }
 
-function StatCard({ title, value }: { title: string; value: string }) {
+function HeroMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <p className="text-xs uppercase tracking-wide text-slate-500">{title}</p>
-      <p className="mt-2 text-2xl font-semibold text-slate-900">{value}</p>
+    <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-4 backdrop-blur-sm">
+      <p className="text-xs uppercase tracking-[0.2em] text-slate-300">{label}</p>
+      <p className="mt-3 text-3xl font-semibold text-white">{value}</p>
     </div>
   );
 }
 
-function AlertCard({ title, children }: { title: string; children: React.ReactNode }) {
+function QuickOverviewItem({ label, value }: { label: string; value: string }) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-white/10 bg-slate-950/20 px-4 py-4">
+      <p className="text-sm text-slate-300">{label}</p>
+      <p className="mt-2 text-3xl font-semibold text-white">{value}</p>
+    </div>
+  );
+}
+
+function StatCard({
+  title,
+  value,
+  icon: Icon,
+  iconClassName,
+}: {
+  title: string;
+  value: string;
+  icon: React.ComponentType<{ className?: string }>;
+  iconClassName: string;
+}) {
+  return (
+    <div className="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm transition-transform duration-200 hover:-translate-y-0.5 sm:min-h-[170px] sm:p-6">
+      <div className="flex items-start justify-between gap-4">
+        <p className="max-w-[12rem] text-sm font-medium uppercase tracking-[0.18em] text-slate-500">
+          {title}
+        </p>
+        <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${iconClassName}`}>
+          <Icon className="h-5 w-5" />
+        </div>
+      </div>
+
+      <p className="mt-10 text-4xl font-semibold tracking-tight text-slate-900">{value}</p>
+    </div>
+  );
+}
+
+function DashboardPanel({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
-      <div className="mt-3 space-y-1">{children}</div>
+      <div className="mt-5 space-y-3">{children}</div>
     </section>
+  );
+}
+
+function DashboardListItem({ title, detail }: { title: string; detail: string }) {
+  return (
+    <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3">
+      <p className="text-sm font-medium text-slate-900">{title}</p>
+      <p className="mt-1 text-xs text-slate-500">{detail}</p>
+    </div>
+  );
+}
+
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="flex min-h-[220px] items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 text-center text-sm text-slate-400">
+      {message}
+    </div>
+  );
+}
+
+function ActiveMetricCard({
+  title,
+  value,
+  icon: Icon,
+}: {
+  title: string;
+  value: string;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-sm font-medium text-slate-600">{title}</p>
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm">
+          <Icon className="h-5 w-5" />
+        </div>
+      </div>
+      <p className="mt-8 text-4xl font-semibold tracking-tight text-slate-900">{value}</p>
+    </div>
+  );
+}
+
+function SummaryRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-2xl bg-white px-4 py-3">
+      <p className="text-sm font-medium text-slate-600">{label}</p>
+      <p className="text-lg font-semibold text-slate-900">{value}</p>
+    </div>
   );
 }

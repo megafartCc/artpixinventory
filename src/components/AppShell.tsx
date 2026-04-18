@@ -186,20 +186,20 @@ export function AppShell({
 
             {/* Profile badge */}
             {session?.user && (
-              <div className="flex items-center gap-2">
-                <div className="hidden sm:block text-right">
-                  <p className="text-sm font-medium text-slate-700 leading-tight">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="hidden sm:flex min-w-[104px] flex-col items-end justify-center gap-1 text-right">
+                  <p className="text-sm font-medium leading-none text-slate-700">
                     {session.user.name}
                   </p>
                   <span
-                    className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${roleBadgeColor[role]}`}
+                    className={`inline-flex items-center rounded-md border px-2 py-1 text-[10px] font-semibold leading-none ${roleBadgeColor[role]}`}
                   >
                     {role}
                   </span>
                 </div>
                 <button
                   onClick={() => signOut({ callbackUrl: `/${locale}/login` })}
-                  className="p-2 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
                   title="Sign out"
                 >
                   <LogOut className="w-4 h-4" />
