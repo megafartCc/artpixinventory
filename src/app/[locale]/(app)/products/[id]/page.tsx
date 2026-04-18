@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
-import { AlertTriangle, ArrowLeftRight, Boxes, Package, Printer, Receipt, Truck } from "lucide-react";
+import { AlertTriangle, ArrowLeftRight, Boxes, Printer, Truck } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { buildProductLabelZpl } from "@/lib/zpl";
 
