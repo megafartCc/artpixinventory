@@ -344,41 +344,43 @@ export function LabelsClient({
   return (
     <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
       <div className="flex w-full flex-col gap-6">
-        <div className="flex flex-col gap-4 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 xl:flex-row xl:items-end xl:justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{t("title")}</h1>
-            <p className="mt-2 max-w-3xl text-sm text-slate-500">{t("subtitle")}</p>
+        <div className="grid gap-5 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 2xl:grid-cols-[minmax(0,1fr)_420px] 2xl:items-center">
+          <div className="space-y-4">
+            <div>
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{t("title")}</h1>
+              <p className="mt-2 max-w-2xl text-sm text-slate-500">{t("subtitle")}</p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setTab("products")}
+                className={`${tabButtonClass} ${tab === "products" ? "bg-slate-900 text-white" : "border border-slate-200 bg-white text-slate-700"}`}
+              >
+                {t("tabs.products")}
+              </button>
+              <button
+                onClick={() => setTab("locations")}
+                className={`${tabButtonClass} ${tab === "locations" ? "bg-slate-900 text-white" : "border border-slate-200 bg-white text-slate-700"}`}
+              >
+                {t("tabs.locations")}
+              </button>
+              <button
+                onClick={() => setTab("pallets")}
+                className={`${tabButtonClass} ${tab === "pallets" ? "bg-slate-900 text-white" : "border border-slate-200 bg-white text-slate-700"}`}
+              >
+                {t("tabs.pallets")}
+              </button>
+            </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-3 xl:w-[540px]">
-            <StatCard title="Ready labels" value={String(currentLabels.length)} icon={Printer} />
-            <StatCard title="Queue jobs" value={String(queueItems.length)} icon={Layers3} />
-            <StatCard title="Preset copies" value={String(activePreset.copies)} icon={Copy} />
+          <div className="grid gap-3 sm:grid-cols-3 2xl:grid-cols-1">
+            <StatCard title="Ready labels" value={String(currentLabels.length)} icon={Printer} compact />
+            <StatCard title="Queue jobs" value={String(queueItems.length)} icon={Layers3} compact />
+            <StatCard title="Preset copies" value={String(activePreset.copies)} icon={Copy} compact />
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setTab("products")}
-            className={`${tabButtonClass} ${tab === "products" ? "bg-slate-900 text-white" : "bg-white text-slate-700 border border-slate-200"}`}
-          >
-            {t("tabs.products")}
-          </button>
-          <button
-            onClick={() => setTab("locations")}
-            className={`${tabButtonClass} ${tab === "locations" ? "bg-slate-900 text-white" : "bg-white text-slate-700 border border-slate-200"}`}
-          >
-            {t("tabs.locations")}
-          </button>
-          <button
-            onClick={() => setTab("pallets")}
-            className={`${tabButtonClass} ${tab === "pallets" ? "bg-slate-900 text-white" : "bg-white text-slate-700 border border-slate-200"}`}
-          >
-            {t("tabs.pallets")}
-          </button>
-        </div>
-
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]">
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(360px,0.9fr)]">
           <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -393,94 +395,100 @@ export function LabelsClient({
             {tab === "products" ? (
               <div className="mt-5 space-y-2">
                 <p className="text-sm text-slate-600">{t("selectProducts")}</p>
-                {products.map((product) => {
-                  const checked = selectedProductIds.includes(product.id);
-                  return (
-                    <div key={product.id} className="flex items-center gap-3 rounded-2xl border border-slate-200 px-3 py-3">
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={(event) => {
-                          if (event.target.checked) {
-                            setSelectedProductIds((current) => [...current, product.id]);
-                            setProductQty((current) => ({ ...current, [product.id]: current[product.id] ?? "1" }));
-                          } else {
-                            setSelectedProductIds((current) => current.filter((id) => id !== product.id));
+                <div className="max-h-[660px] space-y-2 overflow-y-auto pr-1">
+                  {products.map((product) => {
+                    const checked = selectedProductIds.includes(product.id);
+                    return (
+                      <div key={product.id} className="grid grid-cols-[auto_minmax(0,1fr)_88px] items-center gap-3 rounded-2xl border border-slate-200 px-3 py-3">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(event) => {
+                            if (event.target.checked) {
+                              setSelectedProductIds((current) => [...current, product.id]);
+                              setProductQty((current) => ({ ...current, [product.id]: current[product.id] ?? "1" }));
+                            } else {
+                              setSelectedProductIds((current) => current.filter((id) => id !== product.id));
+                            }
+                          }}
+                        />
+                        <span className="min-w-0">
+                          <span className="block text-sm font-medium text-slate-800">{product.compoundId}</span>
+                          <span className="block truncate text-xs text-slate-500">{product.name}</span>
+                        </span>
+                        <input
+                          type="number"
+                          min={1}
+                          value={productQty[product.id] ?? "1"}
+                          onChange={(event) =>
+                            setProductQty((current) => ({ ...current, [product.id]: event.target.value }))
                           }
-                        }}
-                      />
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-medium text-slate-800">{product.compoundId}</span>
-                        <span className="block truncate text-xs text-slate-500">{product.name}</span>
-                      </span>
-                      <input
-                        type="number"
-                        min={1}
-                        value={productQty[product.id] ?? "1"}
-                        onChange={(event) =>
-                          setProductQty((current) => ({ ...current, [product.id]: event.target.value }))
-                        }
-                        className="w-20 rounded-xl border border-slate-200 px-3 py-2 text-sm"
-                      />
-                    </div>
-                  );
-                })}
+                          className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             ) : null}
 
             {tab === "locations" ? (
               <div className="mt-5 space-y-2">
                 <p className="text-sm text-slate-600">{t("selectLocations")}</p>
-                {locations.map((location) => (
-                  <label key={location.id} className="flex items-center gap-3 rounded-2xl border border-slate-200 px-3 py-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedLocationIds.includes(location.id)}
-                      onChange={(event) => {
-                        if (event.target.checked) {
-                          setSelectedLocationIds((current) => [...current, location.id]);
-                        } else {
-                          setSelectedLocationIds((current) => current.filter((id) => id !== location.id));
-                        }
-                      }}
-                    />
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-medium text-slate-800">{location.name}</span>
-                      <span className="block text-xs text-slate-500">{location.type}</span>
-                    </span>
-                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                      {location.qrCode}
-                    </span>
-                  </label>
-                ))}
+                <div className="max-h-[660px] space-y-2 overflow-y-auto pr-1">
+                  {locations.map((location) => (
+                    <label key={location.id} className="flex items-center gap-3 rounded-2xl border border-slate-200 px-3 py-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedLocationIds.includes(location.id)}
+                        onChange={(event) => {
+                          if (event.target.checked) {
+                            setSelectedLocationIds((current) => [...current, location.id]);
+                          } else {
+                            setSelectedLocationIds((current) => current.filter((id) => id !== location.id));
+                          }
+                        }}
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-medium text-slate-800">{location.name}</span>
+                        <span className="block text-xs text-slate-500">{location.type}</span>
+                      </span>
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                        {location.qrCode}
+                      </span>
+                    </label>
+                  ))}
+                </div>
               </div>
             ) : null}
 
             {tab === "pallets" ? (
               <div className="mt-5 space-y-2">
                 <p className="text-sm text-slate-600">{t("recentPallets")}</p>
-                {pallets.map((pallet) => (
-                  <label key={pallet.id} className="flex items-center gap-3 rounded-2xl border border-slate-200 px-3 py-3">
-                    <input
-                      type="radio"
-                      name="pallet"
-                      checked={selectedPalletId === pallet.id}
-                      onChange={() => setSelectedPalletId(pallet.id)}
-                    />
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-medium text-slate-800">{pallet.palletNumber}</span>
-                      <span className="block text-xs text-slate-500">Status {pallet.status}</span>
-                    </span>
-                    {selectedPalletId === pallet.id ? (
-                      <Check className="h-4 w-4 text-emerald-600" />
-                    ) : null}
-                  </label>
-                ))}
+                <div className="max-h-[660px] space-y-2 overflow-y-auto pr-1">
+                  {pallets.map((pallet) => (
+                    <label key={pallet.id} className="flex items-center gap-3 rounded-2xl border border-slate-200 px-3 py-3">
+                      <input
+                        type="radio"
+                        name="pallet"
+                        checked={selectedPalletId === pallet.id}
+                        onChange={() => setSelectedPalletId(pallet.id)}
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-medium text-slate-800">{pallet.palletNumber}</span>
+                        <span className="block text-xs text-slate-500">Status {pallet.status}</span>
+                      </span>
+                      {selectedPalletId === pallet.id ? (
+                        <Check className="h-4 w-4 text-emerald-600" />
+                      ) : null}
+                    </label>
+                  ))}
+                </div>
               </div>
             ) : null}
           </section>
 
-          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <section className="self-start rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 xl:sticky xl:top-4">
             <h2 className="text-lg font-semibold text-slate-900">Print presets</h2>
             <div className="mt-5 space-y-3">
               {presetConfig[tab].map((preset) => {
@@ -538,9 +546,6 @@ export function LabelsClient({
               </ActionButton>
               <ActionButton onClick={printCurrent} icon={Printer}>
                 Print Preview
-              </ActionButton>
-              <ActionButton onClick={copyQueue} icon={Clipboard}>
-                Copy Queue ZPL
               </ActionButton>
             </div>
           </section>
@@ -601,7 +606,7 @@ export function LabelsClient({
                 <h2 className="text-lg font-semibold text-slate-900">Batch queue</h2>
                 <p className="mt-1 text-sm text-slate-500">Stage multiple print jobs before copying or printing them together.</p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => void printQueueToZebra()}
@@ -615,6 +620,13 @@ export function LabelsClient({
                   className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
                 >
                   Print Queue
+                </button>
+                <button
+                  type="button"
+                  onClick={copyQueue}
+                  className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                >
+                  Copy Queue ZPL
                 </button>
                 <button
                   type="button"
@@ -676,20 +688,22 @@ function StatCard({
   title,
   value,
   icon: Icon,
+  compact = false,
 }: {
   title: string;
   value: string;
   icon: React.ComponentType<{ className?: string }>;
+  compact?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+    <div className={`rounded-2xl border border-slate-200 bg-slate-50 ${compact ? "px-4 py-4" : "px-4 py-5"}`}>
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{title}</p>
         <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm">
           <Icon className="h-4 w-4" />
         </span>
       </div>
-      <p className="mt-4 text-3xl font-semibold tracking-tight text-slate-900">{value}</p>
+      <p className={`font-semibold tracking-tight text-slate-900 ${compact ? "mt-3 text-2xl" : "mt-4 text-3xl"}`}>{value}</p>
     </div>
   );
 }

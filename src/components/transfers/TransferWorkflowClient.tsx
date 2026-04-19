@@ -467,11 +467,11 @@ export function TransferWorkflowClient({
               </div>
             </section>
 
-            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_360px]">
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
               <section className="space-y-6">
                 {currentTransfer.status === "COLLECTING" && (
                   <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
                       <div>
                         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-600">
                           Collection mode
@@ -483,13 +483,11 @@ export function TransferWorkflowClient({
                           Paste or scan a location QR, confirm the source, then pick items directly from that source stock list.
                         </p>
                       </div>
-                      <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-600 lg:w-[260px]">
-                        <p className="font-semibold text-slate-900">Operator rules</p>
-                        <ul className="mt-3 space-y-2 text-sm text-slate-500">
-                          <li>Pick only from the scanned location.</li>
-                          <li>Switch to drop-off only after the cart is correct.</li>
-                          <li>Cancel will return every pick to origin.</li>
-                        </ul>
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <InlineNote>Pick only from the scanned location.</InlineNote>
+                        <InlineNote>Switch to drop-off only after the cart is correct.</InlineNote>
+                        <InlineNote>Cancel returns every pick to origin.</InlineNote>
                       </div>
                     </div>
 
@@ -627,7 +625,7 @@ export function TransferWorkflowClient({
 
                 {currentTransfer.status === "DROPPING" && (
                   <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
                       <div>
                         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-600">
                           Drop-off mode
@@ -639,13 +637,11 @@ export function TransferWorkflowClient({
                           Pick a remaining cart line, scan the destination, and confirm the exact quantity. Flagged destinations require an explicit exception approval.
                         </p>
                       </div>
-                      <div className="rounded-3xl border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-700 lg:w-[280px]">
-                        <p className="font-semibold">Drop controls</p>
-                        <ul className="mt-3 space-y-2 text-sm">
-                          <li>No switching back to collect mode.</li>
-                          <li>Wrong-location drops require approval.</li>
-                          <li>Transfer auto-completes when the cart reaches zero.</li>
-                        </ul>
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <InlineNote tone="amber">No switching back to collect mode.</InlineNote>
+                        <InlineNote tone="amber">Wrong-location drops require approval.</InlineNote>
+                        <InlineNote tone="amber">Transfer auto-completes when the cart reaches zero.</InlineNote>
                       </div>
                     </div>
 
@@ -846,7 +842,7 @@ export function TransferWorkflowClient({
                 )}
               </section>
 
-              <section className="space-y-6">
+              <section className="self-start space-y-6 xl:sticky xl:top-4">
                 <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                   <div className="flex items-center justify-between gap-3">
                     <h2 className="text-lg font-semibold text-slate-900">{t("cart")}</h2>
@@ -972,6 +968,26 @@ function FlowStep({
       <p className="text-xs font-semibold uppercase tracking-[0.18em]">{label}</p>
       <p className="mt-2 text-sm font-medium">{detail}</p>
     </div>
+  );
+}
+
+function InlineNote({
+  children,
+  tone = "sky",
+}: {
+  children: React.ReactNode;
+  tone?: "sky" | "amber";
+}) {
+  return (
+    <span
+      className={`rounded-full px-3 py-1.5 text-xs font-medium ${
+        tone === "sky"
+          ? "border border-sky-200 bg-sky-50 text-sky-700"
+          : "border border-amber-200 bg-amber-50 text-amber-700"
+      }`}
+    >
+      {children}
+    </span>
   );
 }
 

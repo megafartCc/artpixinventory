@@ -17,6 +17,53 @@ type ActivityLog = {
   } | null;
 };
 
+function formatDetailKey(value: string) {
+  return value
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function formatDetailValue(value: unknown) {
+  if (typeof value === "string") {
+    return value;
+  }
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  return "";
+}
+
+function summarizeDetails(details: unknown) {
+  if (!details) {
+    return "";
+  }
+
+  if (typeof details === "string") {
+    return details;
+  }
+
+  if (typeof details !== "object" || Array.isArray(details)) {
+    return "";
+  }
+
+  const summary = Object.entries(details as Record<string, unknown>)
+    .filter(([key, value]) => {
+      if (value === null || value === undefined || value === "") {
+        return false;
+      }
+      if (key.toLowerCase().endsWith("id")) {
+        return false;
+      }
+      return ["string", "number", "boolean"].includes(typeof value);
+    })
+    .slice(0, 4)
+    .map(([key, value]) => `${formatDetailKey(key)}: ${formatDetailValue(value)}`)
+    .join(" | ");
+
+  return summary;
+}
+
 function getActionIcon(action: string) {
   const lowerAction = action.toLowerCase();
   if (lowerAction.includes("create") || lowerAction.includes("add")) return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
@@ -106,35 +153,35 @@ export function ActivityTimeline({ entityType, entityId }: { entityType: string;
   }
 
   return (
-    <div className="relative space-y-6 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:border-l-2 before:border-slate-200 md:before:mx-auto md:before:translate-x-0">
+    <div className="relative space-y-4 before:absolute before:bottom-0 before:left-5 before:top-0 before:border-l-2 before:border-slate-200">
       {logs.map((log) => (
-        <div key={log.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-          <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+        <div key={log.id} className="relative flex items-start gap-4">
+          <div className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-4 border-white bg-white shadow">
             {getActionIcon(log.action)}
           </div>
-          
-          <div className={`w-[calc(100%-3rem)] md:w-[calc(50%-2.5rem)] rounded-2xl border ${getActionColor(log.action)} p-4 shadow-sm`}>
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-              <div>
+
+          <div className={`min-w-0 flex-1 rounded-2xl border ${getActionColor(log.action)} p-4 shadow-sm`}>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
                 <p className="text-sm font-semibold text-slate-900">{log.action}</p>
-                {Boolean(log.details) && (
-                  <p className="mt-1 text-xs text-slate-600 line-clamp-2">
-                    {typeof log.details === 'string' ? log.details : JSON.stringify(log.details)}
+                {summarizeDetails(log.details) && (
+                  <p className="mt-1 break-words text-xs text-slate-600">
+                    {summarizeDetails(log.details)}
                   </p>
                 )}
               </div>
-              <time className="shrink-0 text-xs text-slate-500 whitespace-nowrap">
+              <time className="shrink-0 whitespace-nowrap text-xs text-slate-500">
                 {formatTimeAgo(log.createdAt)}
               </time>
             </div>
-            
+
             {log.user && (
-              <div className="mt-3 flex items-center gap-2 border-t border-slate-200/60 pt-3">
+              <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-200/60 pt-3">
                 <div className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200">
                   <User className="h-3 w-3 text-slate-500" />
                 </div>
                 <span className="text-xs font-medium text-slate-700">{log.user.name}</span>
-                <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold tracking-wider text-slate-500 uppercase border border-slate-200/60">
+                <span className="rounded-full border border-slate-200/60 bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                   {log.user.role}
                 </span>
               </div>

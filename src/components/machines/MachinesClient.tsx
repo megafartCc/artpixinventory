@@ -153,19 +153,19 @@ export function MachinesClient({
   };
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="flex h-full min-h-0 flex-col px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="flex min-h-0 flex-1 flex-col gap-5">
+        <div className="flex flex-col gap-4 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">{t("title")}</h1>
-            <p className="mt-1 text-slate-500">
+            <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{t("title")}</h1>
+            <p className="mt-2 text-sm text-slate-500">
               {t("subtitle")}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <button
               onClick={syncPlaceholder}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+              className="inline-flex min-h-12 items-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-50 lg:min-h-0 lg:py-2.5"
             >
               <RefreshCcw className="h-4 w-4" />
               {t("syncFromErpix")}
@@ -173,7 +173,7 @@ export function MachinesClient({
             {canManage && (
               <button
                 onClick={openCreate}
-                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
+                className="inline-flex min-h-12 items-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800 lg:min-h-0 lg:py-2.5"
               >
                 <Plus className="h-4 w-4" />
                 {t("newMachine")}
@@ -182,7 +182,7 @@ export function MachinesClient({
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -191,33 +191,38 @@ export function MachinesClient({
           />
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="overflow-x-auto">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-200 px-5 py-4 sm:px-6">
+            <p className="text-sm font-medium text-slate-500">
+              {filteredMachines.length} {filteredMachines.length === 1 ? "machine" : "machines"} shown
+            </p>
+          </div>
+          <div className="min-h-0 flex-1 overflow-auto">
             <table className="min-w-full divide-y divide-slate-200">
-              <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <thead className="sticky top-0 z-10 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">{t("columns.name")}</th>
-                  <th className="px-4 py-3">{t("columns.type")}</th>
-                  <th className="px-4 py-3">{t("columns.sublocation")}</th>
-                  <th className="px-4 py-3">{t("columns.erpixId")}</th>
-                  <th className="px-4 py-3">{t("columns.active")}</th>
-                  <th className="px-4 py-3 text-right">{t("columns.actions")}</th>
+                  <th className="px-5 py-3 sm:px-6">{t("columns.name")}</th>
+                  <th className="px-5 py-3 sm:px-6">{t("columns.type")}</th>
+                  <th className="px-5 py-3 sm:px-6">{t("columns.sublocation")}</th>
+                  <th className="px-5 py-3 sm:px-6">{t("columns.erpixId")}</th>
+                  <th className="px-5 py-3 sm:px-6">{t("columns.active")}</th>
+                  <th className="px-5 py-3 text-right sm:px-6">{t("columns.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                 {filteredMachines.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-16 text-center text-slate-400">
+                    <td colSpan={6} className="px-5 py-20 text-center text-slate-400 sm:px-6">
                       {t("noMatch")}
                     </td>
                   </tr>
                 ) : (
                   filteredMachines.map((machine) => (
                     <tr key={machine.id}>
-                      <td className="px-4 py-4 font-semibold text-slate-900">
+                      <td className="px-5 py-4 font-semibold text-slate-900 sm:px-6">
                         {machine.name}
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-5 py-4 sm:px-6">
                         <span
                           className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                             machine.type === "STN"
@@ -228,9 +233,9 @@ export function MachinesClient({
                           {machine.type}
                         </span>
                       </td>
-                      <td className="px-4 py-4">{machine.locationName}</td>
-                      <td className="px-4 py-4">{machine.erpixMachineId || "—"}</td>
-                      <td className="px-4 py-4">
+                      <td className="px-5 py-4 sm:px-6">{machine.locationName}</td>
+                      <td className="px-5 py-4 sm:px-6">{machine.erpixMachineId || "—"}</td>
+                      <td className="px-5 py-4 sm:px-6">
                         <span
                           className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                             machine.active
@@ -241,7 +246,7 @@ export function MachinesClient({
                           {machine.active ? t("active") : t("inactive")}
                         </span>
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-5 py-4 sm:px-6">
                         <div className="flex justify-end gap-2">
                           <Link
                             href={`/${locale}/machines/${machine.id}`}

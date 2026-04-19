@@ -225,23 +225,23 @@ export function ReceivingClient({
   return (
     <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
       <div className="flex w-full flex-col gap-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-4 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
-            <p className="mt-1 text-slate-500">
+            <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{t("title")}</h1>
+            <p className="mt-2 text-sm text-slate-500">
               {t("subtitle")}
             </p>
           </div>
           <Link
             href={`/${locale}/receiving/place`}
-            className="rounded-2xl border border-slate-200 px-5 py-3 text-base lg:text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-slate-200 px-5 py-3 text-base font-medium text-slate-700 transition hover:bg-slate-50 lg:min-h-0 lg:text-sm"
           >
             {t("palletPlacement")}
           </Link>
         </div>
 
-        <div className="grid gap-6 2xl:grid-cols-[1.2fr_0.8fr]">
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="grid gap-6 2xl:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)]">
+          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <h2 className="text-lg font-semibold text-slate-900">{t("receivePo")}</h2>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               <Field label={t("step1")}>
@@ -292,128 +292,130 @@ export function ReceivingClient({
               </Field>
             </div>
 
-            <div className="mt-5 overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-200">
-                <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  <tr>
-                    <th className="px-4 py-3">{t("columns.product")}</th>
-                    <th className="px-4 py-3">{t("columns.ordered")}</th>
-                    <th className="px-4 py-3">{t("columns.received")}</th>
-                    <th className="px-4 py-3">{t("columns.remaining")}</th>
-                    <th className="px-4 py-3">{t("columns.receiveQty")}</th>
-                    <th className="px-4 py-3">{t("columns.damaged")}</th>
-                    <th className="px-4 py-3">{t("columns.notes")}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
-                  {!selectedPurchaseOrder ? (
-                    <tr>
-                      <td colSpan={7} className="px-4 py-16 text-center text-slate-400">
-                        {t("emptyTable")}
-                      </td>
-                    </tr>
-                  ) : (
-                    selectedPurchaseOrder.items.map((item) => {
-                      const row =
-                        receivingRows.find((entry) => entry.poItemId === item.poItemId) ??
-                        {
-                          poItemId: item.poItemId,
-                          receiveQty: "0",
-                          damagedQty: "0",
-                          notes: "",
-                        };
-
-                      return (
-                        <tr key={item.poItemId}>
-                          <td className="px-4 py-4">
-                            <div className="flex flex-col">
-                              <span className="font-semibold text-slate-900">
-                                {item.compoundId}
-                              </span>
-                              <span>{item.productName}</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-4">{item.orderedQty}</td>
-                          <td className="px-4 py-4">{item.receivedQty}</td>
-                          <td className="px-4 py-4">{item.remainingQty}</td>
-                          <td className="px-4 py-4">
-                            <input
-                              value={row.receiveQty}
-                              onChange={(event) =>
-                                setReceivingRows((current) =>
-                                  current.map((entry) =>
-                                    entry.poItemId === item.poItemId
-                                      ? { ...entry, receiveQty: event.target.value }
-                                      : entry
-                                  )
-                                )
-                              }
-                              className={inputClassName}
-                              inputMode="numeric"
-                            />
-                          </td>
-                          <td className="px-4 py-4">
-                            <input
-                              value={row.damagedQty}
-                              onChange={(event) =>
-                                setReceivingRows((current) =>
-                                  current.map((entry) =>
-                                    entry.poItemId === item.poItemId
-                                      ? { ...entry, damagedQty: event.target.value }
-                                      : entry
-                                  )
-                                )
-                              }
-                              className={inputClassName}
-                              inputMode="numeric"
-                            />
-                          </td>
-                          <td className="px-4 py-4">
-                            <input
-                              value={row.notes}
-                              onChange={(event) =>
-                                setReceivingRows((current) =>
-                                  current.map((entry) =>
-                                    entry.poItemId === item.poItemId
-                                      ? { ...entry, notes: event.target.value }
-                                      : entry
-                                  )
-                                )
-                              }
-                              className={inputClassName}
-                            />
-                          </td>
+            {!selectedPurchaseOrder ? (
+              <div className="mt-5 rounded-[26px] border border-dashed border-slate-200 bg-slate-50 px-6 py-14 text-center text-sm text-slate-400">
+                {t("emptyTable")}
+              </div>
+            ) : (
+              <>
+                <div className="mt-5 overflow-hidden rounded-[26px] border border-slate-200">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-slate-200">
+                      <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        <tr>
+                          <th className="px-4 py-3">{t("columns.product")}</th>
+                          <th className="px-4 py-3">{t("columns.ordered")}</th>
+                          <th className="px-4 py-3">{t("columns.received")}</th>
+                          <th className="px-4 py-3">{t("columns.remaining")}</th>
+                          <th className="px-4 py-3">{t("columns.receiveQty")}</th>
+                          <th className="px-4 py-3">{t("columns.damaged")}</th>
+                          <th className="px-4 py-3">{t("columns.notes")}</th>
                         </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
+                        {selectedPurchaseOrder.items.map((item) => {
+                          const row =
+                            receivingRows.find((entry) => entry.poItemId === item.poItemId) ??
+                            {
+                              poItemId: item.poItemId,
+                              receiveQty: "0",
+                              damagedQty: "0",
+                              notes: "",
+                            };
 
-            <div className="mt-5 grid gap-4">
-              <Field label={t("sessionNotes")}>
-                <textarea
-                  value={receivingNotes}
-                  onChange={(event) => setReceivingNotes(event.target.value)}
-                  className={`${inputClassName} min-h-24 resize-y`}
-                />
-              </Field>
-            </div>
+                          return (
+                            <tr key={item.poItemId}>
+                              <td className="px-4 py-4">
+                                <div className="flex flex-col">
+                                  <span className="font-semibold text-slate-900">
+                                    {item.compoundId}
+                                  </span>
+                                  <span>{item.productName}</span>
+                                </div>
+                              </td>
+                              <td className="px-4 py-4">{item.orderedQty}</td>
+                              <td className="px-4 py-4">{item.receivedQty}</td>
+                              <td className="px-4 py-4">{item.remainingQty}</td>
+                              <td className="px-4 py-4">
+                                <input
+                                  value={row.receiveQty}
+                                  onChange={(event) =>
+                                    setReceivingRows((current) =>
+                                      current.map((entry) =>
+                                        entry.poItemId === item.poItemId
+                                          ? { ...entry, receiveQty: event.target.value }
+                                          : entry
+                                      )
+                                    )
+                                  }
+                                  className={inputClassName}
+                                  inputMode="numeric"
+                                />
+                              </td>
+                              <td className="px-4 py-4">
+                                <input
+                                  value={row.damagedQty}
+                                  onChange={(event) =>
+                                    setReceivingRows((current) =>
+                                      current.map((entry) =>
+                                        entry.poItemId === item.poItemId
+                                          ? { ...entry, damagedQty: event.target.value }
+                                          : entry
+                                      )
+                                    )
+                                  }
+                                  className={inputClassName}
+                                  inputMode="numeric"
+                                />
+                              </td>
+                              <td className="px-4 py-4">
+                                <input
+                                  value={row.notes}
+                                  onChange={(event) =>
+                                    setReceivingRows((current) =>
+                                      current.map((entry) =>
+                                        entry.poItemId === item.poItemId
+                                          ? { ...entry, notes: event.target.value }
+                                          : entry
+                                      )
+                                    )
+                                  }
+                                  className={inputClassName}
+                                />
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
 
-            <div className="fixed bottom-0 inset-x-0 p-4 bg-white border-t border-slate-200 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] flex gap-3 z-50 lg:static lg:mt-6 lg:p-0 lg:border-none lg:bg-transparent lg:shadow-none lg:justify-end">
-              <button
-                onClick={() => void submitReceiving()}
-                disabled={submitting || !selectedPurchaseOrder}
-                className="flex-1 lg:flex-initial rounded-2xl bg-slate-900 px-5 py-4 text-base lg:py-3 lg:text-sm font-semibold text-white disabled:opacity-60"
-              >
-                {t("completeReceiving")}
-              </button>
-            </div>
+                <div className="mt-5 rounded-[26px] border border-slate-200 bg-slate-50 p-4">
+                  <Field label={t("sessionNotes")}>
+                    <textarea
+                      value={receivingNotes}
+                      onChange={(event) => setReceivingNotes(event.target.value)}
+                      className={`${inputClassName} min-h-24 resize-y bg-white`}
+                    />
+                  </Field>
+                </div>
+
+                <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                  <button
+                    onClick={() => void submitReceiving()}
+                    disabled={submitting || !selectedPurchaseOrder}
+                    className="rounded-2xl bg-slate-900 px-5 py-3.5 text-sm font-semibold text-white transition disabled:opacity-60"
+                  >
+                    {t("completeReceiving")}
+                  </button>
+                </div>
+              </>
+            )}
           </section>
 
           <section className="space-y-6">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
               <h2 className="text-lg font-semibold text-slate-900">{t("createPallet")}</h2>
               <Field label={t("recentSession")}>
                 <select
@@ -436,16 +438,16 @@ export function ReceivingClient({
                 </div>
               ) : (
                 <>
-                  <div className="mt-5 space-y-3">
-                    {palletAvailability.length === 0 ? (
-                      <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
+                <div className="mt-5 space-y-3">
+                  {palletAvailability.length === 0 ? (
+                      <div className="rounded-[26px] border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
                         {t("allPalletized")}
                       </div>
                     ) : (
                       palletAvailability.map((item) => (
                         <div
                           key={item.productId}
-                          className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                          className="rounded-[26px] border border-slate-200 bg-slate-50 p-4"
                         >
                           <div className="flex items-center justify-between gap-4">
                             <div>
@@ -477,11 +479,11 @@ export function ReceivingClient({
                     )}
                   </div>
 
-                  <div className="fixed bottom-0 inset-x-0 p-4 bg-white border-t border-slate-200 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] flex gap-3 z-50 lg:static lg:mt-5 lg:p-0 lg:border-none lg:bg-transparent lg:shadow-none lg:justify-end">
+                  <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
                     <button
                       onClick={() => void createPallet()}
                       disabled={submitting || palletAvailability.length === 0}
-                      className="flex-1 lg:flex-initial rounded-2xl bg-slate-900 px-5 py-4 text-base lg:py-3 lg:text-sm font-semibold text-white disabled:opacity-60"
+                      className="rounded-2xl bg-slate-900 px-5 py-3.5 text-sm font-semibold text-white transition disabled:opacity-60"
                     >
                       {t("createPallet")}
                     </button>
@@ -491,7 +493,7 @@ export function ReceivingClient({
             </div>
 
             {zplBundle && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <h2 className="text-lg font-semibold text-slate-900">
@@ -501,19 +503,21 @@ export function ReceivingClient({
                       {t("zebraReady")}
                     </p>
                   </div>
-                  <button
-                    onClick={() => void printToZebra(zplBundle.zpl, setError, setFeedback)}
-                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                  >
-                    {t("printQr")}
-                  </button>
-                  <button
-                    onClick={() => downloadText(`${zplBundle.palletNumber}.zpl`, zplBundle.zpl)}
-                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                  >
-                    <Download className="h-4 w-4" />
-                    Download ZPL
-                  </button>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      onClick={() => void printToZebra(zplBundle.zpl, setError, setFeedback)}
+                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    >
+                      {t("printQr")}
+                    </button>
+                    <button
+                      onClick={() => downloadText(`${zplBundle.palletNumber}.zpl`, zplBundle.zpl)}
+                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    >
+                      <Download className="h-4 w-4" />
+                      Download ZPL
+                    </button>
+                  </div>
                 </div>
                 <pre className="mt-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs text-emerald-300">
                   {zplBundle.zpl}
@@ -522,7 +526,7 @@ export function ReceivingClient({
             )}
 
             {selectedSession && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                 <h2 className="text-lg font-semibold text-slate-900 mb-5">{t("activity")}</h2>
                 <ActivityTimeline entityType="ReceivingSession" entityId={selectedSession.id} />
               </div>
