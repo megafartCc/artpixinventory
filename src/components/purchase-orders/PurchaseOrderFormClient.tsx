@@ -5,7 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { Trash2 } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  PackagePlus,
+  Search,
+  ShieldCheck,
+  Trash2,
+} from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { canManagePurchaseOrders } from "@/lib/permissions";
 import { calculatePurchaseOrder } from "@/lib/purchase-order-utils";
@@ -23,6 +30,7 @@ type VendorProductMapping = {
   itemWeight: string | null;
   weightUnit: string | null;
   uom: string;
+  isDefault: boolean;
 };
 
 type VendorOption = {
@@ -76,6 +84,14 @@ function currency(value: number) {
   return `$${value.toFixed(2)}`;
 }
 
+function parseQty(value: string) {
+  return Math.max(1, Number(value) || 1);
+}
+
+function parseMoney(value: string) {
+  return Math.max(0, Number(value) || 0);
+}
+
 export function PurchaseOrderFormClient({
   locale,
   vendors,
@@ -109,9 +125,7 @@ export function PurchaseOrderFormClient({
     }
   );
   const [search, setSearch] = useState("");
-  const [pendingSubmitType, setPendingSubmitType] = useState<
-    "draft" | "submit" | null
-  >(null);
+  const [pendingSubmitType, setPendingSubmitType] = useState<"draft" | "submit" | null>(null);
   const [error, setError] = useState("");
   useToastFeedback(error);
 
@@ -128,86 +142,92 @@ export function PurchaseOrderFormClient({
     return (
       templates.find(
         (template) =>
-          template.id ===
-          (form.containerTemplateId || selectedVendor.containerTemplateId)
+          template.id === (form.containerTemplateId || selectedVendor.containerTemplateId)
       ) ?? null
     );
   }, [form.containerTemplateId, selectedVendor, templates]);
 
   const vendorProducts = useMemo(
-    () => selectedVendor?.products ?? [],
+    () =>
+      [...(selectedVendor?.products ?? [])].sort((left, right) => {
+        if (left.isDefault !== right.isDefault) {
+          return left.isDefault ? -1 : 1;
+        }
+        return left.compoundId.localeCompare(right.compoundId);
+      }),
     [selectedVendor]
   );
 
   const filteredVendorProducts = useMemo(() => {
     const normalized = search.trim().toLowerCase();
     if (!normalized) {
-      return vendorProducts;
+      return vendorProducts.slice(0, 16);
     }
 
-    return vendorProducts.filter((product) =>
-      `${product.compoundId} ${product.productName}`
-        .toLowerCase()
-        .includes(normalized)
-    );
+    return vendorProducts
+      .filter((product) =>
+        `${product.compoundId} ${product.productName} ${product.vendorSku ?? ""}`
+          .toLowerCase()
+          .includes(normalized)
+      )
+      .slice(0, 16);
   }, [search, vendorProducts]);
 
-  const calculation = useMemo(() => {
-    const items = form.items
-      .map((item) => {
-        const product = vendorProducts.find((entry) => entry.productId === item.productId);
-        if (!product) {
-          return null;
-        }
+  const quickSuggestions = useMemo(
+    () => vendorProducts.filter((product) => product.isDefault).slice(0, 6),
+    [vendorProducts]
+  );
 
-        return {
-          productId: item.productId,
-          orderedQty: Number(item.orderedQty) || 0,
-          unitCost: Number(item.unitCost) || 0,
-          notes: item.notes || null,
-          product: {
-            id: product.productId,
-            compoundId: product.compoundId,
-            name: product.productName,
-            uom: product.uom,
-            itemsPerBox: product.itemsPerBox,
-            boxesPerPallet: product.boxesPerPallet,
-            weight: product.weight,
-            itemWeight: product.itemWeight,
-            weightUnit: product.weightUnit,
-          },
-        };
-      })
-      .filter(Boolean) as Array<{
-      productId: string;
-      orderedQty: number;
-      unitCost: number;
-      notes: string | null;
+  const selectedItems = useMemo(
+    () =>
+      form.items
+        .map((item) => ({
+          ...item,
+          product: vendorProducts.find((entry) => entry.productId === item.productId) ?? null,
+        }))
+        .filter((item) => item.product !== null),
+    [form.items, vendorProducts]
+  );
+
+  const calculation = useMemo(() => {
+    const items = selectedItems.map((item) => ({
+      productId: item.productId,
+      orderedQty: Number(item.orderedQty) || 0,
+      unitCost: Number(item.unitCost) || 0,
+      notes: item.notes || null,
       product: {
-        id: string;
-        compoundId: string;
-        name: string;
-        uom: string;
-        itemsPerBox: number | null;
-        boxesPerPallet: number | null;
-        weight: string | null;
-        itemWeight: string | null;
-        weightUnit: string | null;
-      };
-    }>;
+        id: item.product!.productId,
+        compoundId: item.product!.compoundId,
+        name: item.product!.productName,
+        uom: item.product!.uom,
+        itemsPerBox: item.product!.itemsPerBox,
+        boxesPerPallet: item.product!.boxesPerPallet,
+        weight: item.product!.weight,
+        itemWeight: item.product!.itemWeight,
+        weightUnit: item.product!.weightUnit,
+      },
+    }));
 
     return calculatePurchaseOrder(
       items,
-      Number(form.shippingCost) || 0,
-      Number(form.otherCosts) || 0,
+      parseMoney(form.shippingCost),
+      parseMoney(form.otherCosts),
       selectedTemplate
     );
-  }, [form.items, form.otherCosts, form.shippingCost, selectedTemplate, vendorProducts]);
+  }, [form.otherCosts, form.shippingCost, selectedItems, selectedTemplate]);
 
   const expectedDate = useMemo(() => {
     const leadTime = Number(form.leadTimeDays) || 0;
     return addDaysToDate(form.orderDate, leadTime);
   }, [form.leadTimeDays, form.orderDate]);
+
+  const zeroCostCount = selectedItems.filter((item) => parseMoney(item.unitCost) <= 0).length;
+  const moqWarningCount = selectedItems.filter((item) => {
+    const moq = item.product?.moq ?? null;
+    return moq !== null && parseQty(item.orderedQty) < moq;
+  }).length;
+  const approvalIssues = zeroCostCount + moqWarningCount + calculation.constraintWarnings.length;
+  const canSubmit = form.vendorId !== "" && form.items.length > 0;
 
   useEffect(() => {
     if (!selectedVendor || initialValue) {
@@ -231,24 +251,28 @@ export function PurchaseOrderFormClient({
   const addItem = (mapping: VendorProductMapping) => {
     setError("");
     setForm((current) => {
-      if (!current.vendorId) {
-        return current;
-      }
-
-      if (current.items.some((item) => item.productId === mapping.productId)) {
-        return current;
+      const existing = current.items.find((item) => item.productId === mapping.productId);
+      if (existing) {
+        return {
+          ...current,
+          items: current.items.map((item) =>
+            item.productId === mapping.productId
+              ? { ...item, orderedQty: String(parseQty(item.orderedQty) + 1) }
+              : item
+          ),
+        };
       }
 
       return {
         ...current,
         items: [
-          ...current.items,
           {
             productId: mapping.productId,
             orderedQty: "1",
             unitCost: mapping.unitCost ?? "0",
             notes: "",
           },
+          ...current.items,
         ],
       };
     });
@@ -283,9 +307,7 @@ export function PurchaseOrderFormClient({
     setError("");
 
     const response = await fetch(
-      mode === "create"
-        ? "/api/purchase-orders"
-        : `/api/purchase-orders/${purchaseOrderId}`,
+      mode === "create" ? "/api/purchase-orders" : `/api/purchase-orders/${purchaseOrderId}`,
       {
         method: mode === "create" ? "POST" : "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -336,48 +358,52 @@ export function PurchaseOrderFormClient({
   return (
     <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
       <div className="flex w-full flex-col gap-6">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <Link
-              href={`/${locale}/purchase-orders`}
-              className="text-sm font-medium text-slate-500 hover:text-slate-700"
-            >
-              {t("back")}
-            </Link>
-            <h1 className="mt-3 text-3xl font-bold text-slate-900">
-              {mode === "create" ? t("createTitle") : t("editTitle")}
-            </h1>
-            <p className="mt-1 text-slate-500">
-              {t("subtitle")}
-            </p>
+        <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <Link
+                href={`/${locale}/purchase-orders`}
+                className="text-sm font-medium text-slate-500 transition hover:text-slate-700"
+              >
+                {t("back")}
+              </Link>
+              <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+                {mode === "create" ? t("createTitle") : t("editTitle")}
+              </h1>
+              <p className="mt-2 max-w-3xl text-sm text-slate-500">
+                Faster PO build flow with default-first quick add, approval readiness, and a sticky summary rail.
+              </p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3 lg:w-[520px]">
+              <MetricCard title="Line items" value={String(selectedItems.length)} icon={PackagePlus} />
+              <MetricCard title="Approval issues" value={String(approvalIssues)} icon={ShieldCheck} />
+              <MetricCard title="Total" value={currency(calculation.totalCost)} icon={CheckCircle2} />
+            </div>
           </div>
         </div>
 
-        <div className="grid gap-6 2xl:grid-cols-[1.1fr_0.9fr]">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_360px]">
           <div className="space-y-6">
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
               <h2 className="text-lg font-semibold text-slate-900">{t("header")}</h2>
               <div className="mt-5 grid gap-4 md:grid-cols-2">
                 <Field label={t("vendor")}>
                   <select
                     value={form.vendorId}
                     onChange={(event) => {
-                      const vendor = vendors.find(
-                        (entry) => entry.id === event.target.value
-                      );
+                      const vendor = vendors.find((entry) => entry.id === event.target.value);
                       setForm((current) => ({
                         ...current,
                         vendorId: event.target.value,
                         leadTimeDays:
-                          vendor?.defaultLeadTimeDays === null ||
-                          vendor?.defaultLeadTimeDays === undefined
+                          vendor?.defaultLeadTimeDays === null || vendor?.defaultLeadTimeDays === undefined
                             ? ""
                             : String(vendor.defaultLeadTimeDays),
-                        containerTemplateId: vendor?.enableContainerConstraints
-                          ? vendor.containerTemplateId ?? ""
-                          : "",
+                        containerTemplateId: vendor?.enableContainerConstraints ? vendor.containerTemplateId ?? "" : "",
                         items: [],
                       }));
+                      setSearch("");
                     }}
                     className={inputClassName}
                     required
@@ -393,24 +419,14 @@ export function PurchaseOrderFormClient({
                 <Field label={t("vendorOrderId")}>
                   <input
                     value={form.vendorOrderId}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        vendorOrderId: event.target.value,
-                      }))
-                    }
+                    onChange={(event) => setForm((current) => ({ ...current, vendorOrderId: event.target.value }))}
                     className={inputClassName}
                   />
                 </Field>
                 <Field label={t("orderDate")}>
                   <input
                     value={form.orderDate}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        orderDate: event.target.value,
-                      }))
-                    }
+                    onChange={(event) => setForm((current) => ({ ...current, orderDate: event.target.value }))}
                     className={inputClassName}
                     type="date"
                   />
@@ -418,12 +434,7 @@ export function PurchaseOrderFormClient({
                 <Field label={t("leadTime")}>
                   <input
                     value={form.leadTimeDays}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        leadTimeDays: event.target.value,
-                      }))
-                    }
+                    onChange={(event) => setForm((current) => ({ ...current, leadTimeDays: event.target.value }))}
                     className={inputClassName}
                     inputMode="numeric"
                   />
@@ -436,10 +447,7 @@ export function PurchaseOrderFormClient({
                     <select
                       value={form.containerTemplateId}
                       onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          containerTemplateId: event.target.value,
-                        }))
+                        setForm((current) => ({ ...current, containerTemplateId: event.target.value }))
                       }
                       className={inputClassName}
                     >
@@ -455,14 +463,26 @@ export function PurchaseOrderFormClient({
               </div>
             </section>
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-slate-900">{t("itemsTitle")}</h2>
-                  <p className="mt-1 text-sm text-slate-500">
-                    {t("itemsSubtitle")}
-                  </p>
+                  <p className="mt-1 text-sm text-slate-500">{t("itemsSubtitle")}</p>
                 </div>
+                {quickSuggestions.length > 0 && (
+                  <div className="flex max-w-full flex-wrap gap-2 lg:max-w-[420px] lg:justify-end">
+                    {quickSuggestions.map((product) => (
+                      <button
+                        key={product.productId}
+                        type="button"
+                        onClick={() => addItem(product)}
+                        className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-100"
+                      >
+                        {product.compoundId}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {!selectedVendor ? (
@@ -471,29 +491,43 @@ export function PurchaseOrderFormClient({
                 </div>
               ) : (
                 <>
-                  <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                    <div className="flex flex-col gap-3 md:flex-row">
+                  <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                    <label className="text-sm font-medium text-slate-700">Quick add products</label>
+                    <div className="relative mt-3">
+                      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                       <input
                         value={search}
                         onChange={(event) => setSearch(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" && filteredVendorProducts[0]) {
+                            event.preventDefault();
+                            addItem(filteredVendorProducts[0]);
+                          }
+                        }}
                         placeholder={t("searchPlaceholder")}
-                        className={inputClassName}
+                        className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm text-slate-700 outline-none focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-200"
                       />
                     </div>
-                    <div className="mt-4 max-h-56 space-y-2 overflow-y-auto">
+                    <div className="mt-4 max-h-72 space-y-2 overflow-y-auto pr-1">
                       {filteredVendorProducts.map((product) => (
                         <button
                           key={product.productId}
                           type="button"
                           onClick={() => addItem(product)}
-                          className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-left hover:border-slate-300"
+                          className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left transition hover:border-slate-300 hover:bg-slate-50"
                         >
                           <div>
-                            <p className="text-sm font-semibold text-slate-900">
-                              {product.compoundId}
-                            </p>
-                            <p className="text-sm text-slate-500">
-                              {product.productName}
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="text-sm font-semibold text-slate-900">{product.compoundId}</p>
+                              {product.isDefault && (
+                                <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
+                                  Default
+                                </span>
+                              )}
+                            </div>
+                            <p className="mt-1 text-sm text-slate-500">{product.productName}</p>
+                            <p className="mt-1 text-xs text-slate-400">
+                              {product.vendorSku ? `Vendor SKU ${product.vendorSku} / ` : ""}{product.uom.toUpperCase()}
                             </p>
                           </div>
                           <div className="text-right text-xs text-slate-500">
@@ -505,167 +539,162 @@ export function PurchaseOrderFormClient({
                     </div>
                   </div>
 
-                  <div className="mt-5 overflow-x-auto">
-                    <table className="min-w-full divide-y divide-slate-200">
-                      <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        <tr>
-                          <th className="px-4 py-3">{t("columnProduct")}</th>
-                          <th className="px-4 py-3">{t("columnQty")}</th>
-                          <th className="px-4 py-3">{t("columnUnitCost")}</th>
-                          <th className="px-4 py-3">{t("columnTotal")}</th>
-                          <th className="px-4 py-3">{t("columnNotes")}</th>
-                          <th className="px-4 py-3 text-right">{t("columnActions")}</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
-                        {form.items.length === 0 ? (
-                          <tr>
-                            <td colSpan={6} className="px-4 py-16 text-center text-slate-400">
-                              {t("noItems")}
-                            </td>
-                          </tr>
-                        ) : (
-                          form.items.map((item) => {
-                            const product = vendorProducts.find(
-                              (entry) => entry.productId === item.productId
-                            );
-                            const qty = Number(item.orderedQty) || 0;
-                            const unitCost = Number(item.unitCost) || 0;
-                            const lineTotal = qty * unitCost;
-                            const belowMoq =
-                              product?.moq !== null &&
-                              product?.moq !== undefined &&
-                              qty > 0 &&
-                              qty < product.moq;
+                  <div className="mt-5 space-y-4">
+                    {selectedItems.length === 0 ? (
+                      <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center text-sm text-slate-400">
+                        {t("noItems")}
+                      </div>
+                    ) : (
+                      selectedItems.map((item) => {
+                        const product = item.product!;
+                        const qty = parseQty(item.orderedQty);
+                        const unitCost = parseMoney(item.unitCost);
+                        const lineTotal = qty * unitCost;
+                        const belowMoq = product.moq !== null && qty < product.moq;
 
-                            return (
-                              <tr key={item.productId}>
-                                <td className="px-4 py-4">
-                                  <div className="flex flex-col">
-                                    <span className="font-semibold text-slate-900">
-                                      {product?.compoundId}
+                        return (
+                          <div key={item.productId} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                              <div>
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <p className="text-lg font-semibold tracking-tight text-slate-900">
+                                    {product.compoundId}
+                                  </p>
+                                  {product.isDefault && (
+                                    <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
+                                      Default
                                     </span>
-                                    <span>{product?.productName}</span>
-                                    {belowMoq && (
-                                      <span className="mt-1 text-xs font-medium text-amber-600">
-                                        {t("belowMoq", { moq: product?.moq })}
-                                      </span>
-                                    )}
-                                  </div>
-                                </td>
-                                <td className="px-4 py-4">
+                                  )}
+                                  {belowMoq && (
+                                    <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-700">
+                                      Below MOQ
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="mt-1 text-sm text-slate-500">{product.productName}</p>
+                                <p className="mt-2 text-xs text-slate-400">
+                                  {product.vendorSku ? `Vendor SKU ${product.vendorSku} / ` : ""}{product.uom.toUpperCase()}
+                                  {product.moq !== null ? ` / MOQ ${product.moq}` : ""}
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => removeItem(item.productId)}
+                                className="inline-flex items-center gap-1 rounded-xl border border-rose-200 px-3 py-2 text-xs font-medium text-rose-600 transition hover:bg-rose-50"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                                {t("remove")}
+                              </button>
+                            </div>
+
+                            <div className="mt-4 grid gap-4 lg:grid-cols-[180px_180px_minmax(0,1fr)_180px]">
+                              <Field label={t("columnQty")}>
+                                <div className="flex items-center gap-2">
+                                  <StepButton
+                                    onClick={() => updateItem(item.productId, "orderedQty", String(Math.max(1, qty - 1)))}
+                                  >
+                                    -
+                                  </StepButton>
                                   <input
                                     value={item.orderedQty}
-                                    onChange={(event) =>
-                                      updateItem(
-                                        item.productId,
-                                        "orderedQty",
-                                        event.target.value
-                                      )
-                                    }
-                                    className={inputClassName}
+                                    onChange={(event) => updateItem(item.productId, "orderedQty", event.target.value)}
+                                    className={`${inputClassName} text-center`}
                                     inputMode="numeric"
                                   />
-                                </td>
-                                <td className="px-4 py-4">
-                                  <input
-                                    value={item.unitCost}
-                                    onChange={(event) =>
-                                      updateItem(
-                                        item.productId,
-                                        "unitCost",
-                                        event.target.value
-                                      )
-                                    }
-                                    className={inputClassName}
-                                    inputMode="decimal"
-                                  />
-                                </td>
-                                <td className="px-4 py-4 font-semibold text-slate-900">
+                                  <StepButton onClick={() => updateItem(item.productId, "orderedQty", String(qty + 1))}>
+                                    +
+                                  </StepButton>
+                                </div>
+                              </Field>
+                              <Field label={t("columnUnitCost")}>
+                                <input
+                                  value={item.unitCost}
+                                  onChange={(event) => updateItem(item.productId, "unitCost", event.target.value)}
+                                  className={inputClassName}
+                                  inputMode="decimal"
+                                />
+                              </Field>
+                              <Field label={t("columnNotes")}>
+                                <input
+                                  value={item.notes}
+                                  onChange={(event) => updateItem(item.productId, "notes", event.target.value)}
+                                  className={inputClassName}
+                                />
+                              </Field>
+                              <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
+                                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                                  {t("columnTotal")}
+                                </p>
+                                <p className="mt-3 text-2xl font-semibold tracking-tight text-slate-900">
                                   {currency(lineTotal)}
-                                </td>
-                                <td className="px-4 py-4">
-                                  <input
-                                    value={item.notes}
-                                    onChange={(event) =>
-                                      updateItem(item.productId, "notes", event.target.value)
-                                    }
-                                    className={inputClassName}
-                                  />
-                                </td>
-                                <td className="px-4 py-4">
-                                  <div className="flex justify-end">
-                                    <button
-                                      type="button"
-                                      onClick={() => removeItem(item.productId)}
-                                      className="inline-flex items-center gap-1 rounded-lg border border-rose-200 px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50"
-                                    >
-                                      <Trash2 className="h-3.5 w-3.5" />
-                                      {t("remove")}
-                                    </button>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          })
-                        )}
-                      </tbody>
-                    </table>
+                                </p>
+                              </div>
+                            </div>
+
+                            {belowMoq && (
+                              <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                                {t("belowMoq", { moq: product.moq ?? 0 })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
+                    )}
                   </div>
                 </>
               )}
             </section>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 xl:sticky xl:top-20 xl:self-start">
+            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <h2 className="text-lg font-semibold text-slate-900">Approval readiness</h2>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                <SummaryMetric label="Zero-cost lines" value={String(zeroCostCount)} tone={zeroCostCount > 0 ? "amber" : "slate"} />
+                <SummaryMetric label="MOQ warnings" value={String(moqWarningCount)} tone={moqWarningCount > 0 ? "amber" : "slate"} />
+                <SummaryMetric
+                  label="Constraint warnings"
+                  value={String(calculation.constraintWarnings.length)}
+                  tone={calculation.constraintWarnings.length > 0 ? "rose" : "slate"}
+                />
+              </div>
+              {calculation.constraintWarnings.length > 0 && (
+                <div className="mt-5 rounded-3xl border border-rose-200 bg-rose-50 p-4">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="mt-0.5 h-5 w-5 text-rose-600" />
+                    <div className="space-y-2">
+                      {calculation.constraintWarnings.map((warning) => (
+                        <p key={warning} className="text-sm text-rose-700">
+                          {warning}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+
             {selectedVendor?.enableContainerConstraints && selectedTemplate && (
-              <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 className="text-lg font-semibold text-slate-900">
-                  {t("calculatorTitle")}
-                </h2>
+              <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <h2 className="text-lg font-semibold text-slate-900">{t("calculatorTitle")}</h2>
                 <p className="mt-1 text-sm text-slate-500">
                   {t("calculatorSubtitle", { template: selectedTemplate.name })}
                 </p>
                 <div className="mt-5 space-y-4">
-                  <Meter
-                    label={t("meterWeight")}
-                    value={calculation.totalWeightKg}
-                    max={selectedTemplate.maxWeightKg}
-                    suffix="kg"
-                  />
-                  <Meter
-                    label={t("meterPallets")}
-                    value={calculation.totalPallets}
-                    max={selectedTemplate.maxPallets}
-                  />
-                  <Meter
-                    label={t("meterLooseBoxes")}
-                    value={calculation.totalLooseBoxes}
-                    max={selectedTemplate.maxLooseBoxes}
-                  />
+                  <Meter label={t("meterWeight")} value={calculation.totalWeightKg} max={selectedTemplate.maxWeightKg} suffix="kg" />
+                  <Meter label={t("meterPallets")} value={calculation.totalPallets} max={selectedTemplate.maxPallets} />
+                  <Meter label={t("meterLooseBoxes")} value={calculation.totalLooseBoxes} max={selectedTemplate.maxLooseBoxes} />
                 </div>
-                {calculation.constraintWarnings.length > 0 && (
-                  <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                    {calculation.constraintWarnings.map((warning) => (
-                      <p key={warning}>{warning}</p>
-                    ))}
-                  </div>
-                )}
               </section>
             )}
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
               <h2 className="text-lg font-semibold text-slate-900">{t("costsTitle")}</h2>
               <div className="mt-5 grid gap-4">
                 <Field label={t("shippingCost")}>
                   <input
                     value={form.shippingCost}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        shippingCost: event.target.value,
-                      }))
-                    }
+                    onChange={(event) => setForm((current) => ({ ...current, shippingCost: event.target.value }))}
                     className={inputClassName}
                     inputMode="decimal"
                   />
@@ -673,12 +702,7 @@ export function PurchaseOrderFormClient({
                 <Field label={t("otherCosts")}>
                   <input
                     value={form.otherCosts}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        otherCosts: event.target.value,
-                      }))
-                    }
+                    onChange={(event) => setForm((current) => ({ ...current, otherCosts: event.target.value }))}
                     className={inputClassName}
                     inputMode="decimal"
                   />
@@ -686,59 +710,67 @@ export function PurchaseOrderFormClient({
                 <Field label={t("notes")}>
                   <textarea
                     value={form.notes}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        notes: event.target.value,
-                      }))
-                    }
+                    onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))}
                     className={`${inputClassName} min-h-28 resize-y`}
                   />
                 </Field>
               </div>
 
-              <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div className="flex items-center justify-between text-sm text-slate-600">
-                  <span>{t("subtotal")}</span>
-                  <span className="font-semibold text-slate-900">
-                    {currency(calculation.subtotal)}
-                  </span>
-                </div>
-                <div className="mt-2 flex items-center justify-between text-sm text-slate-600">
-                  <span>{t("shipping")}</span>
-                  <span>{currency(Number(form.shippingCost) || 0)}</span>
-                </div>
-                <div className="mt-2 flex items-center justify-between text-sm text-slate-600">
-                  <span>{t("otherCosts")}</span>
-                  <span>{currency(Number(form.otherCosts) || 0)}</span>
-                </div>
-                <div className="mt-4 flex items-center justify-between border-t border-slate-200 pt-4 text-base font-semibold text-slate-900">
-                  <span>{t("total")}</span>
-                  <span>{currency(calculation.totalCost)}</span>
+              <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                <div className="space-y-3">
+                  <SummaryRow label={t("subtotal")} value={currency(calculation.subtotal)} />
+                  <SummaryRow label={t("shipping")} value={currency(parseMoney(form.shippingCost))} />
+                  <SummaryRow label={t("otherCosts")} value={currency(parseMoney(form.otherCosts))} />
+                  <SummaryRow label={t("total")} value={currency(calculation.totalCost)} emphasize />
                 </div>
               </div>
+            </section>
 
-              <div className="mt-6 flex flex-wrap justify-end gap-3">
+            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <h2 className="text-lg font-semibold text-slate-900">Actions</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Save a working draft or send it to approval when the warnings are resolved.
+              </p>
+              <div className="mt-5 grid gap-3">
                 <button
                   type="button"
                   onClick={() => void submit(false)}
-                  disabled={pendingSubmitType !== null || !form.vendorId}
-                  className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={pendingSubmitType !== null || !canSubmit}
+                  className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
                 >
                   {pendingSubmitType === "draft" ? t("saving") : t("saveDraft")}
                 </button>
                 <button
                   type="button"
                   onClick={() => void submit(true)}
-                  disabled={pendingSubmitType !== null || !form.vendorId}
-                  className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={pendingSubmitType !== null || !canSubmit}
+                  className="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60"
                 >
-                  {pendingSubmitType === "submit"
-                    ? t("submitting")
-                    : t("submitApproval")}
+                  {pendingSubmitType === "submit" ? t("submitting") : t("submitApproval")}
                 </button>
               </div>
             </section>
+          </div>
+        </div>
+
+        <div className="fixed inset-x-0 bottom-16 z-40 border-t border-slate-200 bg-white/95 p-4 backdrop-blur xl:hidden">
+          <div className="mx-auto flex max-w-5xl flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => void submit(false)}
+              disabled={pendingSubmitType !== null || !canSubmit}
+              className="flex-1 rounded-2xl border border-slate-200 px-4 py-4 text-base font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+            >
+              {pendingSubmitType === "draft" ? t("saving") : t("saveDraft")}
+            </button>
+            <button
+              type="button"
+              onClick={() => void submit(true)}
+              disabled={pendingSubmitType !== null || !canSubmit}
+              className="flex-1 rounded-2xl bg-slate-900 px-4 py-4 text-base font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60"
+            >
+              {pendingSubmitType === "submit" ? t("submitting") : t("submitApproval")}
+            </button>
           </div>
         </div>
       </div>
@@ -758,6 +790,91 @@ function Field({
       <span>{label}</span>
       {children}
     </label>
+  );
+}
+
+function MetricCard({
+  title,
+  value,
+  icon: Icon,
+}: {
+  title: string;
+  value: string;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{title}</p>
+        <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm">
+          <Icon className="h-4 w-4" />
+        </span>
+      </div>
+      <p className="mt-4 text-2xl font-semibold tracking-tight text-slate-900">{value}</p>
+    </div>
+  );
+}
+
+function StepButton({
+  children,
+  onClick,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+    >
+      {children}
+    </button>
+  );
+}
+
+function SummaryMetric({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "slate" | "amber" | "rose";
+}) {
+  const toneClass =
+    tone === "amber"
+      ? "border-amber-200 bg-amber-50 text-amber-700"
+      : tone === "rose"
+        ? "border-rose-200 bg-rose-50 text-rose-700"
+        : "border-slate-200 bg-slate-50 text-slate-700";
+
+  return (
+    <div className={`rounded-2xl border px-4 py-4 ${toneClass}`}>
+      <p className="text-xs font-semibold uppercase tracking-[0.16em]">{label}</p>
+      <p className="mt-3 text-2xl font-semibold tracking-tight">{value}</p>
+    </div>
+  );
+}
+
+function SummaryRow({
+  label,
+  value,
+  emphasize = false,
+}: {
+  label: string;
+  value: string;
+  emphasize?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-2xl bg-white px-4 py-3">
+      <p className={`text-sm ${emphasize ? "font-semibold text-slate-900" : "font-medium text-slate-600"}`}>
+        {label}
+      </p>
+      <p className={`${emphasize ? "text-lg font-semibold text-slate-900" : "text-sm font-semibold text-slate-900"}`}>
+        {value}
+      </p>
+    </div>
   );
 }
 

@@ -6,7 +6,6 @@ import { CsvExportButton } from "@/components/CsvExportButton";
 export default async function CreditsReportPage({ params }: { params: { locale: string } }) {
   noStore();
   const t = await getTranslations({ locale: params.locale, namespace: "Credits" });
-  const tReports = await getTranslations({ locale: params.locale, namespace: "ReportsHub" });
 
   const credits = await prisma.vendorCredit.findMany({
     include: {

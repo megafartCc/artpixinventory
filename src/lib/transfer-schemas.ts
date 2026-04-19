@@ -26,6 +26,7 @@ export const transferDropSchema = z.object({
   locationQrCode: z.string().trim().min(1, "Destination QR is required."),
   productId: z.string().trim().min(1, "Product is required."),
   quantity: z.coerce.number().int().positive(),
+  allowException: z.boolean().optional().default(false),
 });
 
 export const transferStatusSchema = z.object({

@@ -61,6 +61,7 @@ export default async function NewPurchaseOrderPage({
           productId: mapping.product.id,
           compoundId: mapping.product.compoundId,
           productName: mapping.product.name,
+          isDefault: mapping.isDefault,
           unitCost: mapping.unitCost?.toString() ?? null,
           moq: mapping.moq,
           vendorSku: mapping.vendorSku,

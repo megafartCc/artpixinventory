@@ -9,7 +9,6 @@ import {
   canManagePurchaseOrders,
 } from "@/lib/permissions";
 import {
-  formatPoStatus,
   getPoStatusTone,
 } from "@/lib/purchase-order-utils";
 

@@ -3,12 +3,101 @@
 import { startTransition, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  AlertTriangle,
+  ArrowLeftRight,
+  CheckCircle2,
+  ChevronRight,
+  MapPin,
+  Package2,
+  QrCode,
+  ScanLine,
+  ShieldAlert,
+} from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { useTranslations } from "next-intl";
 
 const inputClassName =
-  "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-200";
+  "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-base text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-200";
+
+type TransferRecord = {
+  id: string;
+  reference: string;
+  status: string;
+  picks: Array<{
+    id: string;
+    productId: string;
+    compoundId: string;
+    productName: string;
+    locationId: string;
+    locationName: string;
+    quantity: number;
+  }>;
+  drops: Array<{
+    id: string;
+    productId: string;
+    compoundId: string;
+    productName: string;
+    locationId: string;
+    locationName: string;
+    quantity: number;
+  }>;
+};
+
+type LocationRecord = {
+  id: string;
+  name: string;
+  qrCode: string;
+  type: string;
+};
+
+type StockRecord = {
+  locationId: string;
+  locationName: string;
+  locationQrCode: string;
+  productId: string;
+  compoundId: string;
+  productName: string;
+  quantity: number;
+};
+
+type ExceptionState = {
+  warnings: string[];
+  productId: string;
+  quantity: string;
+  locationQrCode: string;
+};
+
+function normalizeQr(value: string) {
+  return value.trim().toUpperCase();
+}
+
+function parseQty(value: string) {
+  return Math.max(1, Number(value) || 1);
+}
+
+function formatStatus(status: string) {
+  if (status === "COLLECTING") return "Collecting";
+  if (status === "DROPPING") return "Dropping";
+  if (status === "COMPLETED") return "Completed";
+  if (status === "CANCELLED") return "Cancelled";
+  return status;
+}
+
+function stepState(currentStatus: string, step: "collect" | "review" | "drop" | "done") {
+  if (currentStatus === "COLLECTING") {
+    return step === "collect" ? "active" : "upcoming";
+  }
+  if (currentStatus === "DROPPING") {
+    if (step === "collect" || step === "review") return "complete";
+    return step === "drop" ? "active" : "upcoming";
+  }
+  if (currentStatus === "COMPLETED") {
+    return "complete";
+  }
+  return step === "collect" ? "active" : "upcoming";
+}
 
 export function TransferWorkflowClient({
   locale,
@@ -17,71 +106,61 @@ export function TransferWorkflowClient({
   stockLevels,
 }: {
   locale: string;
-  currentTransfer: {
-    id: string;
-    reference: string;
-    status: string;
-    picks: Array<{
-      id: string;
-      productId: string;
-      compoundId: string;
-      productName: string;
-      locationId: string;
-      locationName: string;
-      quantity: number;
-    }>;
-    drops: Array<{
-      id: string;
-      productId: string;
-      compoundId: string;
-      productName: string;
-      locationId: string;
-      locationName: string;
-      quantity: number;
-    }>;
-  } | null;
-  locations: Array<{
-    id: string;
-    name: string;
-    qrCode: string;
-    type: string;
-  }>;
-  stockLevels: Array<{
-    locationId: string;
-    locationName: string;
-    locationQrCode: string;
-    productId: string;
-    compoundId: string;
-    productName: string;
-    quantity: number;
-  }>;
+  currentTransfer: TransferRecord | null;
+  locations: LocationRecord[];
+  stockLevels: StockRecord[];
 }) {
   const router = useRouter();
+  const t = useTranslations("TransferWorkflow");
   const [sourceQr, setSourceQr] = useState("");
   const [selectedProductId, setSelectedProductId] = useState("");
-  const [pickQty, setPickQty] = useState("");
+  const [pickQty, setPickQty] = useState("1");
+  const [sourceSearch, setSourceSearch] = useState("");
   const [destinationQr, setDestinationQr] = useState("");
   const [dropProductId, setDropProductId] = useState("");
-  const [dropQty, setDropQty] = useState("");
+  const [dropQty, setDropQty] = useState("1");
+  const [dropSearch, setDropSearch] = useState("");
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [dropWarnings, setDropWarnings] = useState<string[]>([]);
-  const t = useTranslations("TransferWorkflow");
+  const [pendingException, setPendingException] = useState<ExceptionState | null>(null);
+  const [exceptionConfirmed, setExceptionConfirmed] = useState(false);
   useToastFeedback(error, feedback);
 
   const refresh = () => startTransition(() => router.refresh());
 
   const sourceLocation = useMemo(
-    () => locations.find((location) => location.qrCode === sourceQr) ?? null,
+    () =>
+      locations.find((location) => normalizeQr(location.qrCode) === normalizeQr(sourceQr)) ??
+      null,
     [locations, sourceQr]
   );
-  const sourceStock = useMemo(
+
+  const sourceStock = useMemo(() => {
+    if (!sourceLocation) {
+      return [];
+    }
+
+    const normalizedSearch = sourceSearch.trim().toLowerCase();
+    return stockLevels
+      .filter((stock) => stock.locationId === sourceLocation.id)
+      .filter((stock) =>
+        normalizedSearch
+          ? `${stock.compoundId} ${stock.productName}`.toLowerCase().includes(normalizedSearch)
+          : true
+      )
+      .sort((left, right) => left.compoundId.localeCompare(right.compoundId));
+  }, [sourceLocation, sourceSearch, stockLevels]);
+
+  const selectedSourceItem = sourceStock.find((stock) => stock.productId === selectedProductId) ?? null;
+
+  const destinationLocation = useMemo(
     () =>
-      sourceLocation
-        ? stockLevels.filter((stock) => stock.locationId === sourceLocation.id)
-        : [],
-    [sourceLocation, stockLevels]
+      locations.find(
+        (location) => normalizeQr(location.qrCode) === normalizeQr(destinationQr)
+      ) ?? null,
+    [destinationQr, locations]
   );
 
   const cartItems = useMemo(() => {
@@ -92,6 +171,7 @@ export function TransferWorkflowClient({
         compoundId: string;
         productName: string;
         quantity: number;
+        sourceNames: string[];
       }
     >();
 
@@ -102,6 +182,7 @@ export function TransferWorkflowClient({
         compoundId: pick.compoundId,
         productName: pick.productName,
         quantity: (existing?.quantity ?? 0) + pick.quantity,
+        sourceNames: Array.from(new Set([...(existing?.sourceNames ?? []), pick.locationName])),
       });
     }
 
@@ -114,13 +195,32 @@ export function TransferWorkflowClient({
       itemMap.set(drop.productId, existing);
     }
 
-    return Array.from(itemMap.values()).filter((item) => item.quantity > 0);
-  }, [currentTransfer]);
+    return Array.from(itemMap.values())
+      .filter((item) => item.quantity > 0)
+      .filter((item) =>
+        dropSearch.trim()
+          ? `${item.compoundId} ${item.productName}`.toLowerCase().includes(dropSearch.trim().toLowerCase())
+          : true
+      )
+      .sort((left, right) => left.compoundId.localeCompare(right.compoundId));
+  }, [currentTransfer, dropSearch]);
 
-  const destinationLocation = useMemo(
-    () => locations.find((location) => location.qrCode === destinationQr) ?? null,
-    [destinationQr, locations]
-  );
+  const selectedDropItem = cartItems.find((item) => item.productId === dropProductId) ?? null;
+
+  const progress = useMemo(() => {
+    const picked = (currentTransfer?.picks ?? []).reduce((sum, pick) => sum + pick.quantity, 0);
+    const dropped = (currentTransfer?.drops ?? []).reduce((sum, drop) => sum + drop.quantity, 0);
+    const openLines = cartItems.length;
+
+    return {
+      picked,
+      dropped,
+      openLines,
+      percent: picked > 0 ? Math.round((dropped / picked) * 100) : 0,
+    };
+  }, [cartItems.length, currentTransfer]);
+
+  const canStartDropoff = (currentTransfer?.status === "COLLECTING" && progress.picked > 0) ?? false;
 
   const startTransfer = async () => {
     setSubmitting(true);
@@ -142,7 +242,7 @@ export function TransferWorkflowClient({
   };
 
   const collect = async () => {
-    if (!currentTransfer) {
+    if (!currentTransfer || !sourceLocation || !selectedSourceItem) {
       return;
     }
 
@@ -153,8 +253,8 @@ export function TransferWorkflowClient({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        locationQrCode: sourceQr,
-        productId: selectedProductId,
+        locationQrCode: sourceLocation.qrCode,
+        productId: selectedSourceItem.productId,
         quantity: pickQty,
       }),
     });
@@ -167,8 +267,9 @@ export function TransferWorkflowClient({
     }
 
     setFeedback(payload.message ?? t("feedback.collected"));
-    setPickQty("");
     setSelectedProductId("");
+    setPickQty("1");
+    setSourceSearch("");
     refresh();
   };
 
@@ -194,11 +295,13 @@ export function TransferWorkflowClient({
     }
 
     setFeedback(payload.message ?? t("feedback.modeStarted"));
+    setDropProductId("");
+    setDropQty("1");
     refresh();
   };
 
-  const drop = async () => {
-    if (!currentTransfer) {
+  const performDrop = async (allowException: boolean) => {
+    if (!currentTransfer || !destinationLocation || !selectedDropItem) {
       return;
     }
 
@@ -210,30 +313,47 @@ export function TransferWorkflowClient({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        locationQrCode: destinationQr,
-        productId: dropProductId,
+        locationQrCode: destinationLocation.qrCode,
+        productId: selectedDropItem.productId,
         quantity: dropQty,
+        allowException,
       }),
     });
+
     const payload = (await response.json()) as {
       error?: string;
       message?: string;
       warnings?: string[];
+      requiresConfirmation?: boolean;
     };
     setSubmitting(false);
+
+    if (response.status === 409 && payload.requiresConfirmation) {
+      setPendingException({
+        warnings: payload.warnings ?? [],
+        productId: selectedDropItem.productId,
+        quantity: dropQty,
+        locationQrCode: destinationLocation.qrCode,
+      });
+      return;
+    }
 
     if (!response.ok) {
       setError(payload.error ?? t("feedback.dropFailed"));
       return;
     }
 
+    setPendingException(null);
+    setExceptionConfirmed(false);
+
     if (payload.warnings && payload.warnings.length > 0) {
       setDropWarnings(payload.warnings);
     }
 
     setFeedback(payload.message ?? t("feedback.dropped"));
-    setDropQty("");
+    setDropQty("1");
     setDropProductId("");
+    setDropSearch("");
     refresh();
   };
 
@@ -265,326 +385,753 @@ export function TransferWorkflowClient({
   return (
     <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
       <div className="flex w-full flex-col gap-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <Link
-              href={`/${locale}/transfers`}
-              className="text-sm font-medium text-slate-500 hover:text-slate-700"
-            >
-              {t("back")}
-            </Link>
-            <h1 className="mt-3 text-3xl font-bold text-slate-900">{t("title")}</h1>
-            <p className="mt-1 text-slate-500">
-              {t("subtitle")}
-            </p>
-          </div>
-          {!currentTransfer ? (
-            <button
-              onClick={() => void startTransfer()}
-              disabled={submitting}
-              className="rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
-            >
-              {t("startTransfer")}
-            </button>
-          ) : (
-            <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
-              <p className="font-semibold text-slate-900">{currentTransfer.reference}</p>
-              <p>{t("status")}: {currentTransfer.status}</p>
+        <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <Link
+                href={`/${locale}/transfers`}
+                className="text-sm font-medium text-slate-500 transition hover:text-slate-700"
+              >
+                {t("back")}
+              </Link>
+              <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+                {t("title")}
+              </h1>
+              <p className="mt-2 max-w-3xl text-sm text-slate-500">
+                Mobile-first collection and drop confirmation flow. Scan or paste location QR codes, confirm the pick cart, then finish controlled drops with exception approval when needed.
+              </p>
             </div>
-          )}
+
+            {!currentTransfer ? (
+              <button
+                onClick={() => void startTransfer()}
+                disabled={submitting}
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60"
+              >
+                <ScanLine className="h-4 w-4" />
+                {t("startTransfer")}
+              </button>
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-3 lg:w-[480px]">
+                <MetricCard title="Transfer" value={currentTransfer.reference} icon={ArrowLeftRight} />
+                <MetricCard title="Picked" value={String(progress.picked)} icon={Package2} />
+                <MetricCard title="Dropped" value={String(progress.dropped)} icon={CheckCircle2} />
+              </div>
+            )}
+          </div>
         </div>
 
         {currentTransfer && (
-          <div className="grid gap-6 2xl:grid-cols-[1.1fr_0.9fr]">
-            <section className="space-y-6">
-              {currentTransfer.status === "COLLECTING" && (
-                <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-sky-600">
-                        {t("collectionMode")}
-                      </p>
-                      <h2 className="mt-2 text-2xl font-bold text-slate-900">
-                        {t("scanLocation")}
-                      </h2>
-                    </div>
-                    <button className="rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white">
-                      {t("scanLocation")}
-                    </button>
-                  </div>
+          <>
+            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                <div className="grid gap-3 sm:grid-cols-4">
+                  <FlowStep
+                    label="Collect"
+                    state={stepState(currentTransfer.status, "collect")}
+                    detail={`${progress.picked} units`}
+                  />
+                  <FlowStep
+                    label="Review"
+                    state={stepState(currentTransfer.status, "review")}
+                    detail={`${progress.openLines} open lines`}
+                  />
+                  <FlowStep
+                    label="Drop"
+                    state={stepState(currentTransfer.status, "drop")}
+                    detail={`${progress.percent}% complete`}
+                  />
+                  <FlowStep
+                    label="Done"
+                    state={stepState(currentTransfer.status, "done")}
+                    detail={formatStatus(currentTransfer.status)}
+                  />
+                </div>
 
-                  <div className="mt-5 space-y-4">
-                    <input
-                      value={sourceQr}
-                      onChange={(event) => setSourceQr(event.target.value)}
-                      placeholder={t("sourcePlaceholder")}
-                      className={inputClassName}
-                      autoFocus
+                <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-4 lg:min-w-[260px]">
+                  <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                    <span>Progress</span>
+                    <span>{progress.percent}%</span>
+                  </div>
+                  <div className="mt-3 h-2 rounded-full bg-slate-200">
+                    <div
+                      className="h-2 rounded-full bg-slate-900 transition-all"
+                      style={{ width: `${Math.min(progress.percent, 100)}%` }}
                     />
-                    <div className="flex max-h-24 flex-wrap gap-2 overflow-y-auto">
-                      {locations.slice(0, 18).map((location) => (
-                        <button
-                          key={location.id}
-                          onClick={() => setSourceQr(location.qrCode)}
-                          className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
-                        >
-                          {location.name}
-                        </button>
-                      ))}
-                    </div>
-
-                    {sourceLocation && (
-                      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                        <p className="font-semibold text-slate-900">{sourceLocation.name}</p>
-                        <p className="mt-1 text-xs text-slate-500">{sourceLocation.qrCode}</p>
-                      </div>
-                    )}
-
-                    <div className="space-y-3">
-                      {sourceStock.map((stock) => (
-                        <button
-                          key={`${stock.locationId}-${stock.productId}`}
-                          onClick={() => setSelectedProductId(stock.productId)}
-                          className={`w-full rounded-2xl border px-4 py-3 text-left ${
-                            selectedProductId === stock.productId
-                              ? "border-sky-500 bg-sky-50"
-                              : "border-slate-200 bg-white"
-                          }`}
-                        >
-                          <p className="font-semibold text-slate-900">{stock.compoundId}</p>
-                          <p className="text-sm text-slate-500">{stock.productName}</p>
-                          <p className="mt-1 text-xs text-slate-500">{t("inStock")}: {stock.quantity}</p>
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="grid gap-3 md:grid-cols-[1fr_auto]">
-                      <input
-                        value={pickQty}
-                        onChange={(event) => setPickQty(event.target.value)}
-                        placeholder={t("qty")}
-                        className={inputClassName}
-                        inputMode="numeric"
-                      />
-                      <button
-                        onClick={() => void collect()}
-                        disabled={submitting || !sourceQr || !selectedProductId || !pickQty}
-                        className="rounded-2xl bg-sky-600 px-5 py-4 text-base lg:py-3 lg:text-sm font-semibold text-white disabled:opacity-60"
-                      >
-                        {t("addToCart")}
-                      </button>
-                    </div>
-
-                    <div className="fixed bottom-0 inset-x-0 p-4 bg-white border-t border-slate-200 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] flex flex-col sm:flex-row gap-3 z-50 lg:static lg:p-0 lg:border-none lg:bg-transparent lg:shadow-none lg:flex-row lg:flex-wrap">
-                      <button
-                        onClick={() => setSourceQr("")}
-                        className="rounded-2xl border border-slate-200 px-4 py-4 text-base lg:py-2.5 lg:text-sm font-medium text-slate-700 hover:bg-slate-50 flex-1"
-                      >
-                        {t("scanAnother")}
-                      </button>
-                      <button
-                        onClick={() => void switchToDropoff()}
-                        disabled={submitting || cartItems.length === 0}
-                        className="rounded-2xl bg-amber-500 px-4 py-4 text-base lg:py-2.5 lg:text-sm font-semibold text-white disabled:opacity-60 flex-1"
-                      >
-                        {t("switchToDropoff")}
-                      </button>
-                    </div>
                   </div>
-                </div>
-              )}
-
-              {currentTransfer.status === "DROPPING" && (
-                <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-amber-600">
-                        {t("dropoffMode")}
-                      </p>
-                      <h2 className="mt-2 text-2xl font-bold text-slate-900">
-                        {t("scanDestination")}
-                      </h2>
-                    </div>
-                    <button className="rounded-2xl bg-amber-500 px-5 py-3 text-sm font-semibold text-white">
-                      {t("scanDestination")}
-                    </button>
-                  </div>
-
-                  <div className="mt-5 space-y-4">
-                    <input
-                      value={destinationQr}
-                      onChange={(event) => setDestinationQr(event.target.value)}
-                      placeholder={t("destPlaceholder")}
-                      className={inputClassName}
-                      autoFocus
-                    />
-                    <div className="flex max-h-24 flex-wrap gap-2 overflow-y-auto">
-                      {locations
-                        .filter((location) => !["WAREHOUSE"].includes(location.type))
-                        .slice(0, 18)
-                        .map((location) => (
-                          <button
-                            key={location.id}
-                            onClick={() => setDestinationQr(location.qrCode)}
-                            className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
-                          >
-                            {location.name}
-                          </button>
-                        ))}
-                    </div>
-
-                    {destinationLocation && (
-                      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                        <p className="font-semibold text-slate-900">{destinationLocation.name}</p>
-                        <p className="mt-1 text-xs text-slate-500">
-                          {destinationLocation.qrCode}
-                        </p>
-                      </div>
-                    )}
-
-                    {dropWarnings.length > 0 && (
-                      <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex items-start gap-3">
-                            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-200">
-                              <span className="text-sm">⚠️</span>
-                            </span>
-                            <div className="space-y-1">
-                              {dropWarnings.map((warning, index) => (
-                                <p key={index} className="text-sm font-medium text-amber-800">
-                                  {warning}
-                                </p>
-                              ))}
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => setDropWarnings([])}
-                            className="shrink-0 rounded-lg px-2 py-1 text-xs font-medium text-amber-600 hover:bg-amber-100"
-                          >
-                            {t("dismiss")}
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="space-y-3">
-                      {cartItems.map((item) => (
-                        <button
-                          key={item.productId}
-                          onClick={() => setDropProductId(item.productId)}
-                          className={`w-full rounded-2xl border px-4 py-3 text-left ${
-                            dropProductId === item.productId
-                              ? "border-amber-500 bg-amber-50"
-                              : "border-slate-200 bg-white"
-                          }`}
-                        >
-                          <p className="font-semibold text-slate-900">{item.compoundId}</p>
-                          <p className="text-sm text-slate-500">{item.productName}</p>
-                          <p className="mt-1 text-xs text-slate-500">
-                            {t("remainingInCart")}: {item.quantity}
-                          </p>
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="grid gap-3 md:grid-cols-[1fr_auto]">
-                      <input
-                        value={dropQty}
-                        onChange={(event) => setDropQty(event.target.value)}
-                        placeholder={t("dropQty")}
-                        className={inputClassName}
-                        inputMode="numeric"
-                      />
-                      <button
-                        onClick={() => void drop()}
-                        disabled={submitting || !destinationQr || !dropProductId || !dropQty}
-                        className="rounded-2xl bg-amber-500 px-5 py-4 text-base lg:py-3 lg:text-sm font-semibold text-white disabled:opacity-60"
-                      >
-                        {t("drop")}
-                      </button>
-                    </div>
-
-                    <div className="fixed bottom-0 inset-x-0 p-4 bg-white border-t border-slate-200 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] flex flex-col sm:flex-row gap-3 z-50 lg:static lg:p-0 lg:border-none lg:bg-transparent lg:shadow-none lg:flex-row lg:flex-wrap">
-                      <button
-                        onClick={() => setDestinationQr("")}
-                        className="rounded-2xl border border-slate-200 px-4 py-4 text-base lg:py-2.5 lg:text-sm font-medium text-slate-700 hover:bg-slate-50 flex-1"
-                      >
-                        {t("scanAnotherDest")}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </section>
-
-            <section className="space-y-6">
-              <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-slate-900">{t("cart")}</h2>
-                  <Link
-                    href={`/${locale}/transfers/${currentTransfer.id}`}
-                    className="text-sm font-medium text-slate-500 hover:text-slate-700"
-                  >
-                    {t("detail")}
-                  </Link>
-                </div>
-                <div className="mt-5 space-y-3">
-                  {cartItems.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
-                      {t("cartEmpty")}
-                    </div>
-                  ) : (
-                    cartItems.map((item) => (
-                      <div
-                        key={item.productId}
-                        className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
-                      >
-                        <p className="font-semibold text-slate-900">{item.compoundId}</p>
-                        <p className="text-sm text-slate-500">{item.productName}</p>
-                        <p className="mt-1 text-xs text-slate-500">{t("qtyLabel")}: {item.quantity}</p>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-
-              <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 className="text-lg font-semibold text-slate-900">{t("transferControls")}</h2>
-                <div className="mt-5 flex flex-wrap gap-3">
-                  <button
-                    onClick={() => void cancelTransfer()}
-                    disabled={submitting}
-                    className="rounded-2xl border border-rose-200 px-4 py-2.5 text-sm font-medium text-rose-600 hover:bg-rose-50 disabled:opacity-60"
-                  >
-                    {t("cancelTransfer")}
-                  </button>
-                  {currentTransfer.status === "COMPLETED" && (
-                    <Link
-                      href={`/${locale}/transfers/${currentTransfer.id}`}
-                      className="rounded-2xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white"
-                    >
-                      {t("viewCompletedTransfer")}
-                    </Link>
-                  )}
-                </div>
-
-                <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-sm text-slate-600">
-                    {t("controlsInfo")}
+                  <p className="mt-3 text-sm text-slate-500">
+                    {progress.openLines === 0
+                      ? "No open lines left in the cart."
+                      : `${progress.openLines} product lines still need a destination drop.`}
                   </p>
                 </div>
               </div>
+            </section>
 
-              {currentTransfer && (
-                <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                  <h2 className="text-lg font-semibold text-slate-900 mb-5">{t("activity")}</h2>
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_360px]">
+              <section className="space-y-6">
+                {currentTransfer.status === "COLLECTING" && (
+                  <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-600">
+                          Collection mode
+                        </p>
+                        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+                          Scan source location first
+                        </h2>
+                        <p className="mt-2 max-w-2xl text-sm text-slate-500">
+                          Paste or scan a location QR, confirm the source, then pick items directly from that source stock list.
+                        </p>
+                      </div>
+                      <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-600 lg:w-[260px]">
+                        <p className="font-semibold text-slate-900">Operator rules</p>
+                        <ul className="mt-3 space-y-2 text-sm text-slate-500">
+                          <li>Pick only from the scanned location.</li>
+                          <li>Switch to drop-off only after the cart is correct.</li>
+                          <li>Cancel will return every pick to origin.</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+                      <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                        <PanelTitle
+                          icon={QrCode}
+                          title="Source scan"
+                          description="Use one source at a time. The stock list updates as soon as the QR matches a live location."
+                        />
+                        <div className="mt-4 space-y-3">
+                          <input
+                            value={sourceQr}
+                            onChange={(event) => setSourceQr(event.target.value)}
+                            placeholder={t("sourcePlaceholder")}
+                            className={inputClassName}
+                            autoFocus
+                          />
+                          <div className="flex flex-wrap gap-2">
+                            {locations.slice(0, 12).map((location) => (
+                              <button
+                                key={location.id}
+                                type="button"
+                                onClick={() => setSourceQr(location.qrCode)}
+                                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-100"
+                              >
+                                {location.name}
+                              </button>
+                            ))}
+                          </div>
+                          {sourceLocation ? (
+                            <ScanConfirmCard
+                              title={sourceLocation.name}
+                              meta={`${sourceLocation.qrCode} / ${sourceLocation.type}`}
+                              tone="sky"
+                            />
+                          ) : (
+                            <EmptyHint message="Waiting for a valid source QR scan." />
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="rounded-3xl border border-slate-200 bg-white p-4">
+                        <PanelTitle
+                          icon={Package2}
+                          title="Pick from source stock"
+                          description="Select the SKU, set quantity, and add it straight into the transfer cart."
+                        />
+                        {sourceLocation ? (
+                          <>
+                            <div className="mt-4">
+                              <input
+                                value={sourceSearch}
+                                onChange={(event) => setSourceSearch(event.target.value)}
+                                placeholder="Search source stock"
+                                className={inputClassName}
+                              />
+                            </div>
+                            <div className="mt-4 max-h-[360px] space-y-3 overflow-y-auto pr-1">
+                              {sourceStock.length === 0 ? (
+                                <EmptyHint message="No active stock found at this source location." />
+                              ) : (
+                                sourceStock.map((stock) => (
+                                  <button
+                                    key={`${stock.locationId}-${stock.productId}`}
+                                    type="button"
+                                    onClick={() => setSelectedProductId(stock.productId)}
+                                    className={`w-full rounded-3xl border px-4 py-4 text-left transition ${
+                                      selectedProductId === stock.productId
+                                        ? "border-sky-500 bg-sky-50"
+                                        : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white"
+                                    }`}
+                                  >
+                                    <div className="flex items-start justify-between gap-3">
+                                      <div>
+                                        <p className="text-sm font-semibold text-slate-900">{stock.compoundId}</p>
+                                        <p className="mt-1 text-sm text-slate-500">{stock.productName}</p>
+                                      </div>
+                                      <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                                        {stock.quantity} on hand
+                                      </span>
+                                    </div>
+                                  </button>
+                                ))
+                              )}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="mt-4">
+                            <EmptyHint message="Scan a source location to unlock its stock list." />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                      <PanelTitle
+                        icon={ChevronRight}
+                        title="Confirm pick"
+                        description="Every pick deducts stock immediately from the source location."
+                      />
+                      {selectedSourceItem ? (
+                        <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px]">
+                          <SelectedItemCard
+                            title={selectedSourceItem.compoundId}
+                            subtitle={selectedSourceItem.productName}
+                            meta={`${selectedSourceItem.quantity} available at ${sourceLocation?.name}`}
+                          />
+                          <div className="rounded-3xl border border-slate-200 bg-white p-4">
+                            <label className="text-sm font-medium text-slate-700">Pick quantity</label>
+                            <div className="mt-3 flex items-center gap-2">
+                              <StepButton onClick={() => setPickQty(String(Math.max(1, parseQty(pickQty) - 1)))}>-</StepButton>
+                              <input
+                                value={pickQty}
+                                onChange={(event) => setPickQty(event.target.value)}
+                                className={`${inputClassName} text-center`}
+                                inputMode="numeric"
+                              />
+                              <StepButton onClick={() => setPickQty(String(parseQty(pickQty) + 1))}>+</StepButton>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-4">
+                          <EmptyHint message="Select a SKU from the scanned source location." />
+                        </div>
+                      )}
+                    </div>
+
+                    <MobileActionBar
+                      primaryLabel="Pick into cart"
+                      primaryTone="sky"
+                      onPrimary={() => void collect()}
+                      secondaryLabel="Start drop-off"
+                      onSecondary={() => void switchToDropoff()}
+                      disablePrimary={submitting || !sourceLocation || !selectedSourceItem}
+                      disableSecondary={submitting || !canStartDropoff}
+                    />
+                  </div>
+                )}
+
+                {currentTransfer.status === "DROPPING" && (
+                  <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-600">
+                          Drop-off mode
+                        </p>
+                        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+                          Scan destination and confirm the drop
+                        </h2>
+                        <p className="mt-2 max-w-2xl text-sm text-slate-500">
+                          Pick a remaining cart line, scan the destination, and confirm the exact quantity. Flagged destinations require an explicit exception approval.
+                        </p>
+                      </div>
+                      <div className="rounded-3xl border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-700 lg:w-[280px]">
+                        <p className="font-semibold">Drop controls</p>
+                        <ul className="mt-3 space-y-2 text-sm">
+                          <li>No switching back to collect mode.</li>
+                          <li>Wrong-location drops require approval.</li>
+                          <li>Transfer auto-completes when the cart reaches zero.</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+                      <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                        <PanelTitle
+                          icon={MapPin}
+                          title="Destination scan"
+                          description="Scan a valid destination QR before confirming the product drop."
+                        />
+                        <div className="mt-4 space-y-3">
+                          <input
+                            value={destinationQr}
+                            onChange={(event) => setDestinationQr(event.target.value)}
+                            placeholder={t("destPlaceholder")}
+                            className={inputClassName}
+                            autoFocus
+                          />
+                          <div className="flex flex-wrap gap-2">
+                            {locations
+                              .filter((location) => location.type !== "WAREHOUSE")
+                              .slice(0, 12)
+                              .map((location) => (
+                                <button
+                                  key={location.id}
+                                  type="button"
+                                  onClick={() => setDestinationQr(location.qrCode)}
+                                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-100"
+                                >
+                                  {location.name}
+                                </button>
+                              ))}
+                          </div>
+                          {destinationLocation ? (
+                            <ScanConfirmCard
+                              title={destinationLocation.name}
+                              meta={`${destinationLocation.qrCode} / ${destinationLocation.type}`}
+                              tone="amber"
+                            />
+                          ) : (
+                            <EmptyHint message="Waiting for a valid destination QR scan." />
+                          )}
+                        </div>
+
+                        {dropWarnings.length > 0 && (
+                          <div className="mt-4 rounded-3xl border border-amber-300 bg-amber-50 p-4">
+                            <div className="flex items-start gap-3">
+                              <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-600" />
+                              <div className="space-y-1">
+                                {dropWarnings.map((warning) => (
+                                  <p key={warning} className="text-sm font-medium text-amber-800">
+                                    {warning}
+                                  </p>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {pendingException && (
+                          <div className="mt-4 rounded-3xl border border-rose-300 bg-rose-50 p-4">
+                            <div className="flex items-start gap-3">
+                              <ShieldAlert className="mt-0.5 h-5 w-5 text-rose-600" />
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-semibold text-rose-800">
+                                  Exception confirmation required
+                                </p>
+                                <div className="mt-2 space-y-1">
+                                  {pendingException.warnings.map((warning) => (
+                                    <p key={warning} className="text-sm text-rose-700">
+                                      {warning}
+                                    </p>
+                                  ))}
+                                </div>
+                                <label className="mt-3 flex items-center gap-2 text-sm text-rose-800">
+                                  <input
+                                    type="checkbox"
+                                    checked={exceptionConfirmed}
+                                    onChange={(event) => setExceptionConfirmed(event.target.checked)}
+                                  />
+                                  I reviewed this drop and want to continue anyway.
+                                </label>
+                                <div className="mt-4 flex flex-wrap gap-3">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setPendingException(null);
+                                      setExceptionConfirmed(false);
+                                    }}
+                                    className="rounded-2xl border border-rose-200 px-4 py-2.5 text-sm font-medium text-rose-700 transition hover:bg-rose-100"
+                                  >
+                                    Cancel exception
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => void performDrop(true)}
+                                    disabled={!exceptionConfirmed || submitting}
+                                    className="rounded-2xl bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:opacity-60"
+                                  >
+                                    Approve exception and drop
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="rounded-3xl border border-slate-200 bg-white p-4">
+                        <PanelTitle
+                          icon={Package2}
+                          title="Drop from cart"
+                          description="Only remaining cart lines can be dropped. The transfer closes automatically when all lines are cleared."
+                        />
+                        <div className="mt-4">
+                          <input
+                            value={dropSearch}
+                            onChange={(event) => setDropSearch(event.target.value)}
+                            placeholder="Search remaining cart"
+                            className={inputClassName}
+                          />
+                        </div>
+                        <div className="mt-4 max-h-[360px] space-y-3 overflow-y-auto pr-1">
+                          {cartItems.length === 0 ? (
+                            <EmptyHint message="No remaining cart lines. The transfer will finish as soon as the backend marks it complete." />
+                          ) : (
+                            cartItems.map((item) => (
+                              <button
+                                key={item.productId}
+                                type="button"
+                                onClick={() => setDropProductId(item.productId)}
+                                className={`w-full rounded-3xl border px-4 py-4 text-left transition ${
+                                  dropProductId === item.productId
+                                    ? "border-amber-500 bg-amber-50"
+                                    : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white"
+                                }`}
+                              >
+                                <div className="flex items-start justify-between gap-3">
+                                  <div>
+                                    <p className="text-sm font-semibold text-slate-900">{item.compoundId}</p>
+                                    <p className="mt-1 text-sm text-slate-500">{item.productName}</p>
+                                    <p className="mt-1 text-xs text-slate-400">
+                                      From {item.sourceNames.join(", ")}
+                                    </p>
+                                  </div>
+                                  <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                                    {item.quantity} open
+                                  </span>
+                                </div>
+                              </button>
+                            ))
+                          )}
+                        </div>
+
+                        <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                          <PanelTitle
+                            icon={CheckCircle2}
+                            title="Confirm drop"
+                            description="Check the destination, selected SKU, and quantity before committing the stock."
+                          />
+                          {selectedDropItem ? (
+                            <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px]">
+                              <SelectedItemCard
+                                title={selectedDropItem.compoundId}
+                                subtitle={selectedDropItem.productName}
+                                meta={`${selectedDropItem.quantity} remaining / ${selectedDropItem.sourceNames.join(", ")}`}
+                              />
+                              <div className="rounded-3xl border border-slate-200 bg-white p-4">
+                                <label className="text-sm font-medium text-slate-700">Drop quantity</label>
+                                <div className="mt-3 flex items-center gap-2">
+                                  <StepButton onClick={() => setDropQty(String(Math.max(1, parseQty(dropQty) - 1)))}>-</StepButton>
+                                  <input
+                                    value={dropQty}
+                                    onChange={(event) => setDropQty(event.target.value)}
+                                    className={`${inputClassName} text-center`}
+                                    inputMode="numeric"
+                                  />
+                                  <StepButton onClick={() => setDropQty(String(parseQty(dropQty) + 1))}>+</StepButton>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="mt-4">
+                              <EmptyHint message="Select a remaining cart line before confirming the drop." />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <MobileActionBar
+                      primaryLabel="Confirm drop"
+                      primaryTone="amber"
+                      onPrimary={() => void performDrop(false)}
+                      secondaryLabel="Scan another destination"
+                      onSecondary={() => {
+                        setDestinationQr("");
+                        setPendingException(null);
+                        setExceptionConfirmed(false);
+                      }}
+                      disablePrimary={submitting || !destinationLocation || !selectedDropItem}
+                    />
+                  </div>
+                )}
+              </section>
+
+              <section className="space-y-6">
+                <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                  <div className="flex items-center justify-between gap-3">
+                    <h2 className="text-lg font-semibold text-slate-900">{t("cart")}</h2>
+                    <Link
+                      href={`/${locale}/transfers/${currentTransfer.id}`}
+                      className="text-sm font-medium text-slate-500 transition hover:text-slate-700"
+                    >
+                      {t("detail")}
+                    </Link>
+                  </div>
+                  <div className="mt-5 space-y-3">
+                    {cartItems.length === 0 ? (
+                      <EmptyHint message={t("cartEmpty")} />
+                    ) : (
+                      cartItems.map((item) => (
+                        <div
+                          key={item.productId}
+                          className="rounded-3xl border border-slate-200 bg-slate-50 p-4"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-sm font-semibold text-slate-900">{item.compoundId}</p>
+                              <p className="mt-1 text-sm text-slate-500">{item.productName}</p>
+                              <p className="mt-1 text-xs text-slate-400">
+                                From {item.sourceNames.join(", ")}
+                              </p>
+                            </div>
+                            <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                              {item.quantity}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                  <h2 className="text-lg font-semibold text-slate-900">Transfer controls</h2>
+                  <div className="mt-5 grid gap-3">
+                    {currentTransfer.status === "COLLECTING" && (
+                      <button
+                        type="button"
+                        onClick={() => void switchToDropoff()}
+                        disabled={!canStartDropoff || submitting}
+                        className="rounded-2xl bg-amber-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-amber-600 disabled:opacity-60"
+                      >
+                        Start drop-off
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => void cancelTransfer()}
+                      disabled={submitting}
+                      className="rounded-2xl border border-rose-200 px-4 py-3 text-sm font-medium text-rose-600 transition hover:bg-rose-50 disabled:opacity-60"
+                    >
+                      {t("cancelTransfer")}
+                    </button>
+                  </div>
+                  <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                    <div className="space-y-3">
+                      <SummaryRow label="Status" value={formatStatus(currentTransfer.status)} />
+                      <SummaryRow label="Picked units" value={String(progress.picked)} />
+                      <SummaryRow label="Dropped units" value={String(progress.dropped)} />
+                      <SummaryRow label="Open lines" value={String(progress.openLines)} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                  <h2 className="mb-5 text-lg font-semibold text-slate-900">{t("activity")}</h2>
                   <ActivityTimeline entityType="Transfer" entityId={currentTransfer.id} />
                 </div>
-              )}
-            </section>
-          </div>
+              </section>
+            </div>
+          </>
         )}
       </div>
+    </div>
+  );
+}
+
+function MetricCard({
+  title,
+  value,
+  icon: Icon,
+}: {
+  title: string;
+  value: string;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{title}</p>
+        <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm">
+          <Icon className="h-4 w-4" />
+        </span>
+      </div>
+      <p className="mt-4 text-2xl font-semibold tracking-tight text-slate-900">{value}</p>
+    </div>
+  );
+}
+
+function FlowStep({
+  label,
+  detail,
+  state,
+}: {
+  label: string;
+  detail: string;
+  state: "active" | "complete" | "upcoming";
+}) {
+  const tone =
+    state === "active"
+      ? "border-slate-900 bg-slate-900 text-white"
+      : state === "complete"
+        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+        : "border-slate-200 bg-slate-50 text-slate-500";
+
+  return (
+    <div className={`rounded-3xl border px-4 py-4 ${tone}`}>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em]">{label}</p>
+      <p className="mt-2 text-sm font-medium">{detail}</p>
+    </div>
+  );
+}
+
+function PanelTitle({
+  title,
+  description,
+  icon: Icon,
+}: {
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm">
+        <Icon className="h-4 w-4" />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-semibold text-slate-900">{title}</span>
+        <span className="mt-1 block text-sm text-slate-500">{description}</span>
+      </span>
+    </div>
+  );
+}
+
+function ScanConfirmCard({
+  title,
+  meta,
+  tone,
+}: {
+  title: string;
+  meta: string;
+  tone: "sky" | "amber";
+}) {
+  return (
+    <div
+      className={`rounded-3xl border px-4 py-4 ${
+        tone === "sky" ? "border-sky-200 bg-sky-50" : "border-amber-200 bg-amber-50"
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <CheckCircle2
+          className={`mt-0.5 h-5 w-5 ${tone === "sky" ? "text-sky-600" : "text-amber-600"}`}
+        />
+        <div>
+          <p className="text-sm font-semibold text-slate-900">{title}</p>
+          <p className="mt-1 text-xs text-slate-500">{meta}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SelectedItemCard({
+  title,
+  subtitle,
+  meta,
+}: {
+  title: string;
+  subtitle: string;
+  meta: string;
+}) {
+  return (
+    <div className="rounded-3xl border border-slate-200 bg-white p-4">
+      <p className="text-lg font-semibold tracking-tight text-slate-900">{title}</p>
+      <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
+      <p className="mt-3 text-xs font-medium uppercase tracking-[0.16em] text-slate-400">{meta}</p>
+    </div>
+  );
+}
+
+function StepButton({
+  children,
+  onClick,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex h-[52px] w-[52px] items-center justify-center rounded-2xl border border-slate-200 bg-white text-lg font-semibold text-slate-700 transition hover:bg-slate-50"
+    >
+      {children}
+    </button>
+  );
+}
+
+function MobileActionBar({
+  primaryLabel,
+  secondaryLabel,
+  primaryTone,
+  disablePrimary,
+  disableSecondary = false,
+  onPrimary,
+  onSecondary,
+}: {
+  primaryLabel: string;
+  secondaryLabel: string;
+  primaryTone: "sky" | "amber";
+  disablePrimary: boolean;
+  disableSecondary?: boolean;
+  onPrimary: () => void;
+  onSecondary: () => void;
+}) {
+  return (
+    <div className="mt-6 lg:mt-5">
+      <div className="fixed inset-x-0 bottom-16 z-40 border-t border-slate-200 bg-white/95 p-4 backdrop-blur lg:static lg:border-0 lg:bg-transparent lg:p-0">
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={onSecondary}
+            disabled={disableSecondary}
+            className="flex-1 rounded-2xl border border-slate-200 px-4 py-4 text-base font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60 lg:py-3 lg:text-sm"
+          >
+            {secondaryLabel}
+          </button>
+          <button
+            type="button"
+            onClick={onPrimary}
+            disabled={disablePrimary}
+            className={`flex-1 rounded-2xl px-4 py-4 text-base font-semibold text-white transition disabled:opacity-60 lg:py-3 lg:text-sm ${
+              primaryTone === "sky" ? "bg-sky-600 hover:bg-sky-700" : "bg-amber-500 hover:bg-amber-600"
+            }`}
+          >
+            {primaryLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SummaryRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-2xl bg-white px-4 py-3">
+      <p className="text-sm font-medium text-slate-600">{label}</p>
+      <p className="text-sm font-semibold text-slate-900">{value}</p>
+    </div>
+  );
+}
+
+function EmptyHint({ message }: { message: string }) {
+  return (
+    <div className="flex min-h-[140px] items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white px-4 text-center text-sm text-slate-400">
+      {message}
     </div>
   );
 }

@@ -18,7 +18,7 @@ function startOfToday() {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
-function formatRelativeSync(value: Date | null, t: any) {
+function formatRelativeSync(value: Date | null, t: (key: string, values?: Record<string, string | number | Date>) => string) {
   if (!value) return t("notSynced");
   const minutes = Math.max(0, Math.floor((Date.now() - value.getTime()) / 60000));
   if (minutes < 1) return t("justNow");
@@ -394,7 +394,7 @@ function StatCard({
 }: {
   title: string;
   value: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ElementType;
   iconClassName: string;
 }) {
   return (
@@ -423,7 +423,7 @@ function InsightCard({
   title: string;
   subtitle: string;
   metrics: Array<{ label: string; value: string }>;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ElementType;
   iconClassName: string;
 }) {
   return (
@@ -487,7 +487,7 @@ function ActiveMetricCard({
 }: {
   title: string;
   value: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ElementType;
 }) {
   return (
     <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">

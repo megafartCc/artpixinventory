@@ -81,12 +81,6 @@ type EntitySearchItem = {
   kind: string;
 };
 
-const roleBadgeColor: Record<string, string> = {
-  ADMIN: "border-fuchsia-200 bg-fuchsia-100 text-fuchsia-700",
-  MANAGER: "border-sky-200 bg-sky-100 text-sky-700",
-  PURCHASER: "border-amber-200 bg-amber-100 text-amber-700",
-  WAREHOUSE: "border-emerald-200 bg-emerald-100 text-emerald-700",
-};
 
 function LocaleFlag({ locale }: { locale: string }) {
   const usRows = [
@@ -141,7 +135,6 @@ export function AppShell({
   const reportsProduction = useTranslations("ReportsProduction");
   const reportsDefects = useTranslations("ReportsDefects");
   const reportsQbo = useTranslations("ReportsQbo");
-  const common = useTranslations("Common");
   const appShell = useTranslations("AppShell");
   const { data: session } = useSession();
   const pathname = usePathname();
@@ -168,7 +161,6 @@ export function AppShell({
   const searchRef = useRef<HTMLDivElement>(null);
 
   const role = (session?.user as { role?: string })?.role || "WAREHOUSE";
-  const roleClassName = roleBadgeColor[role] ?? roleBadgeColor.WAREHOUSE;
   const currentLocale =
     localeOptions.find((option) => option.value === locale) ?? localeOptions[0];
 

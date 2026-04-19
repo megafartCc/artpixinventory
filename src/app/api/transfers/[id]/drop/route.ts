@@ -103,6 +103,13 @@ export async function POST(request: Request, { params }: RouteContext) {
         throw new Error("Drop quantity exceeds the picked quantity remaining.");
       }
 
+      if (warningFlags.length > 0 && !parsed.data.allowException) {
+        throw Object.assign(new Error("Destination requires operator confirmation."), {
+          code: "EXCEPTION_CONFIRMATION_REQUIRED",
+          warnings: warningFlags,
+        });
+      }
+
       const stockResult = await adjustStockLevel(tx, {
         productId: parsed.data.productId,
         locationId: destination.id,
@@ -132,6 +139,7 @@ export async function POST(request: Request, { params }: RouteContext) {
           beforeQty: stockResult.previousQty,
           afterQty: stockResult.nextQty,
           warnings: warningFlags.length > 0 ? warningFlags : undefined,
+          exceptionApproved: warningFlags.length > 0 ? true : undefined,
         } as Prisma.InputJsonValue,
       });
 
@@ -206,6 +214,26 @@ export async function POST(request: Request, { params }: RouteContext) {
     });
   } catch (error) {
     console.error("POST /api/transfers/[id]/drop failed", error);
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      (error as { code?: string }).code === "EXCEPTION_CONFIRMATION_REQUIRED"
+    ) {
+      return NextResponse.json(
+        {
+          error: "Destination requires operator confirmation.",
+          warnings:
+            "warnings" in error && Array.isArray((error as { warnings?: string[] }).warnings)
+              ? (error as { warnings?: string[] }).warnings
+              : [],
+          requiresConfirmation: true,
+        },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
       {
         error:
