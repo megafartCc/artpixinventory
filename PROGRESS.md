@@ -20,11 +20,11 @@
 - [x] Session 15: Label Printing
 - [x] Session 16: Defects Hardening
 - [x] Session 17: ERPIX Integration
-- [x] Session 21: Dashboard + Slack + Settings
-- [x] Session 20: Reports + QBO Export
 - [x] Session 18: Production Queue
-- [x] Session 22: Polish + Bug Fixes
 - [x] Session 19: Vendor Credits
+- [x] Session 20: Reports + QBO Export
+- [x] Session 21: Dashboard + Slack + Settings
+- [x] Session 22: Polish + Bug Fixes
 
 ## Current Phase
 Phase 3 - QA and Production Hardening
@@ -33,13 +33,7 @@ Phase 3 - QA and Production Hardening
 - [ ] Workflow QA and hardware verification
 
 ## Notes
-- Session 4 now includes dedicated product create/edit/detail routes, a shared form, and packaging image support.
+- Session 4 is now fully implemented in code: dedicated product create/edit routes, a shared form, product detail actions, and packaging image support.
+- The shell and major list pages now use standardized gutters and contained scrolling so desktop screens read consistently.
+- The remaining work is verification and hardening: role checks, workflow QA, scanner/printer behavior, exports, and mobile edge cases.
 - Current app routes that build successfully: dashboard, login, products, products/import, products/new, products/[id], products/[id]/edit, indexes, categories, stock, locations, machines, machines/[id], vendors, vendors/[id], container-templates, purchase-orders, purchase-orders/new, purchase-orders/[id], purchase-orders/[id]/edit, receiving, receiving/place, transfers, transfers/new, transfers/[id], counts, counts/new, counts/[id], counts/[id]/review, labels, production, credits, credits/new, credits/[id], reports, reports/stock-levels, reports/po-aging, reports/defects, reports/production, reports/qbo-export, settings.
-- Session 9 now includes vendor CRUD, vendor-product mappings, PO history placeholders, container template CRUD, and pre-seeded 20ft/40ft/40ft HC templates.
-- Sessions 10 and 11 now add purchase order list/create/edit/detail pages, lifecycle actions, duplicate flow, inline document uploads, and PDF export.
-- Seed data now includes demo vendors, vendor-product mappings, and product packaging defaults so PO creation and container math can be exercised immediately after seeding.
-- Sessions 12 and 13 now add PO receiving, receiving sessions, pallet creation with ZPL label output, pallet placement by QR, transfer collection/drop-off, transfer cancellation rollback, and transfer detail/history.
-- Seed data now includes a sample ORDERED purchase order so receiving and pallet workflows are usable immediately after `prisma:seed`.
-- Defects module now supports batch reports, review queue, stock deduction on confirm, and vendor-credit suggestion flags for vendor faults.
-- Products module is now aligned with the original Session 4 plan.
-- Vendor credits and final polish pass are now implemented; next work should focus on QA hardening, workflow verification, and UX refinements.
