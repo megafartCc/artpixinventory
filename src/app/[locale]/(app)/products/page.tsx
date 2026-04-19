@@ -5,7 +5,7 @@ import { ProductsClient } from "@/components/products/ProductsClient";
 export default async function ProductsPage({ params }: { params: { locale: string } }) {
   noStore();
 
-  const [products, indexes, categories] = await Promise.all([
+  const [products, indexes] = await Promise.all([
     prisma.product.findMany({
       orderBy: { updatedAt: "desc" },
       include: {
@@ -20,11 +20,6 @@ export default async function ProductsPage({ params }: { params: { locale: strin
       },
     }),
     prisma.productIndex.findMany({
-      where: { active: true },
-      orderBy: { name: "asc" },
-      select: { id: true, name: true },
-    }),
-    prisma.category.findMany({
       where: { active: true },
       orderBy: { name: "asc" },
       select: { id: true, name: true },
@@ -54,7 +49,6 @@ export default async function ProductsPage({ params }: { params: { locale: strin
         updatedAt: product.updatedAt.toISOString(),
       }))}
       indexes={indexes}
-      categories={categories}
     />
   );
 }
