@@ -1,8 +1,20 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { unstable_noStore as noStore } from "next/cache";
-import { AlertTriangle, ArrowLeftRight, Boxes, Printer, Truck } from "lucide-react";
+import { getServerSession } from "next-auth";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowLeftRight,
+  Boxes,
+  Pencil,
+  Printer,
+  Truck,
+} from "lucide-react";
 import prisma from "@/lib/prisma";
+import { authOptions } from "@/lib/auth";
+import { canManageCatalog } from "@/lib/permissions";
 import { buildProductLabelZpl } from "@/lib/zpl";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 
@@ -135,6 +147,8 @@ export default async function ProductDetailPage({
     notFound();
   }
 
+  const session = await getServerSession(authOptions);
+  const canEditProduct = canManageCatalog(session?.user?.role);
   const totalStock = product.stockLevels.reduce((sum, row) => sum + row.quantity, 0);
   const categoryNames = product.categories.map((entry) => entry.category.name);
   const productZpl = buildProductLabelZpl({
@@ -188,8 +202,8 @@ export default async function ProductDetailPage({
               href={`/${params.locale}/products`}
               className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-indigo-600"
             >
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 group-hover:bg-indigo-50">
-                ←
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100">
+                <ArrowLeft className="h-3.5 w-3.5" />
               </span>
               Back to Products
             </Link>
@@ -210,10 +224,30 @@ export default async function ProductDetailPage({
                 {product.uom}
               </span>
             </div>
-            <p className="mt-3 text-lg text-slate-600 font-medium">{product.name}</p>
-            <p className="mt-3 max-w-3xl text-sm text-slate-500 leading-relaxed">
-              Part of Index <span className="font-semibold text-slate-900">{product.index.name}</span> with {categoryNames.length || 0} categories, min stock {product.minStock}, and total on-hand quantity {totalStock}.
+            <p className="mt-3 text-lg font-medium text-slate-600">{product.name}</p>
+            <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate-500">
+              Part of Index <span className="font-semibold text-slate-900">{product.index.name}</span> with{" "}
+              {categoryNames.length || 0} categories, min stock {product.minStock}, and total on-hand quantity{" "}
+              {totalStock}.
             </p>
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              {canEditProduct && (
+                <Link
+                  href={`/${params.locale}/products/${product.id}/edit`}
+                  className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  <Pencil className="h-4 w-4" />
+                  Edit Product
+                </Link>
+              )}
+              <Link
+                href={`/${params.locale}/labels?tab=products&product=${product.id}`}
+                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                <Printer className="h-4 w-4" />
+                Label Center
+              </Link>
+            </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:w-[600px]">
@@ -262,6 +296,21 @@ export default async function ProductDetailPage({
                 {product.notes?.trim() ? product.notes : "No product notes yet."}
               </p>
             </div>
+            {product.packagingImageUrl ? (
+              <div className="mt-6 rounded-[24px] border border-slate-100 bg-slate-50/50 p-6 transition group-hover:bg-white">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                  Packaging Image
+                </p>
+                <Image
+                  src={product.packagingImageUrl}
+                  alt={`${product.compoundId} packaging preview`}
+                  width={1200}
+                  height={800}
+                  unoptimized
+                  className="mt-4 h-64 w-full rounded-2xl border border-slate-200 bg-white object-contain"
+                />
+              </div>
+            ) : null}
           </section>
 
           <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
@@ -312,12 +361,16 @@ export default async function ProductDetailPage({
                 </div>
               ) : (
                 product.vendors.slice(0, 4).map((mapping) => (
-                  <div key={mapping.id} className="rounded-[24px] border border-slate-100 bg-slate-50/50 p-6 transition hover:bg-white hover:shadow-md">
+                  <div
+                    key={mapping.id}
+                    className="rounded-[24px] border border-slate-100 bg-slate-50/50 p-6 transition hover:bg-white hover:shadow-md"
+                  >
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <p className="text-sm font-bold text-slate-900">{mapping.vendor.name}</p>
                         <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          {mapping.vendor.country ?? "Global"}{mapping.vendorSku ? ` • SKU ${mapping.vendorSku}` : ""}
+                          {mapping.vendor.country ?? "Global"}
+                          {mapping.vendorSku ? ` • SKU ${mapping.vendorSku}` : ""}
                         </p>
                       </div>
                       {mapping.isDefault && (
@@ -326,8 +379,11 @@ export default async function ProductDetailPage({
                         </span>
                       )}
                     </div>
-                    <div className="mt-6 grid gap-4 grid-cols-3">
-                      <MiniStat label="Unit cost" value={mapping.unitCost ? formatCurrency(params.locale, mapping.unitCost.toString()) : "-"} />
+                    <div className="mt-6 grid grid-cols-3 gap-4">
+                      <MiniStat
+                        label="Unit cost"
+                        value={mapping.unitCost ? formatCurrency(params.locale, mapping.unitCost.toString()) : "-"}
+                      />
                       <MiniStat label="MOQ" value={mapping.moq?.toString() ?? "-"} />
                       <MiniStat label="Lead" value={mapping.leadTimeDays ? `${mapping.leadTimeDays}d` : "-"} />
                     </div>
@@ -349,7 +405,7 @@ export default async function ProductDetailPage({
                 <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                   {product.poItems.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-6 py-12 text-center text-slate-400 italic">
+                      <td colSpan={4} className="px-6 py-12 text-center italic text-slate-400">
                         No purchase order history recorded.
                       </td>
                     </tr>
@@ -358,7 +414,9 @@ export default async function ProductDetailPage({
                       <tr key={item.id} className="transition hover:bg-slate-50/50">
                         <td className="px-6 py-5 font-bold text-slate-950">{item.purchaseOrder.poNumber}</td>
                         <td className="px-6 py-5">{item.purchaseOrder.vendor.name}</td>
-                        <td className="px-6 py-5 text-center font-medium text-slate-500">{formatDate(params.locale, item.purchaseOrder.orderDate)}</td>
+                        <td className="px-6 py-5 text-center font-medium text-slate-500">
+                          {formatDate(params.locale, item.purchaseOrder.orderDate)}
+                        </td>
                         <td className="px-6 py-5 text-right font-bold text-slate-950">
                           {formatCurrency(params.locale, item.unitCost.toString())}
                         </td>
@@ -377,9 +435,12 @@ export default async function ProductDetailPage({
             ) : (
               <div className="mt-8 space-y-4">
                 {recentMovements.map((movement) => (
-                  <div key={movement.id} className="rounded-[24px] border border-slate-100 bg-slate-50/30 p-5 transition hover:bg-white hover:shadow-md">
+                  <div
+                    key={movement.id}
+                    className="rounded-[24px] border border-slate-100 bg-slate-50/30 p-5 transition hover:bg-white hover:shadow-md"
+                  >
                     <div className="flex items-start gap-4">
-                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm border border-slate-100">
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-100 bg-white text-slate-700 shadow-sm">
                         <movement.icon className="h-5 w-5" />
                       </span>
                       <div className="min-w-0 flex-1">
@@ -390,7 +451,9 @@ export default async function ProductDetailPage({
                           </span>
                         </div>
                         <p className="mt-1 text-sm text-slate-500">{movement.detail}</p>
-                        <p className="mt-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">{formatDate(params.locale, movement.timestamp)}</p>
+                        <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          {formatDate(params.locale, movement.timestamp)}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -415,20 +478,26 @@ export default async function ProductDetailPage({
             <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.1fr]">
               <div className="rounded-[28px] border border-slate-100 bg-slate-50/50 p-6">
                 <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Physical Label Preview</p>
-                  <p className="mt-6 text-3xl font-extrabold tracking-tight text-slate-950">{product.compoundId}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                    Physical Label Preview
+                  </p>
+                  <p className="mt-6 text-3xl font-extrabold tracking-tight text-slate-950">
+                    {product.compoundId}
+                  </p>
                   <div className="mt-6 flex h-16 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-[10px] font-black uppercase tracking-[0.5em] text-slate-400">
                     BARCODE
                   </div>
-                  <p className="mt-6 text-sm font-medium text-slate-600 truncate">{product.name}</p>
+                  <p className="mt-6 truncate text-sm font-medium text-slate-600">{product.name}</p>
                 </div>
               </div>
               <div className="relative group">
-                <pre className="h-full max-h-[300px] overflow-auto rounded-[28px] bg-slate-950 p-6 text-[11px] font-mono leading-relaxed text-slate-300 scrollbar-hide">
+                <pre className="h-full max-h-[300px] overflow-auto rounded-[28px] bg-slate-950 p-6 font-mono text-[11px] leading-relaxed text-slate-300 scrollbar-hide">
                   {productZpl}
                 </pre>
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition">
-                  <span className="rounded-lg bg-white/10 px-2 py-1 text-[10px] font-bold text-white uppercase tracking-wider backdrop-blur-sm">ZPL II</span>
+                <div className="absolute right-4 top-4 opacity-0 transition group-hover:opacity-100">
+                  <span className="rounded-lg bg-white/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+                    ZPL II
+                  </span>
                 </div>
               </div>
             </div>
@@ -437,7 +506,13 @@ export default async function ProductDetailPage({
           <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
             <div className="flex items-center justify-between gap-4">
               <h2 className="text-xl font-bold text-slate-900">Quality Exceptions</h2>
-              <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${product.defectItems.length > 0 ? "bg-rose-50 text-rose-600 ring-1 ring-inset ring-rose-200" : "bg-slate-50 text-slate-400 ring-1 ring-inset ring-slate-200"}`}>
+              <span
+                className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${
+                  product.defectItems.length > 0
+                    ? "bg-rose-50 text-rose-600 ring-1 ring-inset ring-rose-200"
+                    : "bg-slate-50 text-slate-400 ring-1 ring-inset ring-slate-200"
+                }`}
+              >
                 {product.defectItems.length} Incidents
               </span>
             </div>
@@ -446,22 +521,28 @@ export default async function ProductDetailPage({
             ) : (
               <div className="mt-8 space-y-4">
                 {product.defectItems.map((item) => (
-                  <div key={item.id} className="rounded-[24px] border border-slate-100 bg-slate-50/30 p-5 transition hover:bg-white hover:shadow-md">
+                  <div
+                    key={item.id}
+                    className="rounded-[24px] border border-slate-100 bg-slate-50/30 p-5 transition hover:bg-white hover:shadow-md"
+                  >
                     <div className="flex items-start gap-4">
-                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-rose-600 shadow-sm border border-slate-100">
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-slate-100 bg-white text-rose-600 shadow-sm">
                         <AlertTriangle className="h-5 w-5" />
                       </span>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-bold text-slate-950">{item.defectReport.reportNumber}</p>
+                          <p className="text-sm font-bold text-slate-950">
+                            {item.defectReport.reportNumber}
+                          </p>
                           <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-500">
                             {item.defectReport.status}
                           </span>
                         </div>
                         <p className="mt-1 text-sm text-slate-600">
-                          <span className="font-bold text-slate-900">{item.quantity}</span> units • {item.reason.name}
+                          <span className="font-bold text-slate-900">{item.quantity}</span> units •{" "}
+                          {item.reason.name}
                         </p>
-                        <p className="mt-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                           {item.defectReport.source} • {formatDate(params.locale, item.defectReport.createdAt)}
                         </p>
                       </div>
@@ -474,7 +555,7 @@ export default async function ProductDetailPage({
         </div>
 
         <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
-          <h2 className="text-xl font-bold text-slate-900 mb-8">System Activity Audit</h2>
+          <h2 className="mb-8 text-xl font-bold text-slate-900">System Activity Audit</h2>
           <ActivityTimeline entityType="Product" entityId={product.id} />
         </section>
       </div>

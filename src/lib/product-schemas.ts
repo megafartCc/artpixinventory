@@ -37,6 +37,10 @@ export const productMutationSchema = z.object({
   barcode: z.preprocess(emptyToNull, z.string().trim().max(191).nullable()),
   minStock: z.coerce.number().int().nonnegative(),
   notes: z.preprocess(emptyToNull, z.string().trim().max(2000).nullable()),
+  packagingImageUrl: z.preprocess(
+    emptyToNull,
+    z.string().trim().max(2000).nullable()
+  ),
   categories: z
     .array(z.string().trim().min(1).max(100))
     .default([])

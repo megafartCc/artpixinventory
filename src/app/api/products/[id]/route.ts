@@ -72,6 +72,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
         barcode: payload.barcode,
         minStock: payload.minStock,
         notes: payload.notes,
+        packagingImageUrl: payload.packagingImageUrl,
         length: toDecimal(payload.length),
         width: toDecimal(payload.width),
         height: toDecimal(payload.height),

@@ -56,6 +56,7 @@ export async function POST(request: Request) {
         barcode: payload.barcode,
         minStock: payload.minStock,
         notes: payload.notes,
+        packagingImageUrl: payload.packagingImageUrl,
         length: toDecimal(payload.length),
         width: toDecimal(payload.width),
         height: toDecimal(payload.height),

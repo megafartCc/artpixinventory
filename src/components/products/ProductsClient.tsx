@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { Loader2, PackagePlus, Pencil, Search, X } from "lucide-react";
+import { Loader2, PackagePlus, Search, X } from "lucide-react";
 import { PdfExportButton } from "@/components/PdfExportButton";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { productUnits } from "@/lib/product-schemas";
@@ -93,7 +93,7 @@ export function ProductsClient({
   const [indexFilter, setIndexFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("active");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [editingProductId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(() => createEmptyForm(indexes));
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -120,41 +120,6 @@ export function ProductsClient({
     );
   }
   filteredProducts.sort((left, right) => left.compoundId.localeCompare(right.compoundId));
-
-  const openCreate = () => {
-    setEditingProductId(null);
-    setForm(createEmptyForm(indexes));
-    setErrorMessage("");
-    setStatusMessage("");
-    setDrawerOpen(true);
-  };
-
-  const openEdit = (product: ProductRecord) => {
-    const safeUom = productUnits.includes(product.uom as (typeof productUnits)[number])
-      ? (product.uom as (typeof productUnits)[number])
-      : "pcs";
-
-    setEditingProductId(product.id);
-    setForm({
-      compoundId: product.compoundId,
-      name: product.name,
-      indexId: product.indexId,
-      uom: safeUom,
-      barcode: product.barcode ?? "",
-      minStock: String(product.minStock),
-      length: product.length,
-      width: product.width,
-      height: product.height,
-      dimensionUnit: product.dimensionUnit,
-      categories: [...product.categories],
-      categoryInput: "",
-      notes: product.notes,
-      active: product.active,
-    });
-    setErrorMessage("");
-    setStatusMessage("");
-    setDrawerOpen(true);
-  };
 
   const addCategory = (value: string) => {
     const nextValue = value.trim();
@@ -248,10 +213,10 @@ export function ProductsClient({
                 {t("csvImport")}
               </Link>
               {canManageProducts && (
-                <button onClick={openCreate} className="inline-flex items-center gap-2 rounded-2xl bg-slate-950 px-6 py-2.5 text-sm font-bold text-white shadow-lg transition hover:bg-slate-800">
+                <Link href={`/${locale}/products/new`} className="inline-flex items-center gap-2 rounded-2xl bg-slate-950 px-6 py-2.5 text-sm font-bold text-white shadow-lg transition hover:bg-slate-800">
                   <PackagePlus className="h-4 w-4" />
                   {t("addProduct")}
-                </button>
+                </Link>
               )}
             </div>
           </div>
@@ -318,27 +283,26 @@ export function ProductsClient({
                     </td>
                     <td className="px-8 py-5 text-slate-500 font-medium">{formatDimensions(product)}</td>
                     <td className="px-8 py-5 text-center font-black text-slate-950">{product.minStock}</td>
-                    <td className="px-8 py-5">
-                      <div className="flex justify-end gap-3">
-                        {canManageProducts && (
-                          <button 
-                            onClick={() => openEdit(product)} 
-                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-600 hover:bg-slate-50 transition shadow-sm"
+                      <td className="px-8 py-5">
+                        <div className="flex justify-end gap-3">
+                          {canManageProducts && (
+                            <Link
+                              href={`/${locale}/products/${product.id}/edit`}
+                              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-600 transition shadow-sm hover:bg-slate-50"
+                            >
+                              {t("edit")}
+                            </Link>
+                          )}
+                          <Link
+                            href={`/${locale}/products/${product.id}`}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-slate-100 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-950 hover:bg-slate-200 transition"
                           >
-                            <Pencil className="h-3 w-3" />
-                            {t("edit")}
-                          </button>
-                        )}
-                        <Link
-                          href={`/${locale}/products/${product.id}`}
-                          className="inline-flex items-center gap-1.5 rounded-xl bg-slate-100 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-950 hover:bg-slate-200 transition"
-                        >
-                          {t("view")}
-                        </Link>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                            {t("view")}
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
