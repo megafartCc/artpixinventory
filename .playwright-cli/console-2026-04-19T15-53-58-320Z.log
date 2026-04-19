@@ -676,3 +676,640 @@ Fast Refresh requires at least one parent function component in your React tree.
 [ 7326281ms] [LOG] [Fast Refresh] done in 90ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
 [ 7330957ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
 [ 7331059ms] [LOG] [Fast Refresh] done in 102ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 7499865ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 7501711ms] [ERROR] ./node_modules/next/dist/client/components/app-router-announcer.js
+Module not found: Can't resolve 'react'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/app-router-announcer.js
+Module not found: Can't resolve 'react-dom'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/app-router.js
+Module not found: Can't resolve 'react/jsx-runtime'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/app-router.js
+Module not found: Can't resolve 'react'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/app-router.js
+Module not found: Can't resolve './router-reducer/router-reducer-types'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/app-router.js
+Module not found: Can't resolve './use-reducer-with-devtools'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/app-router.js
+Module not found: Can't resolve './redirect-boundary'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/app-router.js
+Module not found: Can't resolve './unresolved-thenable'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/app-router.js
+Module not found: Can't resolve '../remove-base-path'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/app-router.js
+Module not found: Can't resolve '../../shared/lib/segment'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/bailout-to-client-rendering.js
+Module not found: Can't resolve './static-generation-async-storage.external'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/navigation.js
+./node_modules/next/dist/api/navigation.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/client-page.js
+Module not found: Can't resolve 'react/jsx-runtime'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/client-page.js
+Module not found: Can't resolve './search-params'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/error-boundary.js
+Module not found: Can't resolve 'react/jsx-runtime'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/error-boundary.js
+Module not found: Can't resolve 'react'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/error-boundary.js
+Module not found: Can't resolve './static-generation-async-storage.external'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/is-next-router-error.js
+Module not found: Can't resolve './redirect'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/error-boundary.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/layout-router.js
+Module not found: Can't resolve 'react/jsx-runtime'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/layout-router.js
+Module not found: Can't resolve 'react'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/layout-router.js
+Module not found: Can't resolve 'react-dom'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/layout-router.js
+Module not found: Can't resolve './unresolved-thenable'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/layout-router.js
+Module not found: Can't resolve './redirect-boundary'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/layout-router.js
+Module not found: Can't resolve './not-found-boundary'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/navigation.js
+Module not found: Can't resolve 'react'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/api/navigation.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/navigation.js
+Module not found: Can't resolve '../../shared/lib/segment'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/api/navigation.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/navigation.js
+Module not found: Can't resolve 'next/dist/server/future/route-modules/app-page/vendored/contexts/server-inserted-html'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/api/navigation.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/navigation.react-server.js
+Module not found: Can't resolve './redirect'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/navigation.js
+./node_modules/next/dist/api/navigation.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js
+Module not found: Can't resolve 'react/jsx-runtime'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js
+Module not found: Can't resolve 'react'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js
+Module not found: Can't resolve '../shared'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js
+Module not found: Can't resolve '../internal/helpers/parseStack'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js
+Module not found: Can't resolve './ReactDevOverlay'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js
+Module not found: Can't resolve '../internal/helpers/use-error-handler'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js
+Module not found: Can't resolve '../internal/helpers/runtime-error-handler'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js
+Module not found: Can't resolve '../internal/helpers/use-websocket'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js
+Module not found: Can't resolve '../internal/helpers/parse-component-stack'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/router-reducer/compute-changed-path.js
+Module not found: Can't resolve '../../../shared/lib/segment'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/router-reducer/create-initial-router-state.js
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501712ms] [ERROR] ./node_modules/next/dist/client/components/router-reducer/create-initial-router-state.js
+Module not found: Can't resolve './prefetch-cache-utils'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/components/router-reducer/create-initial-router-state.js
+Module not found: Can't resolve './router-reducer-types'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/components/router-reducer/create-initial-router-state.js
+Module not found: Can't resolve './refetch-inactive-parallel-segments'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/components/router-reducer/create-router-cache-key.js
+Module not found: Can't resolve '../../../shared/lib/segment'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/layout-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/components/router-reducer/fetch-server-response.js
+Module not found: Can't resolve './router-reducer-types'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/layout-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/components/router-reducer/fetch-server-response.js
+Module not found: Can't resolve 'react-server-dom-webpack/client.edge'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/layout-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/components/router-reducer/fill-lazy-items-till-leaf-with-head.js
+Module not found: Can't resolve './router-reducer-types'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/router-reducer/create-initial-router-state.js
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/flight-data-helpers.js
+Module not found: Can't resolve '../shared/lib/segment'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/router-reducer/fetch-server-response.js
+./node_modules/next/dist/client/components/layout-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/has-base-path.js
+Module not found: Can't resolve '../shared/lib/router/utils/path-has-prefix'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/link.js
+Module not found: Can't resolve 'react/jsx-runtime'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/api/link.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/link.js
+Module not found: Can't resolve 'react'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/api/link.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/link.js
+Module not found: Can't resolve './resolve-href'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/api/link.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/link.js
+Module not found: Can't resolve '../shared/lib/utils'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/api/link.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/link.js
+Module not found: Can't resolve 'next/dist/server/future/route-modules/app-page/vendored/contexts/router-context'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/api/link.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/link.js
+Module not found: Can't resolve './use-intersection'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/api/link.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/link.js
+Module not found: Can't resolve './components/router-reducer/router-reducer-types'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/api/link.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/normalize-trailing-slash.js
+Module not found: Can't resolve '../shared/lib/router/utils/remove-trailing-slash'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/add-base-path.js
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/normalize-trailing-slash.js
+Module not found: Can't resolve '../shared/lib/router/utils/parse-path'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/add-base-path.js
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/server/future/route-modules/app-page/vendored/ssr/react-dom.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next\dist\server\future\route-modules\app-page\vendored\ssr\react-dom.js'
+
+Import trace for requested module:
+./node_modules/next/dist/server/future/route-modules/app-page/vendored/ssr/react-dom.js
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/server/future/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next\dist\server\future\route-modules\app-page\vendored\ssr\react-jsx-dev-runtime.js'
+
+Import trace for requested module:
+./node_modules/next/dist/server/future/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/server/future/route-modules/app-page/vendored/ssr/react-jsx-runtime.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next\dist\server\future\route-modules\app-page\vendored\ssr\react-jsx-runtime.js'
+
+Import trace for requested module:
+./node_modules/next/dist/server/future/route-modules/app-page/vendored/ssr/react-jsx-runtime.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/server/future/route-modules/app-page/vendored/ssr/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next\dist\server\future\route-modules\app-page\vendored\ssr\react.js'
+
+Import trace for requested module:
+./node_modules/next/dist/server/future/route-modules/app-page/vendored/ssr/react.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/shared/lib/router/utils/add-path-prefix.js
+Module not found: Can't resolve './parse-path'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/add-base-path.js
+./node_modules/next/dist/client/components/app-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/shared/lib/router/utils/app-paths.js
+Module not found: Can't resolve '../../segment'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/server/future/helpers/interception-routes.js
+./node_modules/next/dist/server/app-render/get-segment-param.js
+./node_modules/next/dist/client/components/match-segments.js
+./node_modules/next/dist/client/components/layout-router.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/shared/lib/router/utils/format-url.js
+Module not found: Can't resolve './querystring'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/link.js
+./node_modules/next/dist/api/link.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/shared/lib/router/utils/is-local-url.js
+Module not found: Can't resolve '../../utils'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/link.js
+./node_modules/next/dist/api/link.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/build/webpack/loaders/next-flight-loader/module-proxy.js
+Module not found: Can't resolve 'react-server-dom-webpack/server.edge'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/components/draft-mode.js
+Module not found: Can't resolve './static-generation-async-storage.external'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/headers.js
+./node_modules/next/dist/api/headers.js
+./node_modules/next-intl/dist/esm/development/server/react-server/RequestLocale.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getConfig.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getFormatter.js
+./node_modules/next-intl/dist/esm/development/server.react-server.js
+./src/app/[locale]/layout.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/components/headers.js
+Module not found: Can't resolve '../../server/web/spec-extension/adapters/request-cookies'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/api/headers.js
+./node_modules/next-intl/dist/esm/development/server/react-server/RequestLocale.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getConfig.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getFormatter.js
+./node_modules/next-intl/dist/esm/development/server.react-server.js
+./src/app/[locale]/layout.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/components/headers.js
+Module not found: Can't resolve './static-generation-async-storage.external'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/api/headers.js
+./node_modules/next-intl/dist/esm/development/server/react-server/RequestLocale.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getConfig.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getFormatter.js
+./node_modules/next-intl/dist/esm/development/server.react-server.js
+./src/app/[locale]/layout.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/components/headers.js
+Module not found: Can't resolve './request-async-storage.external'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/api/headers.js
+./node_modules/next-intl/dist/esm/development/server/react-server/RequestLocale.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getConfig.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getFormatter.js
+./node_modules/next-intl/dist/esm/development/server.react-server.js
+./src/app/[locale]/layout.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/components/navigation.react-server.js
+Module not found: Can't resolve './redirect'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/api/navigation.react-server.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/createSharedNavigationFns.js
+./node_modules/next-intl/dist/esm/development/navigation/react-server/createNavigation.js
+./node_modules/next-intl/dist/esm/development/navigation.react-server.js
+./src/i18n/routing.ts
+./src/i18n/request.ts
+./node_modules/next-intl/dist/esm/development/server/react-server/getConfig.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getFormatter.js
+./node_modules/next-intl/dist/esm/development/server.react-server.js
+./src/app/[locale]/layout.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/client/components/not-found-error.js
+Error: Failed to read source code from C:\out\project\artpix-inventory\node_modules\next\dist\client\components\not-found-error.js
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/not-found-error.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/lib/metadata/get-metadata-route.js
+Module not found: Can't resolve '../../shared/lib/isomorphic/path'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/build/webpack/loaders/next-metadata-image-loader.js?type=favicon&segment=&basePath=&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js!./src/app/favicon.ico?__next_metadata__ @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/lib/metadata/get-metadata-route.js
+Module not found: Can't resolve '../../server/server-utils'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/build/webpack/loaders/next-metadata-image-loader.js?type=favicon&segment=&basePath=&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js!./src/app/favicon.ico?__next_metadata__ @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/lib/metadata/get-metadata-route.js
+Module not found: Can't resolve '../../shared/lib/router/utils/route-regex'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/build/webpack/loaders/next-metadata-image-loader.js?type=favicon&segment=&basePath=&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js!./src/app/favicon.ico?__next_metadata__ @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/server/app-render/dynamic-rendering.js
+Module not found: Can't resolve 'react'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/headers.js
+./node_modules/next/dist/api/headers.js
+./node_modules/next-intl/dist/esm/development/server/react-server/RequestLocale.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getConfig.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getFormatter.js
+./node_modules/next-intl/dist/esm/development/server.react-server.js
+./src/app/[locale]/layout.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/server/app-render/dynamic-rendering.js
+Module not found: Can't resolve '../../client/components/static-generation-bailout'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/headers.js
+./node_modules/next/dist/api/headers.js
+./node_modules/next-intl/dist/esm/development/server/react-server/RequestLocale.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getConfig.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getFormatter.js
+./node_modules/next-intl/dist/esm/development/server.react-server.js
+./src/app/[locale]/layout.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/server/app-render/dynamic-rendering.js
+Module not found: Can't resolve '../../lib/url'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/headers.js
+./node_modules/next/dist/api/headers.js
+./node_modules/next-intl/dist/esm/development/server/react-server/RequestLocale.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getConfig.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getFormatter.js
+./node_modules/next-intl/dist/esm/development/server.react-server.js
+./src/app/[locale]/layout.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/server/app-render/entry-base.js
+Module not found: Can't resolve 'react-server-dom-webpack/server.edge'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/server/app-render/entry-base.js
+Module not found: Can't resolve '../../client/components/render-from-template-context'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/server/app-render/entry-base.js
+Module not found: Can't resolve '../../client/components/static-generation-async-storage.external'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/server/app-render/entry-base.js
+Module not found: Can't resolve '../../client/components/request-async-storage.external'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/server/app-render/entry-base.js
+Module not found: Can't resolve '../../client/components/search-params'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/server/app-render/entry-base.js
+Module not found: Can't resolve '../../client/components/not-found-boundary'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/server/app-render/entry-base.js
+Module not found: Can't resolve '../lib/patch-fetch'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501713ms] [ERROR] ./node_modules/next/dist/server/app-render/entry-base.js
+Module not found: Can't resolve '../../server/app-render/rsc/preloads'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501714ms] [ERROR] ./node_modules/next/dist/server/app-render/entry-base.js
+Module not found: Can't resolve '../../server/app-render/rsc/postpone'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501714ms] [ERROR] ./node_modules/next/dist/server/app-render/entry-base.js
+Module not found: Can't resolve '../../server/app-render/rsc/taint'
+
+https://nextjs.org/docs/messages/module-not-found @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501714ms] [ERROR] ./node_modules/next/dist/server/future/route-kind.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next\dist\server\future\route-kind.js'
+
+Import trace for requested module:
+./node_modules/next/dist/server/future/route-kind.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501714ms] [ERROR] ./node_modules/next/dist/server/future/route-modules/app-page/vendored/rsc/react-jsx-dev-runtime.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next\dist\server\future\route-modules\app-page\vendored\rsc\react-jsx-dev-runtime.js'
+
+Import trace for requested module:
+./node_modules/next/dist/server/future/route-modules/app-page/vendored/rsc/react-jsx-dev-runtime.js
+./src/app/[locale]/layout.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501714ms] [ERROR] ./node_modules/next/dist/server/future/route-modules/app-page/vendored/rsc/react-jsx-runtime.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next\dist\server\future\route-modules\app-page\vendored\rsc\react-jsx-runtime.js'
+
+Import trace for requested module:
+./node_modules/next/dist/server/future/route-modules/app-page/vendored/rsc/react-jsx-runtime.js
+./node_modules/next-intl/dist/esm/development/react-server/NextIntlClientProviderServer.js
+./node_modules/next-intl/dist/esm/development/index.react-server.js
+./src/app/[locale]/layout.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501714ms] [ERROR] ./node_modules/next/dist/server/future/route-modules/app-page/vendored/rsc/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next\dist\server\future\route-modules\app-page\vendored\rsc\react.js'
+
+Import trace for requested module:
+./node_modules/next/dist/server/future/route-modules/app-page/vendored/rsc/react.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getFormatter.js
+./node_modules/next-intl/dist/esm/development/server.react-server.js
+./src/app/[locale]/layout.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501714ms] [ERROR] ./node_modules/next/dist/server/web/spec-extension/adapters/headers.js
+Module not found: Can't resolve './reflect'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/client/components/headers.js
+./node_modules/next/dist/api/headers.js
+./node_modules/next-intl/dist/esm/development/server/react-server/RequestLocale.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getConfig.js
+./node_modules/next-intl/dist/esm/development/server/react-server/getFormatter.js
+./node_modules/next-intl/dist/esm/development/server.react-server.js
+./src/app/[locale]/layout.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7501714ms] [ERROR] ./node_modules/next/dist/shared/lib/router/utils/app-paths.js
+Module not found: Can't resolve '../../segment'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./node_modules/next/dist/lib/metadata/get-metadata-route.js
+./node_modules/next/dist/build/webpack/loaders/next-metadata-image-loader.js?type=favicon&segment=&basePath=&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js!./src/app/favicon.ico?__next_metadata__ @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32

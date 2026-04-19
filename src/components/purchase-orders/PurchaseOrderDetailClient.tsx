@@ -665,8 +665,6 @@ export function PurchaseOrderDetailClient({
         </div>
       </div>
     </div>
-      </div>
-    </div>
   );
 }
 

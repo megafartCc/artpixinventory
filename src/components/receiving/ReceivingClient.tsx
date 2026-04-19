@@ -555,8 +555,6 @@ export function ReceivingClient({
         </div>
       </div>
     </div>
-      </div>
-    </div>
   );
 }
 
