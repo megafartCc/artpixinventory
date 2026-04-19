@@ -2,6 +2,16 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
+import {
+  canManageDefects,
+  canManageMachines,
+  canManagePurchaseOrders,
+  canManageTransfers,
+  canManageVendors,
+  canManageVendorCredits,
+  canPerformCounts,
+  canReviewCounts,
+} from "@/lib/permissions";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
@@ -15,6 +25,82 @@ export async function GET(request: Request) {
   if (query.length < 2) {
     return NextResponse.json({ items: [] });
   }
+
+  const canSeePurchaseOrders = canManagePurchaseOrders(session.user.role);
+  const canSeeVendors = canManageVendors(session.user.role);
+  const canSeeMachines = canManageMachines(session.user.role);
+  const canSeeTransfers = canManageTransfers(session.user.role);
+  const canSeeDefects = canManageDefects(session.user.role);
+  const canSeeCredits = canManageVendorCredits(session.user.role);
+  const canSeeCounts = canPerformCounts(session.user.role) || canReviewCounts(session.user.role);
+
+  const purchaseOrdersPromise = canSeePurchaseOrders
+    ? prisma.purchaseOrder.findMany({
+        where: { poNumber: { contains: query, mode: "insensitive" } },
+        include: { vendor: { select: { name: true } } },
+        orderBy: { updatedAt: "desc" },
+        take: 5,
+      })
+    : Promise.resolve([]);
+
+  const vendorsPromise = canSeeVendors
+    ? prisma.vendor.findMany({
+        where: { name: { contains: query, mode: "insensitive" } },
+        orderBy: { updatedAt: "desc" },
+        select: { id: true, name: true, country: true },
+        take: 5,
+      })
+    : Promise.resolve([]);
+
+  const machinesPromise = canSeeMachines
+    ? prisma.machine.findMany({
+        where: { name: { contains: query, mode: "insensitive" } },
+        include: { location: { select: { name: true } } },
+        orderBy: { updatedAt: "desc" },
+        take: 5,
+      })
+    : Promise.resolve([]);
+
+  const transfersPromise = canSeeTransfers
+    ? prisma.transfer.findMany({
+        where: { reference: { contains: query, mode: "insensitive" } },
+        orderBy: { startedAt: "desc" },
+        select: { id: true, reference: true, status: true },
+        take: 5,
+      })
+    : Promise.resolve([]);
+
+  const defectsPromise = canSeeDefects
+    ? prisma.defectReport.findMany({
+        where: { reportNumber: { contains: query, mode: "insensitive" } },
+        orderBy: { createdAt: "desc" },
+        select: { id: true, reportNumber: true, status: true },
+        take: 5,
+      })
+    : Promise.resolve([]);
+
+  const creditsPromise = canSeeCredits
+    ? prisma.vendorCredit.findMany({
+        where: { creditNumber: { contains: query, mode: "insensitive" } },
+        include: { vendor: { select: { name: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      })
+    : Promise.resolve([]);
+
+  const countsPromise = canSeeCounts
+    ? prisma.countSession.findMany({
+        where: {
+          OR: [
+            { name: { contains: query, mode: "insensitive" } },
+            { location: { name: { contains: query, mode: "insensitive" } } },
+          ],
+        },
+        include: { location: { select: { name: true } } },
+        orderBy: { startedAt: "desc" },
+        take: 5,
+      })
+    : Promise.resolve([]);
 
   const [
     products,
@@ -38,59 +124,19 @@ export async function GET(request: Request) {
       select: { id: true, compoundId: true, name: true },
       take: 5,
     }),
-    prisma.purchaseOrder.findMany({
-      where: { poNumber: { contains: query, mode: "insensitive" } },
-      include: { vendor: { select: { name: true } } },
-      orderBy: { updatedAt: "desc" },
-      take: 5,
-    }),
-    prisma.vendor.findMany({
-      where: { name: { contains: query, mode: "insensitive" } },
-      orderBy: { updatedAt: "desc" },
-      select: { id: true, name: true, country: true },
-      take: 5,
-    }),
-    prisma.machine.findMany({
-      where: { name: { contains: query, mode: "insensitive" } },
-      include: { location: { select: { name: true } } },
-      orderBy: { updatedAt: "desc" },
-      take: 5,
-    }),
+    purchaseOrdersPromise,
+    vendorsPromise,
+    machinesPromise,
     prisma.location.findMany({
       where: { name: { contains: query, mode: "insensitive" } },
       orderBy: { updatedAt: "desc" },
       select: { id: true, name: true, type: true },
       take: 5,
     }),
-    prisma.transfer.findMany({
-      where: { reference: { contains: query, mode: "insensitive" } },
-      orderBy: { startedAt: "desc" },
-      select: { id: true, reference: true, status: true },
-      take: 5,
-    }),
-    prisma.defectReport.findMany({
-      where: { reportNumber: { contains: query, mode: "insensitive" } },
-      orderBy: { createdAt: "desc" },
-      select: { id: true, reportNumber: true, status: true },
-      take: 5,
-    }),
-    prisma.vendorCredit.findMany({
-      where: { creditNumber: { contains: query, mode: "insensitive" } },
-      include: { vendor: { select: { name: true } } },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    }),
-    prisma.countSession.findMany({
-      where: {
-        OR: [
-          { name: { contains: query, mode: "insensitive" } },
-          { location: { name: { contains: query, mode: "insensitive" } } },
-        ],
-      },
-      include: { location: { select: { name: true } } },
-      orderBy: { startedAt: "desc" },
-      take: 5,
-    }),
+    transfersPromise,
+    defectsPromise,
+    creditsPromise,
+    countsPromise,
   ]);
 
   const items = [

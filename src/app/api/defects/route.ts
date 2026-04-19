@@ -9,6 +9,16 @@ import { generateNextReference } from "@/lib/inventory-utils";
 import { sendSlackNotification } from "@/lib/slack";
 
 export async function GET() {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!canManageDefects(session.user.role)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const defects = await prisma.defectReport.findMany({
     orderBy: { createdAt: "desc" },
     include: {

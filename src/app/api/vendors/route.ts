@@ -12,6 +12,10 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  if (!canManageVendors(session.user.role)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const vendors = await prisma.vendor.findMany({
     orderBy: { name: "asc" },
     include: {

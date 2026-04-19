@@ -47,7 +47,7 @@ export function canApprovePurchaseOrders(role: string | undefined) {
 }
 
 export function canManageReceiving(role: string | undefined) {
-  return hasAnyRole(role, ["ADMIN", "MANAGER", "WAREHOUSE"]);
+  return hasAnyRole(role, ["ADMIN", "MANAGER", "PURCHASER", "WAREHOUSE"]);
 }
 
 export function canManageTransfers(role: string | undefined) {
@@ -55,7 +55,7 @@ export function canManageTransfers(role: string | undefined) {
 }
 
 export function canManageCounts(role: string | undefined) {
-  return hasAnyRole(role, ["ADMIN", "MANAGER"]);
+  return hasAnyRole(role, ["ADMIN", "MANAGER", "WAREHOUSE"]);
 }
 
 export function canPerformCounts(role: string | undefined) {
