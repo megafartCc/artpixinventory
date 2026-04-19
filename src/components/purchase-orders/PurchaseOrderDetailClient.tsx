@@ -273,8 +273,8 @@ export function PurchaseOrderDetailClient({
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-10">
-      <div className="mx-auto max-w-[1800px] space-y-8">
+    <div className="p-6 lg:p-8">
+      <div className="space-y-8">
         <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
@@ -301,7 +301,7 @@ export function PurchaseOrderDetailClient({
               </p>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-3 lg:w-[600px]">
+            <div className="grid gap-4 sm:grid-cols-3 lg:w-[700px]">
               <MetricCard title="Line items" value={String(purchaseOrder.items.length)} icon={ReceiptText} />
               <MetricCard title="Documents" value={String(readiness.documentCount)} icon={FileText} />
               <MetricCard title="Total value" value={`$${purchaseOrder.totalCost}`} icon={ClipboardCheck} />
@@ -318,7 +318,7 @@ export function PurchaseOrderDetailClient({
           </div>
         </section>
 
-        <div className="grid gap-8 xl:grid-cols-[1fr_400px]">
+        <div className="grid gap-8 xl:grid-cols-[1fr_480px]">
           <div className="space-y-8">
             <section className="group rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md">
               <h2 className="text-xl font-bold text-slate-900">{t("summary")}</h2>
@@ -731,9 +731,9 @@ function SummaryMetric({
         : "border-slate-200 bg-slate-50 text-slate-700";
 
   return (
-    <div className={`rounded-2xl border px-4 py-4 ${toneClass}`}>
-      <p className="text-xs font-semibold uppercase tracking-[0.16em]">{label}</p>
-      <p className="mt-3 text-2xl font-semibold tracking-tight">{value}</p>
+    <div className={`rounded-2xl border px-5 py-5 ${toneClass}`}>
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">{label}</p>
+      <p className="mt-2 text-3xl font-black tracking-tight">{value}</p>
     </div>
   );
 }
