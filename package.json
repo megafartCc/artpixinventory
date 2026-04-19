@@ -12,6 +12,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
     "@prisma/client": "^5.22.0",
+    "@swc/helpers": "^0.5.21",
     "bcryptjs": "^3.0.3",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
@@ -19,6 +20,7 @@
     "next": "14.2.35",
     "next-auth": "^4.24.14",
     "next-intl": "^4.9.1",
+    "preact": "^10.11.3",
     "prisma": "^5.22.0",
     "react": "^18",
     "react-dom": "^18",
