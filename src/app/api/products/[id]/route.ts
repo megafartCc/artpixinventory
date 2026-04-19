@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
+import { canManageCatalog } from "@/lib/permissions";
 import { productMutationSchema } from "@/lib/product-schemas";
 
 type RouteContext = {
@@ -18,9 +19,9 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (session.user.role === "WAREHOUSE") {
+  if (!canManageCatalog(session.user.role)) {
     return NextResponse.json(
-      { error: "Warehouse users cannot update products." },
+      { error: "Forbidden" },
       { status: 403 }
     );
   }

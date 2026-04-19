@@ -2,6 +2,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import prisma from "@/lib/prisma";
 import { CsvExportButton } from "@/components/CsvExportButton";
+import { PdfExportButton } from "@/components/PdfExportButton";
 
 export default async function DefectsReportPage({ params }: { params: { locale: string } }) {
   noStore();
@@ -63,11 +64,19 @@ export default async function DefectsReportPage({ params }: { params: { locale: 
             <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
             <p className="mt-1 text-slate-500">{t("subtitle")}</p>
           </div>
-          <CsvExportButton
-            filename={`defects-${new Date().toISOString().slice(0, 10)}.csv`}
-            headers={csvHeaders}
-            rows={csvRows}
-          />
+          <div className="flex gap-3">
+            <CsvExportButton
+              filename={`defects-${new Date().toISOString().slice(0, 10)}.csv`}
+              headers={csvHeaders}
+              rows={csvRows}
+            />
+            <PdfExportButton
+              filename={`defects-${new Date().toISOString().slice(0, 10)}.pdf`}
+              title={t("title")}
+              headers={csvHeaders}
+              rows={csvRows}
+            />
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-4">

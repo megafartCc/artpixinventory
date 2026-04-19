@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
-import { buildSimplePdf } from "@/lib/simple-pdf";
+import { createCyrillicPdf, autoTable } from "@/lib/server-pdf";
 import { formatPoStatus } from "@/lib/purchase-order-utils";
 
 type RouteContext = {
@@ -47,37 +47,58 @@ export async function GET(_: Request, { params }: RouteContext) {
     );
   }
 
-  const lines = [
-    "ArtPix 3D Purchase Order",
-    "",
-    `PO Number: ${po.poNumber}`,
-    `Vendor: ${po.vendor.name}`,
-    `Status: ${formatPoStatus(po.status)}`,
-    `Order Date: ${po.orderDate.toISOString().slice(0, 10)}`,
-    `Expected Date: ${po.expectedDate?.toISOString().slice(0, 10) ?? "-"}`,
-    `Created By: ${po.createdBy.name ?? "-"}`,
-    `Vendor Order ID: ${po.vendorOrderId ?? "-"}`,
-    `Payment Terms: ${po.vendor.paymentTerms ?? "-"}`,
-    "",
-    "Line Items",
-    ...po.items.map(
-      (item) =>
-        `${item.product.compoundId} ${item.product.name} | Qty ${item.orderedQty} | Unit ${item.unitCost.toString()} | Total ${item.totalCost.toString()}`
-    ),
-    "",
-    `Subtotal: ${po.subtotal.toString()}`,
-    `Shipping: ${po.shippingCost.toString()}`,
-    `Other Costs: ${po.otherCosts.toString()}`,
-    `Total: ${po.totalCost.toString()}`,
-  ];
+  const doc = createCyrillicPdf();
+
+  // Header
+  doc.setFontSize(20);
+  doc.text("ArtPix 3D Purchase Order", 14, 20);
+
+  doc.setFontSize(10);
+  doc.text(`PO Number: ${po.poNumber}`, 14, 30);
+  doc.text(`Vendor: ${po.vendor.name}`, 14, 35);
+  doc.text(`Status: ${formatPoStatus(po.status)}`, 14, 40);
+  doc.text(`Order Date: ${po.orderDate.toISOString().slice(0, 10)}`, 14, 45);
+  doc.text(`Expected Date: ${po.expectedDate?.toISOString().slice(0, 10) ?? "-"}`, 14, 50);
+  doc.text(`Created By: ${po.createdBy.name ?? "-"}`, 14, 55);
+  doc.text(`Vendor Order ID: ${po.vendorOrderId ?? "-"}`, 14, 60);
+  doc.text(`Payment Terms: ${po.vendor.paymentTerms ?? "-"}`, 14, 65);
+
+  // Items Table
+  autoTable(doc, {
+    startY: 75,
+    head: [["ID", "Product", "Qty", "Unit Cost", "Total"]],
+    body: po.items.map((item) => [
+      item.product.compoundId,
+      item.product.name,
+      item.orderedQty,
+      item.unitCost.toString(),
+      item.totalCost.toString(),
+    ]),
+    styles: { font: "Roboto" },
+    headStyles: { fillColor: [51, 65, 85] },
+  });
+
+  // Footer / Totals
+  const finalY = (doc as any).lastAutoTable.finalY + 10;
+  doc.text(`Subtotal: ${po.subtotal.toString()}`, 140, finalY);
+  doc.text(`Shipping: ${po.shippingCost.toString()}`, 140, finalY + 5);
+  doc.text(`Other Costs: ${po.otherCosts.toString()}`, 140, finalY + 10);
+  doc.setFontSize(12);
+  doc.setFont("Roboto", "normal"); // Bold would be better if we had it
+  doc.text(`Total: ${po.totalCost.toString()}`, 140, finalY + 18);
 
   if (po.constraintWarnings.length > 0) {
-    lines.push("", "Constraint Warnings", ...po.constraintWarnings);
+    doc.setFontSize(10);
+    doc.setTextColor(220, 38, 38);
+    doc.text("Constraint Warnings:", 14, finalY + 30);
+    po.constraintWarnings.forEach((warning, i) => {
+      doc.text(`• ${warning}`, 14, finalY + 35 + i * 5);
+    });
   }
 
-  const pdf = buildSimplePdf(lines);
+  const pdfArrayBuffer = doc.output("arraybuffer");
 
-  return new NextResponse(pdf, {
+  return new NextResponse(pdfArrayBuffer, {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",

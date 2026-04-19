@@ -3,6 +3,7 @@ import { POStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import prisma from "@/lib/prisma";
 import { CsvExportButton } from "@/components/CsvExportButton";
+import { PdfExportButton } from "@/components/PdfExportButton";
 
 function daysBetween(date: Date, from = new Date()) {
   return Math.floor((from.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
@@ -71,11 +72,19 @@ export default async function PoAgingReportPage({ params }: { params: { locale: 
             <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
             <p className="mt-1 text-slate-500">{t("subtitle")}</p>
           </div>
-          <CsvExportButton
-            filename={`po-aging-${new Date().toISOString().slice(0, 10)}.csv`}
-            headers={csvHeaders}
-            rows={csvRows}
-          />
+          <div className="flex gap-3">
+            <CsvExportButton
+              filename={`po-aging-${new Date().toISOString().slice(0, 10)}.csv`}
+              headers={csvHeaders}
+              rows={csvRows}
+            />
+            <PdfExportButton
+              filename={`po-aging-${new Date().toISOString().slice(0, 10)}.pdf`}
+              title={t("title")}
+              headers={csvHeaders}
+              rows={csvRows}
+            />
+          </div>
         </div>
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">

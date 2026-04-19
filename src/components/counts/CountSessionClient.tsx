@@ -198,7 +198,9 @@ export function CountSessionClient({
             <MetricCard title={t("metrics.entries")} value={String(entries.length)} />
             <MetricCard
               title={t("metrics.variances")}
-              value={String(entries.filter((entry) => entry.variance !== 0).length)}
+              value={canReview || session.status !== "IN_PROGRESS" 
+                ? String(entries.filter((entry) => entry.variance !== 0).length)
+                : "?"}
             />
             <MetricCard
               title={t("metrics.status")}
@@ -365,9 +367,11 @@ export function CountSessionClient({
                       </div>
                       <div className="text-right">
                         <p className="text-xl font-semibold text-slate-900">{entry.countedQty}</p>
-                        <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${entry.variance === 0 ? "text-emerald-600" : "text-amber-600"}`}>
-                          {entry.variance === 0 ? t("varianceMatched") : `${entry.variance > 0 ? "+" : ""}${entry.variance}`}
-                        </p>
+                        {(canReview || session.status !== "IN_PROGRESS") && (
+                          <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${entry.variance === 0 ? "text-emerald-600" : "text-amber-600"}`}>
+                            {entry.variance === 0 ? t("varianceMatched") : `${entry.variance > 0 ? "+" : ""}${entry.variance}`}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">

@@ -61,17 +61,20 @@ export default async function CountSessionPage({
         assignedToName: countSession.assignedTo?.name ?? null,
       }}
       products={products}
-      entries={countSession.entries.map((entry) => ({
-        id: entry.id,
-        productId: entry.productId,
-        compoundId: entry.product.compoundId,
-        productName: entry.product.name,
-        countedQty: entry.countedQty,
-        variance: entry.variance,
-        scannedAt: entry.scannedAt.toISOString(),
-        notes: entry.notes,
-        countedByName: entry.countedBy.name,
-      }))}
+      entries={countSession.entries.map((entry) => {
+        const showVariance = canReviewCounts(session.user.role) || countSession.status !== "IN_PROGRESS";
+        return {
+          id: entry.id,
+          productId: entry.productId,
+          compoundId: entry.product.compoundId,
+          productName: entry.product.name,
+          countedQty: entry.countedQty,
+          variance: showVariance ? entry.variance : 0,
+          scannedAt: entry.scannedAt.toISOString(),
+          notes: entry.notes,
+          countedByName: entry.countedBy.name,
+        };
+      })}
     />
   );
 }
