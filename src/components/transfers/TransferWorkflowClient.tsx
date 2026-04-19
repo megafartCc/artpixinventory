@@ -382,8 +382,8 @@ export function TransferWorkflowClient({
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-10">
-      <div className="mx-auto max-w-[1600px] space-y-10">
+    <div className="p-4 pb-40 sm:p-6 sm:pb-40 lg:p-10 lg:pb-10">
+      <div className="mx-auto w-full max-w-[1760px] space-y-10">
         <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
@@ -473,7 +473,7 @@ export function TransferWorkflowClient({
                   <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
                     <div className="mb-10">
                       <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-600">
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">
                           Collection Mode
                         </p>
                         <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-950">
@@ -626,7 +626,7 @@ export function TransferWorkflowClient({
                   <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
                     <div className="mb-10">
                       <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-600">
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">
                           Drop-off Mode
                         </p>
                         <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-950">

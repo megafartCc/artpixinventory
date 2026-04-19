@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { createCyrillicPdf, autoTable } from "@/lib/server-pdf";
 import { formatPoStatus } from "@/lib/purchase-order-utils";
+import { canManagePurchaseOrders } from "@/lib/permissions";
 
 type RouteContext = {
   params: {
@@ -16,6 +17,10 @@ export async function GET(_: Request, { params }: RouteContext) {
 
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!canManagePurchaseOrders(session.user.role)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const po = await prisma.purchaseOrder.findUnique({

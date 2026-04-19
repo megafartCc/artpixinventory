@@ -224,7 +224,7 @@ export function ReceivingClient({
   };
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="p-6 pb-32 lg:p-8 lg:pb-8">
       <div className="w-full space-y-8">
         <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">

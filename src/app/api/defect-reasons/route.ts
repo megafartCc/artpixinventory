@@ -6,6 +6,16 @@ import { canManageDefects } from "@/lib/permissions";
 import { defectReasonSchema } from "@/lib/defect-schemas";
 
 export async function GET() {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!canManageDefects(session.user.role)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const reasons = await prisma.defectReason.findMany({
     where: { active: true },
     orderBy: [{ faultType: "asc" }, { name: "asc" }],
