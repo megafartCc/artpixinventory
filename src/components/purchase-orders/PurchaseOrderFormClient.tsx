@@ -383,87 +383,209 @@ export function PurchaseOrderFormClient({
           </div>
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_360px]">
-          <div className="space-y-6">
-            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <h2 className="text-lg font-semibold text-slate-900">{t("header")}</h2>
-              <div className="mt-5 grid gap-4 md:grid-cols-2">
-                <Field label={t("vendor")}>
+        <div className="space-y-6">
+          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <h2 className="text-lg font-semibold text-slate-900">{t("header")}</h2>
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <Field label={t("vendor")}>
+                <select
+                  value={form.vendorId}
+                  onChange={(event) => {
+                    const vendor = vendors.find((entry) => entry.id === event.target.value);
+                    setForm((current) => ({
+                      ...current,
+                      vendorId: event.target.value,
+                      leadTimeDays:
+                        vendor?.defaultLeadTimeDays === null || vendor?.defaultLeadTimeDays === undefined
+                          ? ""
+                          : String(vendor.defaultLeadTimeDays),
+                      containerTemplateId: vendor?.enableContainerConstraints ? vendor.containerTemplateId ?? "" : "",
+                      items: [],
+                    }));
+                    setSearch("");
+                  }}
+                  className={inputClassName}
+                  required
+                >
+                  <option value="">{t("selectVendor")}</option>
+                  {vendors.map((vendor) => (
+                    <option key={vendor.id} value={vendor.id}>
+                      {vendor.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label={t("vendorOrderId")}>
+                <input
+                  value={form.vendorOrderId}
+                  onChange={(event) => setForm((current) => ({ ...current, vendorOrderId: event.target.value }))}
+                  className={inputClassName}
+                />
+              </Field>
+              <Field label={t("orderDate")}>
+                <input
+                  value={form.orderDate}
+                  onChange={(event) => setForm((current) => ({ ...current, orderDate: event.target.value }))}
+                  className={inputClassName}
+                  type="date"
+                />
+              </Field>
+              <Field label={t("leadTime")}>
+                <input
+                  value={form.leadTimeDays}
+                  onChange={(event) => setForm((current) => ({ ...current, leadTimeDays: event.target.value }))}
+                  className={inputClassName}
+                  inputMode="numeric"
+                />
+              </Field>
+              <Field label={t("expectedDate")}>
+                <input value={expectedDate} className={inputClassName} readOnly />
+              </Field>
+              {selectedVendor?.enableContainerConstraints && (
+                <Field label={t("containerTemplate")}>
                   <select
-                    value={form.vendorId}
-                    onChange={(event) => {
-                      const vendor = vendors.find((entry) => entry.id === event.target.value);
-                      setForm((current) => ({
-                        ...current,
-                        vendorId: event.target.value,
-                        leadTimeDays:
-                          vendor?.defaultLeadTimeDays === null || vendor?.defaultLeadTimeDays === undefined
-                            ? ""
-                            : String(vendor.defaultLeadTimeDays),
-                        containerTemplateId: vendor?.enableContainerConstraints ? vendor.containerTemplateId ?? "" : "",
-                        items: [],
-                      }));
-                      setSearch("");
-                    }}
+                    value={form.containerTemplateId}
+                    onChange={(event) =>
+                      setForm((current) => ({ ...current, containerTemplateId: event.target.value }))
+                    }
                     className={inputClassName}
-                    required
                   >
-                    <option value="">{t("selectVendor")}</option>
-                    {vendors.map((vendor) => (
-                      <option key={vendor.id} value={vendor.id}>
-                        {vendor.name}
+                    <option value="">{t("useVendorDefault")}</option>
+                    {templates.map((template) => (
+                      <option key={template.id} value={template.id}>
+                        {template.name}
                       </option>
                     ))}
                   </select>
                 </Field>
-                <Field label={t("vendorOrderId")}>
-                  <input
-                    value={form.vendorOrderId}
-                    onChange={(event) => setForm((current) => ({ ...current, vendorOrderId: event.target.value }))}
-                    className={inputClassName}
-                  />
-                </Field>
-                <Field label={t("orderDate")}>
-                  <input
-                    value={form.orderDate}
-                    onChange={(event) => setForm((current) => ({ ...current, orderDate: event.target.value }))}
-                    className={inputClassName}
-                    type="date"
-                  />
-                </Field>
-                <Field label={t("leadTime")}>
-                  <input
-                    value={form.leadTimeDays}
-                    onChange={(event) => setForm((current) => ({ ...current, leadTimeDays: event.target.value }))}
-                    className={inputClassName}
-                    inputMode="numeric"
-                  />
-                </Field>
-                <Field label={t("expectedDate")}>
-                  <input value={expectedDate} className={inputClassName} readOnly />
-                </Field>
-                {selectedVendor?.enableContainerConstraints && (
-                  <Field label={t("containerTemplate")}>
-                    <select
-                      value={form.containerTemplateId}
-                      onChange={(event) =>
-                        setForm((current) => ({ ...current, containerTemplateId: event.target.value }))
-                      }
-                      className={inputClassName}
-                    >
-                      <option value="">{t("useVendorDefault")}</option>
-                      {templates.map((template) => (
-                        <option key={template.id} value={template.id}>
-                          {template.name}
-                        </option>
-                      ))}
-                    </select>
-                  </Field>
-                )}
+              )}
+            </div>
+          </section>
+
+          <div className="grid gap-5 2xl:grid-cols-[minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,1.15fr)]">
+            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <h2 className="text-lg font-semibold text-slate-900">Approval readiness</h2>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 2xl:grid-cols-1">
+                <SummaryMetric label="Zero-cost lines" value={String(zeroCostCount)} tone={zeroCostCount > 0 ? "amber" : "slate"} />
+                <SummaryMetric label="MOQ warnings" value={String(moqWarningCount)} tone={moqWarningCount > 0 ? "amber" : "slate"} />
+                <SummaryMetric
+                  label="Constraint warnings"
+                  value={String(calculation.constraintWarnings.length)}
+                  tone={calculation.constraintWarnings.length > 0 ? "rose" : "slate"}
+                />
               </div>
+              {calculation.constraintWarnings.length > 0 && (
+                <div className="mt-5 rounded-3xl border border-rose-200 bg-rose-50 p-4">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="mt-0.5 h-5 w-5 text-rose-600" />
+                    <div className="space-y-2">
+                      {calculation.constraintWarnings.map((warning) => (
+                        <p key={warning} className="text-sm text-rose-700">
+                          {warning}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </section>
 
+            {selectedVendor?.enableContainerConstraints && selectedTemplate ? (
+              <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <h2 className="text-lg font-semibold text-slate-900">{t("calculatorTitle")}</h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  {t("calculatorSubtitle", { template: selectedTemplate.name })}
+                </p>
+                <div className="mt-5 space-y-4">
+                  <Meter label={t("meterWeight")} value={calculation.totalWeightKg} max={selectedTemplate.maxWeightKg} suffix="kg" />
+                  <Meter label={t("meterPallets")} value={calculation.totalPallets} max={selectedTemplate.maxPallets} />
+                  <Meter label={t("meterLooseBoxes")} value={calculation.totalLooseBoxes} max={selectedTemplate.maxLooseBoxes} />
+                </div>
+              </section>
+            ) : (
+              <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <h2 className="text-lg font-semibold text-slate-900">{t("calculatorTitle")}</h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Choose a vendor with container constraints to unlock the live load calculator.
+                </p>
+                <div className="mt-5 rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center text-sm text-slate-400">
+                  Container planning will appear here when a constrained vendor/template is selected.
+                </div>
+              </section>
+            )}
+
             <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">{t("costsTitle")}</h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Keep shipping, extra charges, notes, and approval actions together while building the PO.
+                  </p>
+                </div>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  {currency(calculation.totalCost)}
+                </span>
+              </div>
+
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                <Field label={t("shippingCost")}>
+                  <input
+                    value={form.shippingCost}
+                    onChange={(event) => setForm((current) => ({ ...current, shippingCost: event.target.value }))}
+                    className={inputClassName}
+                    inputMode="decimal"
+                  />
+                </Field>
+                <Field label={t("otherCosts")}>
+                  <input
+                    value={form.otherCosts}
+                    onChange={(event) => setForm((current) => ({ ...current, otherCosts: event.target.value }))}
+                    className={inputClassName}
+                    inputMode="decimal"
+                  />
+                </Field>
+                <div className="md:col-span-2">
+                  <Field label={t("notes")}>
+                    <textarea
+                      value={form.notes}
+                      onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))}
+                      className={`${inputClassName} min-h-24 resize-y`}
+                    />
+                  </Field>
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                <div className="space-y-3">
+                  <SummaryRow label={t("subtotal")} value={currency(calculation.subtotal)} />
+                  <SummaryRow label={t("shipping")} value={currency(parseMoney(form.shippingCost))} />
+                  <SummaryRow label={t("otherCosts")} value={currency(parseMoney(form.otherCosts))} />
+                  <SummaryRow label={t("total")} value={currency(calculation.totalCost)} emphasize />
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => void submit(false)}
+                  disabled={pendingSubmitType !== null || !canSubmit}
+                  className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+                >
+                  {pendingSubmitType === "draft" ? t("saving") : t("saveDraft")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void submit(true)}
+                  disabled={pendingSubmitType !== null || !canSubmit}
+                  className="rounded-2xl bg-sky-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:opacity-60"
+                >
+                  {pendingSubmitType === "submit" ? t("submitting") : t("submitApproval")}
+                </button>
+              </div>
+            </section>
+          </div>
+
+          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-slate-900">{t("itemsTitle")}</h2>
@@ -643,114 +765,7 @@ export function PurchaseOrderFormClient({
                   </div>
                 </>
               )}
-            </section>
-          </div>
-
-          <div className="space-y-6 xl:sticky xl:top-20 xl:self-start">
-            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <h2 className="text-lg font-semibold text-slate-900">Approval readiness</h2>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                <SummaryMetric label="Zero-cost lines" value={String(zeroCostCount)} tone={zeroCostCount > 0 ? "amber" : "slate"} />
-                <SummaryMetric label="MOQ warnings" value={String(moqWarningCount)} tone={moqWarningCount > 0 ? "amber" : "slate"} />
-                <SummaryMetric
-                  label="Constraint warnings"
-                  value={String(calculation.constraintWarnings.length)}
-                  tone={calculation.constraintWarnings.length > 0 ? "rose" : "slate"}
-                />
-              </div>
-              {calculation.constraintWarnings.length > 0 && (
-                <div className="mt-5 rounded-3xl border border-rose-200 bg-rose-50 p-4">
-                  <div className="flex items-start gap-3">
-                    <AlertTriangle className="mt-0.5 h-5 w-5 text-rose-600" />
-                    <div className="space-y-2">
-                      {calculation.constraintWarnings.map((warning) => (
-                        <p key={warning} className="text-sm text-rose-700">
-                          {warning}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </section>
-
-            {selectedVendor?.enableContainerConstraints && selectedTemplate && (
-              <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                <h2 className="text-lg font-semibold text-slate-900">{t("calculatorTitle")}</h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  {t("calculatorSubtitle", { template: selectedTemplate.name })}
-                </p>
-                <div className="mt-5 space-y-4">
-                  <Meter label={t("meterWeight")} value={calculation.totalWeightKg} max={selectedTemplate.maxWeightKg} suffix="kg" />
-                  <Meter label={t("meterPallets")} value={calculation.totalPallets} max={selectedTemplate.maxPallets} />
-                  <Meter label={t("meterLooseBoxes")} value={calculation.totalLooseBoxes} max={selectedTemplate.maxLooseBoxes} />
-                </div>
-              </section>
-            )}
-
-            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <h2 className="text-lg font-semibold text-slate-900">{t("costsTitle")}</h2>
-              <div className="mt-5 grid gap-4">
-                <Field label={t("shippingCost")}>
-                  <input
-                    value={form.shippingCost}
-                    onChange={(event) => setForm((current) => ({ ...current, shippingCost: event.target.value }))}
-                    className={inputClassName}
-                    inputMode="decimal"
-                  />
-                </Field>
-                <Field label={t("otherCosts")}>
-                  <input
-                    value={form.otherCosts}
-                    onChange={(event) => setForm((current) => ({ ...current, otherCosts: event.target.value }))}
-                    className={inputClassName}
-                    inputMode="decimal"
-                  />
-                </Field>
-                <Field label={t("notes")}>
-                  <textarea
-                    value={form.notes}
-                    onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))}
-                    className={`${inputClassName} min-h-28 resize-y`}
-                  />
-                </Field>
-              </div>
-
-              <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                <div className="space-y-3">
-                  <SummaryRow label={t("subtotal")} value={currency(calculation.subtotal)} />
-                  <SummaryRow label={t("shipping")} value={currency(parseMoney(form.shippingCost))} />
-                  <SummaryRow label={t("otherCosts")} value={currency(parseMoney(form.otherCosts))} />
-                  <SummaryRow label={t("total")} value={currency(calculation.totalCost)} emphasize />
-                </div>
-              </div>
-            </section>
-
-            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <h2 className="text-lg font-semibold text-slate-900">Actions</h2>
-              <p className="mt-1 text-sm text-slate-500">
-                Save a working draft or send it to approval when the warnings are resolved.
-              </p>
-              <div className="mt-5 grid gap-3">
-                <button
-                  type="button"
-                  onClick={() => void submit(false)}
-                  disabled={pendingSubmitType !== null || !canSubmit}
-                  className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
-                >
-                  {pendingSubmitType === "draft" ? t("saving") : t("saveDraft")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void submit(true)}
-                  disabled={pendingSubmitType !== null || !canSubmit}
-                  className="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60"
-                >
-                  {pendingSubmitType === "submit" ? t("submitting") : t("submitApproval")}
-                </button>
-              </div>
-            </section>
-          </div>
+          </section>
         </div>
 
         <div className="fixed inset-x-0 bottom-16 z-40 border-t border-slate-200 bg-white/95 p-4 backdrop-blur xl:hidden">
@@ -767,7 +782,7 @@ export function PurchaseOrderFormClient({
               type="button"
               onClick={() => void submit(true)}
               disabled={pendingSubmitType !== null || !canSubmit}
-              className="flex-1 rounded-2xl bg-slate-900 px-4 py-4 text-base font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60"
+              className="flex-1 rounded-2xl bg-sky-600 px-4 py-4 text-base font-semibold text-white transition hover:bg-sky-700 disabled:opacity-60"
             >
               {pendingSubmitType === "submit" ? t("submitting") : t("submitApproval")}
             </button>
