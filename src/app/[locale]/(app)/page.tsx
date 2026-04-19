@@ -384,7 +384,7 @@ function StatCard({
         </div>
       </div>
 
-      <p className="mt-8 text-5xl font-extrabold tracking-tight text-slate-950">{value}</p>
+      <p className="mt-8 text-3xl font-black tracking-tight text-slate-950">{value}</p>
     </div>
   );
 }
@@ -420,7 +420,7 @@ function InsightCard({
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
               {metric.label}
             </p>
-            <p className="mt-3 text-4xl font-extrabold tracking-tight text-slate-950">
+            <p className="mt-3 text-2xl font-black tracking-tight text-slate-950">
               {metric.value}
             </p>
           </div>
@@ -473,7 +473,7 @@ function ActiveMetricCard({
           <Icon className="h-5 w-5" />
         </div>
       </div>
-      <p className="mt-8 text-4xl font-extrabold tracking-tight text-slate-950">{value}</p>
+      <p className="mt-8 text-2xl font-black tracking-tight text-slate-950">{value}</p>
     </div>
   );
 }
@@ -482,7 +482,7 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 rounded-[20px] bg-white px-5 py-4 shadow-sm border border-slate-100">
       <p className="text-sm font-bold text-slate-500">{label}</p>
-      <p className="text-xl font-black text-slate-950">{value}</p>
+      <p className="text-lg font-bold text-slate-950">{value}</p>
     </div>
   );
 }
