@@ -218,8 +218,8 @@ export function CategoriesManager({
   };
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="flex flex-col gap-6">
+    <div className="flex h-full min-h-0 flex-col p-6 lg:p-8">
+      <div className="flex min-h-0 flex-1 flex-col gap-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">{t("title")}</h1>
@@ -247,8 +247,8 @@ export function CategoriesManager({
           />
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="overflow-x-auto">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="min-h-0 flex-1 overflow-auto">
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>

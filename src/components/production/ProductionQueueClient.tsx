@@ -44,8 +44,8 @@ export function ProductionQueueClient({
   };
 
   return (
-    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
-      <div className="flex w-full flex-col gap-6">
+    <div className="flex h-full min-h-0 flex-col px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="flex min-h-0 flex-1 flex-col gap-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
@@ -60,8 +60,8 @@ export function ProductionQueueClient({
             {syncing ? t("syncing") : tc("syncNow")}
           </button>
         </div>
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="overflow-x-auto">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="min-h-0 flex-1 overflow-auto">
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>

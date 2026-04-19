@@ -23,8 +23,8 @@ export function TransfersClient({
   const t = useTranslations("Transfers");
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="w-full space-y-10">
+    <div className="flex h-full min-h-0 flex-col p-6 lg:p-8">
+      <div className="flex min-h-0 flex-1 flex-col gap-10">
         <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -60,8 +60,8 @@ export function TransfersClient({
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md">
-          <div className="overflow-x-auto">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md">
+          <div className="min-h-0 flex-1 overflow-auto">
             <table className="min-w-full divide-y divide-slate-100">
               <thead className="bg-slate-50/50 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                 <tr>
