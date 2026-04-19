@@ -5,6 +5,7 @@ import { Check, Clipboard, Copy, Layers3, Package2, Printer, QrCode, Trash2 } fr
 import { useTranslations } from "next-intl";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { buildLocationLabelZpl, buildPalletLabelZpl, buildProductLabelZpl } from "@/lib/zpl";
+import { sendZplToBrowserPrint } from "@/lib/browser-print";
 
 type ProductOption = { id: string; compoundId: string; name: string };
 type LocationOption = { id: string; name: string; type: string; qrCode: string };
@@ -307,6 +308,39 @@ export function LabelsClient({
     }
   };
 
+  const printCurrentToZebra = async () => {
+    if (!previewZpl) {
+      setErrorMessage("Select labels before sending to Zebra.");
+      return;
+    }
+
+    try {
+      await sendZplToBrowserPrint(previewZpl);
+      setErrorMessage("");
+      setFeedbackMessage("Current labels sent to Zebra Browser Print.");
+    } catch (error) {
+      setFeedbackMessage("");
+      setErrorMessage((error as Error).message);
+    }
+  };
+
+  const printQueueToZebra = async () => {
+    const queueZpl = queueItems.map((item) => item.zpl).join("\n\n");
+    if (!queueZpl) {
+      setErrorMessage("Queue is empty.");
+      return;
+    }
+
+    try {
+      await sendZplToBrowserPrint(queueZpl);
+      setErrorMessage("");
+      setFeedbackMessage("Queued labels sent to Zebra Browser Print.");
+    } catch (error) {
+      setFeedbackMessage("");
+      setErrorMessage((error as Error).message);
+    }
+  };
+
   return (
     <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
       <div className="flex w-full flex-col gap-6">
@@ -499,6 +533,9 @@ export function LabelsClient({
               <ActionButton onClick={addCurrentToQueue} icon={Layers3}>
                 Queue Current
               </ActionButton>
+              <ActionButton onClick={() => void printCurrentToZebra()} icon={Printer}>
+                Send to Zebra
+              </ActionButton>
               <ActionButton onClick={printCurrent} icon={Printer}>
                 Print Preview
               </ActionButton>
@@ -565,6 +602,13 @@ export function LabelsClient({
                 <p className="mt-1 text-sm text-slate-500">Stage multiple print jobs before copying or printing them together.</p>
               </div>
               <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => void printQueueToZebra()}
+                  className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                >
+                  Send Queue
+                </button>
                 <button
                   type="button"
                   onClick={printQueue}

@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { Download } from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
+import { sendZplToBrowserPrint } from "@/lib/browser-print";
 
 const inputClassName =
   "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-200";
@@ -501,11 +502,17 @@ export function ReceivingClient({
                     </p>
                   </div>
                   <button
+                    onClick={() => void printToZebra(zplBundle.zpl, setError, setFeedback)}
+                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                  >
+                    {t("printQr")}
+                  </button>
+                  <button
                     onClick={() => downloadText(`${zplBundle.palletNumber}.zpl`, zplBundle.zpl)}
                     className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
                   >
                     <Download className="h-4 w-4" />
-                    {t("printQr")}
+                    Download ZPL
                   </button>
                 </div>
                 <pre className="mt-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs text-emerald-300">
@@ -537,6 +544,21 @@ function downloadText(fileName: string, content: string) {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
+}
+
+async function printToZebra(
+  zpl: string,
+  setError: (value: string) => void,
+  setFeedback: (value: string) => void
+) {
+  try {
+    await sendZplToBrowserPrint(zpl);
+    setError("");
+    setFeedback("Pallet label sent to Zebra Browser Print.");
+  } catch (error) {
+    setFeedback("");
+    setError((error as Error).message);
+  }
 }
 
 function Field({

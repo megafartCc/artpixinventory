@@ -14,7 +14,10 @@
     "labels": "Labels",
     "production": "Production",
     "reports": "Reports",
-    "credits": "Credits"
+    "credits": "Credits",
+    "counts": "Counts",
+    "scan": "Scan",
+    "more": "More"
   },
   "AppShell": {
     "searchPlaceholder": "Search inventory",
@@ -1005,6 +1008,96 @@
       "maxVolume": "Max Volume",
       "vendors": "Vendors",
       "actions": "Actions"
+    }
+  },
+  "Counts": {
+    "title": "Inventory Counts",
+    "subtitle": "Blind counting sessions with scan-first warehouse review.",
+    "newCount": "New Count",
+    "empty": "No count sessions yet.",
+    "open": "Open",
+    "review": "Review",
+    "duplicate": "Duplicate",
+    "back": "Back to Counts",
+    "backToCount": "Back to Count",
+    "newTitle": "Create Count Session",
+    "newSubtitle": "Assign a blind count to a user and location.",
+    "selectLocation": "Select location",
+    "selectUser": "Select user",
+    "cancel": "Cancel",
+    "create": "Create Count",
+    "creating": "Creating...",
+    "assignedTo": "Assigned to",
+    "blindCountHint": "Blind count mode keeps expected stock hidden until review.",
+    "scannerTitle": "Scan Product",
+    "scannerSubtitle": "Use the rear camera to scan a barcode or QR label, or type a code manually.",
+    "scannerPlaceholder": "Scan or type barcode / compound ID",
+    "entryTitle": "Count Entry",
+    "searchPlaceholder": "Search products by compound ID, name, or barcode",
+    "blindCountLabel": "Blind Count Product",
+    "awaitingScan": "Awaiting a scan or quick product pick.",
+    "expectedHidden": "Expected quantity stays hidden until manager review.",
+    "entriesTitle": "Scanned Entries",
+    "emptyEntries": "No products scanned yet.",
+    "notAssigned": "This count is assigned to someone else. Ask a manager to reassign or review it.",
+    "entryLocked": "This count is no longer accepting entries.",
+    "varianceMatched": "Matched",
+    "saveEntry": "Save Entry",
+    "savingEntry": "Saving Entry...",
+    "submitCount": "Submit Count",
+    "reviewTitle": "Review Count Variances",
+    "reviewSummary": "Variance Review",
+    "reviewSummarySubtitle": "Approve this blind count to apply stock adjustments for all variances.",
+    "approve": "Approve Count",
+    "approving": "Approving...",
+    "activity": "Activity History",
+    "feedback": {
+      "entrySaved": "Count entry saved.",
+      "submitted": "Count submitted for review.",
+      "approved": "Count approved.",
+      "duplicated": "Count duplicated."
+    },
+    "errors": {
+      "createFailed": "Failed to create count session.",
+      "duplicateFailed": "Failed to duplicate count session.",
+      "noProduct": "Pick a product before saving the count entry.",
+      "entryFailed": "Failed to save count entry.",
+      "submitFailed": "Failed to submit count session.",
+      "approveFailed": "Failed to approve count session."
+    },
+    "fields": {
+      "name": "Count Name",
+      "type": "Count Type",
+      "location": "Location",
+      "assignedTo": "Assigned To",
+      "notes": "Notes",
+      "searchProduct": "Product Search",
+      "countedQty": "Counted Qty"
+    },
+    "types": {
+      "FULL": "Full",
+      "CYCLE": "Cycle",
+      "SPOT": "Spot"
+    },
+    "columns": {
+      "name": "Name",
+      "location": "Location",
+      "type": "Type",
+      "status": "Status",
+      "assignedTo": "Assigned To",
+      "started": "Started",
+      "variances": "Variances",
+      "actions": "Actions",
+      "product": "Product",
+      "expected": "Expected Qty",
+      "counted": "Counted Qty",
+      "variance": "Variance",
+      "notes": "Notes"
+    },
+    "metrics": {
+      "entries": "Entries",
+      "variances": "Variances",
+      "status": "Status"
     }
   }
 }

@@ -13,6 +13,7 @@ import {
   Bell,
   Boxes,
   Check,
+  ClipboardCheck,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -27,6 +28,7 @@ import {
   Package,
   Printer,
   Receipt,
+  Scan,
   Search,
   Settings,
   Truck,
@@ -45,6 +47,7 @@ const navItems = [
   { key: "receiving", href: "/receiving", icon: Truck },
   { key: "transfers", href: "/transfers", icon: ArrowLeftRight },
   { key: "defects", href: "/defects", icon: AlertTriangle },
+  { key: "counts", href: "/counts", icon: ClipboardCheck },
   { key: "labels", href: "/labels", icon: Printer },
   { key: "production", href: "/production", icon: Factory },
   { key: "credits", href: "/credits", icon: Receipt },
@@ -56,9 +59,9 @@ const settingsNavItem = { key: "settings", href: "/settings", icon: Settings };
 const mobileNavItems = [
   { key: "dashboard", href: "/", icon: Home },
   { key: "stock", href: "/stock", icon: Boxes },
-  { key: "products", href: "/products", icon: Package },
+  { key: "scan", href: "/counts", icon: Scan },
   { key: "transfers", href: "/transfers", icon: ArrowLeftRight },
-  { key: "settings", href: "/settings", icon: Settings },
+  { key: "more", href: "#more", icon: Menu },
 ];
 
 const localeOptions = [
@@ -175,6 +178,7 @@ export function AppShell({
     { label: t("receiving"), href: "/receiving", keywords: ["inbound", "pallets", "receiving"] },
     { label: t("transfers"), href: "/transfers", keywords: ["moves", "warehouse transfers"] },
     { label: t("defects"), href: "/defects", keywords: ["quality", "issues", "qc"] },
+    { label: t("counts"), href: "/counts", keywords: ["cycle count", "blind count", "inventory count"] },
     { label: t("labels"), href: "/labels", keywords: ["print", "zpl", "barcode"] },
     { label: t("production"), href: "/production", keywords: ["restock", "queue", "machine"] },
     { label: t("credits"), href: "/credits", keywords: ["vendor credits", "claims", "refunds"] },
@@ -447,7 +451,7 @@ export function AppShell({
               </div>
             </div>
 
-            <div ref={searchRef} className="flex-1 px-3 pb-3 lg:mx-auto lg:max-w-[600px] lg:px-0 lg:pb-0">
+            <div ref={searchRef} className="flex-1 border-t border-slate-200 px-3 py-3 sm:px-4 lg:border-t-0 lg:mx-auto lg:max-w-[600px] lg:px-0 lg:py-0">
               <div className="relative">
                 <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
@@ -658,6 +662,18 @@ export function AppShell({
                   </Link>
                 );
               })}
+              <Link
+                href={`/${locale}${settingsNavItem.href}`}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium ${
+                  pathname.startsWith(settingsNavItem.href)
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <settingsNavItem.icon className="h-5 w-5" />
+                <span>{t(settingsNavItem.key)}</span>
+              </Link>
             </nav>
           </div>
         )}
@@ -668,6 +684,27 @@ export function AppShell({
           {mobileNavItems.map((item) => {
             const isActive =
               item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+
+            if (item.key === "more") {
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => setMobileMenuOpen((current) => !current)}
+                  className={`
+                    flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all
+                    ${
+                      mobileMenuOpen
+                        ? "text-indigo-600"
+                        : "text-slate-400 hover:text-slate-600"
+                    }
+                  `}
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span>{t(item.key)}</span>
+                </button>
+              );
+            }
 
             return (
               <Link

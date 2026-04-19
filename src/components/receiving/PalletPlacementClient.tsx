@@ -5,9 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
-
-const inputClassName =
-  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-200";
+import { CameraScanner } from "@/components/scanner/CameraScanner";
 
 export function PalletPlacementClient({
   locale,
@@ -97,15 +95,12 @@ export function PalletPlacementClient({
         <div className="grid gap-6 2xl:grid-cols-[0.95fr_1.05fr]">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="space-y-5">
-              <Field label={t("scanPallet")}>
-                <input
-                  value={palletNumber}
-                  onChange={(event) => setPalletNumber(event.target.value)}
-                  placeholder="PAL-YYYY-NNNN"
-                  className={inputClassName}
-                  autoFocus
-                />
-              </Field>
+              <CameraScanner
+                title={t("scanPallet")}
+                subtitle="Use the rear camera to scan the pallet QR label before placement."
+                placeholder="PAL-YYYY-NNNN"
+                onDetected={(value) => setPalletNumber(value)}
+              />
               <div className="flex flex-wrap gap-2">
                 {pallets.slice(0, 8).map((pallet) => (
                   <button
@@ -118,14 +113,12 @@ export function PalletPlacementClient({
                 ))}
               </div>
 
-              <Field label={t("scanDestination")}>
-                <input
-                  value={locationQrCode}
-                  onChange={(event) => setLocationQrCode(event.target.value)}
-                  placeholder="LOC-..."
-                  className={inputClassName}
-                />
-              </Field>
+              <CameraScanner
+                title={t("scanDestination")}
+                subtitle="Scan the destination shelf, bin, or station QR before confirming placement."
+                placeholder="LOC-..."
+                onDetected={(value) => setLocationQrCode(value)}
+              />
               <div className="flex max-h-28 flex-wrap gap-2 overflow-y-auto">
                 {locations
                   .filter((location) => !["WAREHOUSE", "RECEIVING"].includes(location.type))
@@ -206,20 +199,5 @@ export function PalletPlacementClient({
         </div>
       </div>
     </div>
-  );
-}
-
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-      <span>{label}</span>
-      {children}
-    </label>
   );
 }

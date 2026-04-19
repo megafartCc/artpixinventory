@@ -97,6 +97,8 @@ export default async function AppLayout({
             ? "/production"
             : notification.type === "ERPIX_SYNC_FAILURE"
               ? "/settings"
+              : notification.type === "COUNT_SUBMITTED"
+                ? "/counts"
               : notification.type === "DEFECT_REPORTED"
                 ? "/defects"
                 : "/",

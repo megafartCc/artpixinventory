@@ -8,14 +8,13 @@ import {
   ArrowLeftRight,
   CheckCircle2,
   ChevronRight,
-  MapPin,
   Package2,
-  QrCode,
   ScanLine,
   ShieldAlert,
 } from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
+import { CameraScanner } from "@/components/scanner/CameraScanner";
 import { useTranslations } from "next-intl";
 
 const inputClassName =
@@ -496,19 +495,13 @@ export function TransferWorkflowClient({
 
                     <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
                       <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                        <PanelTitle
-                          icon={QrCode}
+                        <CameraScanner
                           title="Source scan"
-                          description="Use one source at a time. The stock list updates as soon as the QR matches a live location."
+                          subtitle="Use the device camera for source QR scans. The source stock list updates immediately after a valid scan."
+                          placeholder={t("sourcePlaceholder")}
+                          onDetected={(value) => setSourceQr(value)}
                         />
                         <div className="mt-4 space-y-3">
-                          <input
-                            value={sourceQr}
-                            onChange={(event) => setSourceQr(event.target.value)}
-                            placeholder={t("sourcePlaceholder")}
-                            className={inputClassName}
-                            autoFocus
-                          />
                           <div className="flex flex-wrap gap-2">
                             {locations.slice(0, 12).map((location) => (
                               <button
@@ -658,19 +651,13 @@ export function TransferWorkflowClient({
 
                     <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
                       <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                        <PanelTitle
-                          icon={MapPin}
+                        <CameraScanner
                           title="Destination scan"
-                          description="Scan a valid destination QR before confirming the product drop."
+                          subtitle="Scan the live destination location instead of typing QR values manually."
+                          placeholder={t("destPlaceholder")}
+                          onDetected={(value) => setDestinationQr(value)}
                         />
                         <div className="mt-4 space-y-3">
-                          <input
-                            value={destinationQr}
-                            onChange={(event) => setDestinationQr(event.target.value)}
-                            placeholder={t("destPlaceholder")}
-                            className={inputClassName}
-                            autoFocus
-                          />
                           <div className="flex flex-wrap gap-2">
                             {locations
                               .filter((location) => location.type !== "WAREHOUSE")

@@ -54,6 +54,18 @@ export function canManageTransfers(role: string | undefined) {
   return hasAnyRole(role, ["ADMIN", "MANAGER", "WAREHOUSE"]);
 }
 
+export function canManageCounts(role: string | undefined) {
+  return hasAnyRole(role, ["ADMIN", "MANAGER"]);
+}
+
+export function canPerformCounts(role: string | undefined) {
+  return hasAnyRole(role, ["ADMIN", "MANAGER", "WAREHOUSE"]);
+}
+
+export function canReviewCounts(role: string | undefined) {
+  return hasAnyRole(role, ["ADMIN", "MANAGER"]);
+}
+
 export function canAccessSettings(role: string | undefined) {
   return hasAnyRole(role, ["ADMIN"]);
 }

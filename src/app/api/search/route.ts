@@ -25,6 +25,7 @@ export async function GET(request: Request) {
     transfers,
     defects,
     credits,
+    counts,
   ] = await Promise.all([
     prisma.product.findMany({
       where: {
@@ -77,6 +78,17 @@ export async function GET(request: Request) {
       where: { creditNumber: { contains: query, mode: "insensitive" } },
       include: { vendor: { select: { name: true } } },
       orderBy: { createdAt: "desc" },
+      take: 5,
+    }),
+    prisma.countSession.findMany({
+      where: {
+        OR: [
+          { name: { contains: query, mode: "insensitive" } },
+          { location: { name: { contains: query, mode: "insensitive" } } },
+        ],
+      },
+      include: { location: { select: { name: true } } },
+      orderBy: { startedAt: "desc" },
       take: 5,
     }),
   ]);
@@ -137,6 +149,13 @@ export async function GET(request: Request) {
       subtitle: `${credit.vendor.name} / Vendor credit`,
       href: `/credits/${credit.id}`,
       kind: "Vendor Credit",
+    })),
+    ...counts.map((count) => ({
+      id: `count-${count.id}`,
+      label: count.name,
+      subtitle: `${count.location.name} / Inventory count`,
+      href: `/counts/${count.id}`,
+      kind: "Count",
     })),
   ].slice(0, 16);
 
