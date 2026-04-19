@@ -731,9 +731,9 @@ function SummaryMetric({
         : "border-slate-200 bg-slate-50 text-slate-700";
 
   return (
-    <div className={`rounded-2xl border px-5 py-5 ${toneClass}`}>
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">{label}</p>
-      <p className="mt-2 text-3xl font-black tracking-tight">{value}</p>
+    <div className={`rounded-2xl border px-6 py-5 ${toneClass}`}>
+      <p className="text-xs font-semibold uppercase tracking-wide opacity-60">{label}</p>
+      <p className="mt-2 text-2xl font-bold tracking-tight">{value}</p>
     </div>
   );
 }

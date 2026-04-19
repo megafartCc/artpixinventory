@@ -53,7 +53,7 @@ export function DefectsGraph({ data }: { data: DefectData[] }) {
         </div>
       </div>
 
-      <div className="h-[300px] w-full">
+      <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={filteredData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
             <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#f1f5f9" />
