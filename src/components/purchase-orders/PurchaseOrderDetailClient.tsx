@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import {
-  CheckCircle2,
   ClipboardCheck,
   FileText,
   ReceiptText,
