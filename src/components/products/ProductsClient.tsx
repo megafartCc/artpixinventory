@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { Loader2, PackagePlus, Pencil, Power, Search, X } from "lucide-react";
+import { Loader2, PackagePlus, Pencil, Search, X } from "lucide-react";
+import { PdfExportButton } from "@/components/PdfExportButton";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { productUnits } from "@/lib/product-schemas";
 
@@ -51,8 +52,6 @@ type FormState = {
   active: boolean;
 };
 
-const inputClassName =
-  "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-200";
 
 const createEmptyForm = (indexes: Option[]): FormState => ({
   compoundId: "",
@@ -80,12 +79,10 @@ export function ProductsClient({
   locale,
   initialProducts,
   indexes,
-  categories,
 }: {
   locale: string;
   initialProducts: ProductRecord[];
   indexes: Option[];
-  categories: Option[];
 }) {
   const t = useTranslations("Products");
   const router = useRouter();
@@ -94,7 +91,6 @@ export function ProductsClient({
   const canManageProducts = userRole !== "WAREHOUSE";
   const [search, setSearch] = useState("");
   const [indexFilter, setIndexFilter] = useState("all");
-  const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("active");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingProductId, setEditingProductId] = useState<string | null>(null);

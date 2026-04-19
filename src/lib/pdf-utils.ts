@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import autoTable, { UserOptions } from "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 /**
  * Loads the Roboto font for Cyrillic support in jsPDF.

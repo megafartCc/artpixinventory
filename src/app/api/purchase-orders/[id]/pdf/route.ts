@@ -79,6 +79,7 @@ export async function GET(_: Request, { params }: RouteContext) {
   });
 
   // Footer / Totals
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const finalY = (doc as any).lastAutoTable.finalY + 10;
   doc.text(`Subtotal: ${po.subtotal.toString()}`, 140, finalY);
   doc.text(`Shipping: ${po.shippingCost.toString()}`, 140, finalY + 5);

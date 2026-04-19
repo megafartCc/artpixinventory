@@ -19,15 +19,6 @@ function startOfToday() {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
-function formatRelativeSync(value: Date | null, t: (key: string, values?: Record<string, string | number | Date>) => string) {
-  if (!value) return t("notSynced");
-  const minutes = Math.max(0, Math.floor((Date.now() - value.getTime()) / 60000));
-  if (minutes < 1) return t("justNow");
-  if (minutes < 60) return t("minAgo", { minutes });
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return t("hoursAgo", { hours });
-  return t("daysAgo", { days: Math.floor(hours / 24) });
-}
 
 function getLowStockSeverity(minStock: number, quantity: number) {
   if (quantity <= 0) return "critical";
@@ -42,7 +33,6 @@ function daysOverdue(value: Date) {
 export default async function DashboardPage({ params }: { params: { locale: string } }) {
   noStore();
   const t = await getTranslations({ locale: params.locale, namespace: "Dashboard" });
-  const common = await getTranslations({ locale: params.locale, namespace: "Common" });
   const today = startOfToday();
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
@@ -497,19 +487,3 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function SyncHealthCard({
-  label,
-  value,
-  alert = false,
-}: {
-  label: string;
-  value: string;
-  alert?: boolean;
-}) {
-  return (
-    <div className={`rounded-2xl border px-4 py-4 ${alert ? "border-rose-200 bg-rose-50" : "border-slate-200 bg-slate-50"}`}>
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
-      <p className={`mt-3 text-lg font-semibold ${alert ? "text-rose-700" : "text-slate-900"}`}>{value}</p>
-    </div>
-  );
-}
