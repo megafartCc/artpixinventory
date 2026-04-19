@@ -58,8 +58,8 @@ export function DefectReviewClient({
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-10">
-      <div className="mx-auto max-w-[1600px] space-y-10">
+    <div className="p-6 lg:p-8">
+      <div className="w-full space-y-10">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h1 className="text-4xl font-extrabold tracking-tight text-slate-950">{t("title")}</h1>
