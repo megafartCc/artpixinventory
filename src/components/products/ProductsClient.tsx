@@ -218,36 +218,6 @@ export function ProductsClient({
     setForm(createEmptyForm(indexes));
   };
 
-  const toggleActive = async (product: ProductRecord) => {
-    setSubmitting(true);
-    setErrorMessage("");
-    const response = await fetch(`/api/products/${product.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        compoundId: product.compoundId,
-        name: product.name,
-        indexId: product.indexId,
-        uom: product.uom,
-        barcode: product.barcode ?? "",
-        minStock: String(product.minStock),
-        categories: product.categories,
-        length: product.length,
-        width: product.width,
-        height: product.height,
-        dimensionUnit: product.dimensionUnit,
-        notes: product.notes,
-        active: !product.active,
-      }),
-    });
-    const result = (await response.json()) as { error?: string };
-    setSubmitting(false);
-    if (!response.ok) {
-      setErrorMessage(result.error ?? t("feedback.updateFailed"));
-      return;
-    }
-    setStatusMessage(product.active ? t("feedback.deactivated") : t("feedback.reactivated"));
-    startTransition(() => router.refresh());
   };
 
   return (
