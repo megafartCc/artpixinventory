@@ -180,53 +180,61 @@ export default async function ProductDetailPage({
     .slice(0, 12);
 
   return (
-    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
-      <div className="flex w-full flex-col gap-6">
-        <div className="flex flex-col gap-4 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 xl:flex-row xl:items-start xl:justify-between">
+    <div className="p-4 sm:p-6 lg:p-10">
+      <div className="mx-auto max-w-[1600px] space-y-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <Link
               href={`/${params.locale}/products`}
-              className="text-sm font-medium text-slate-500 transition hover:text-slate-700"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-indigo-600"
             >
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 group-hover:bg-indigo-50">
+                ←
+              </span>
               Back to Products
             </Link>
-            <div className="mt-3 flex flex-wrap items-center gap-3">
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+            <div className="mt-4 flex flex-wrap items-center gap-4">
+              <h1 className="text-4xl font-extrabold tracking-tight text-slate-950 sm:text-5xl">
                 {product.compoundId}
               </h1>
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <span
+                className={`rounded-2xl px-4 py-1.5 text-xs font-bold uppercase tracking-widest ${
+                  product.active
+                    ? "bg-emerald-50 text-emerald-600 ring-1 ring-inset ring-emerald-200"
+                    : "bg-slate-50 text-slate-600 ring-1 ring-inset ring-slate-200"
+                }`}
+              >
                 {product.active ? "Active" : "Inactive"}
               </span>
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <span className="rounded-2xl bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-blue-600 ring-1 ring-inset ring-blue-200">
                 {product.uom}
               </span>
             </div>
-            <p className="mt-2 text-base text-slate-600">{product.name}</p>
-            <p className="mt-3 max-w-3xl text-sm text-slate-500">
-              Index {product.index.name} with {categoryNames.length || 0} categories, min stock {product.minStock}, and total on-hand quantity {totalStock}.
+            <p className="mt-3 text-lg text-slate-600 font-medium">{product.name}</p>
+            <p className="mt-3 max-w-3xl text-sm text-slate-500 leading-relaxed">
+              Part of Index <span className="font-semibold text-slate-900">{product.index.name}</span> with {categoryNames.length || 0} categories, min stock {product.minStock}, and total on-hand quantity {totalStock}.
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 xl:w-[520px]">
+          <div className="grid gap-4 sm:grid-cols-2 lg:w-[600px]">
             <ActionCard
               href={`/${params.locale}/labels?tab=products&product=${product.id}`}
-              title="Open label center"
-              description="Preload this product in the label workflow."
+              title="Label Center"
+              description="Preload ZPL workflow"
               icon={Printer}
             />
-            <MetricCard title="Total stock" value={String(totalStock)} />
-            <MetricCard title="Locations" value={String(product.stockLevels.length)} />
-            <MetricCard
-              title="Linked defects"
-              value={String(product.defectItems.length)}
-            />
+            <div className="grid grid-cols-3 gap-3">
+              <MetricCard title="Stock" value={String(totalStock)} />
+              <MetricCard title="Locs" value={String(product.stockLevels.length)} />
+              <MetricCard title="Defects" value={String(product.defectItems.length)} />
+            </div>
           </div>
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1.4fr)]">
-          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <h2 className="text-lg font-semibold text-slate-900">Overview</h2>
-            <dl className="mt-5 grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr]">
+          <section className="group overflow-hidden rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md">
+            <h2 className="text-xl font-bold text-slate-900">Technical Specifications</h2>
+            <dl className="mt-8 grid gap-6 sm:grid-cols-2">
               <InfoTile label="Compound ID" value={product.compoundId} />
               <InfoTile label="Barcode" value={product.barcode ?? "Not set"} />
               <InfoTile label="Index" value={product.index.name} />
@@ -246,41 +254,45 @@ export default async function ProductDetailPage({
                 value={categoryNames.length ? categoryNames.join(", ") : "No categories"}
               />
             </dl>
-            <div className="mt-4 rounded-3xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                Notes
+            <div className="mt-6 rounded-[24px] border border-slate-100 bg-slate-50/50 p-6 transition group-hover:bg-white">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                Operational Notes
               </p>
-              <p className="mt-2 text-sm text-slate-600">
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
                 {product.notes?.trim() ? product.notes : "No product notes yet."}
               </p>
             </div>
           </section>
 
-          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
             <div className="flex items-center justify-between gap-4">
-              <h2 className="text-lg font-semibold text-slate-900">Stock by location</h2>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                {totalStock} on hand
+              <h2 className="text-xl font-bold text-slate-900">Real-time Stock Distribution</h2>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white">
+                {totalStock} {product.uom}
               </span>
             </div>
             {product.stockLevels.length === 0 ? (
               <EmptyPanel message="No stock is currently assigned to this product." />
             ) : (
-              <div className="mt-5 overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-200">
-                  <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <div className="mt-8 overflow-hidden rounded-[24px] border border-slate-100">
+                <table className="min-w-full divide-y divide-slate-100">
+                  <thead className="bg-slate-50/50 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                     <tr>
-                      <th className="px-4 py-3">Location</th>
-                      <th className="px-4 py-3">Type</th>
-                      <th className="px-4 py-3 text-right">Quantity</th>
+                      <th className="px-6 py-4">Physical Location</th>
+                      <th className="px-6 py-4 text-center">Type</th>
+                      <th className="px-6 py-4 text-right">Quantity</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                     {product.stockLevels.map((row) => (
-                      <tr key={row.id}>
-                        <td className="px-4 py-3 font-medium text-slate-900">{row.location.name}</td>
-                        <td className="px-4 py-3">{row.location.type}</td>
-                        <td className="px-4 py-3 text-right font-semibold text-slate-900">{row.quantity}</td>
+                      <tr key={row.id} className="transition hover:bg-slate-50/50">
+                        <td className="px-6 py-5 font-bold text-slate-900">{row.location.name}</td>
+                        <td className="px-6 py-5 text-center">
+                          <span className="rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 ring-1 ring-inset ring-slate-200">
+                            {row.location.type}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5 text-right font-extrabold text-slate-950">{row.quantity}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -290,64 +302,64 @@ export default async function ProductDetailPage({
           </section>
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <h2 className="text-lg font-semibold text-slate-900">Vendor pricing history</h2>
-            <div className="mt-5 grid gap-3 lg:grid-cols-2">
+        <div className="grid gap-8 xl:grid-cols-[1.3fr_1fr]">
+          <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+            <h2 className="text-xl font-bold text-slate-900">Procurement & Pricing History</h2>
+            <div className="mt-8 grid gap-4 lg:grid-cols-2">
               {product.vendors.length === 0 ? (
                 <div className="lg:col-span-2">
                   <EmptyPanel message="No vendor mappings exist for this product." />
                 </div>
               ) : (
                 product.vendors.slice(0, 4).map((mapping) => (
-                  <div key={mapping.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                  <div key={mapping.id} className="rounded-[24px] border border-slate-100 bg-slate-50/50 p-6 transition hover:bg-white hover:shadow-md">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="text-sm font-semibold text-slate-900">{mapping.vendor.name}</p>
-                        <p className="mt-1 text-xs text-slate-500">
-                          {mapping.vendor.country ?? "No country"}{mapping.vendorSku ? ` / SKU ${mapping.vendorSku}` : ""}
+                        <p className="text-sm font-bold text-slate-900">{mapping.vendor.name}</p>
+                        <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          {mapping.vendor.country ?? "Global"}{mapping.vendorSku ? ` • SKU ${mapping.vendorSku}` : ""}
                         </p>
                       </div>
                       {mapping.isDefault && (
-                        <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
-                          Default
+                        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-600 ring-1 ring-inset ring-emerald-200">
+                          Primary
                         </span>
                       )}
                     </div>
-                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                    <div className="mt-6 grid gap-4 grid-cols-3">
                       <MiniStat label="Unit cost" value={mapping.unitCost ? formatCurrency(params.locale, mapping.unitCost.toString()) : "-"} />
                       <MiniStat label="MOQ" value={mapping.moq?.toString() ?? "-"} />
-                      <MiniStat label="Lead time" value={mapping.leadTimeDays ? `${mapping.leadTimeDays}d` : "-"} />
+                      <MiniStat label="Lead" value={mapping.leadTimeDays ? `${mapping.leadTimeDays}d` : "-"} />
                     </div>
                   </div>
                 ))
               )}
             </div>
 
-            <div className="mt-5 overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-200">
-                <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <div className="mt-8 overflow-hidden rounded-[24px] border border-slate-100">
+              <table className="min-w-full divide-y divide-slate-100">
+                <thead className="bg-slate-50/50 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                   <tr>
-                    <th className="px-4 py-3">PO</th>
-                    <th className="px-4 py-3">Vendor</th>
-                    <th className="px-4 py-3">Order Date</th>
-                    <th className="px-4 py-3 text-right">Unit Cost</th>
+                    <th className="px-6 py-4">PO Ref</th>
+                    <th className="px-6 py-4">Source Vendor</th>
+                    <th className="px-6 py-4 text-center">Date</th>
+                    <th className="px-6 py-4 text-right">Cost</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                   {product.poItems.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-4 py-12 text-center text-slate-400">
-                        No purchase-order pricing history yet.
+                      <td colSpan={4} className="px-6 py-12 text-center text-slate-400 italic">
+                        No purchase order history recorded.
                       </td>
                     </tr>
                   ) : (
                     product.poItems.map((item) => (
-                      <tr key={item.id}>
-                        <td className="px-4 py-3 font-medium text-slate-900">{item.purchaseOrder.poNumber}</td>
-                        <td className="px-4 py-3">{item.purchaseOrder.vendor.name}</td>
-                        <td className="px-4 py-3">{formatDate(params.locale, item.purchaseOrder.orderDate)}</td>
-                        <td className="px-4 py-3 text-right font-semibold text-slate-900">
+                      <tr key={item.id} className="transition hover:bg-slate-50/50">
+                        <td className="px-6 py-5 font-bold text-slate-950">{item.purchaseOrder.poNumber}</td>
+                        <td className="px-6 py-5">{item.purchaseOrder.vendor.name}</td>
+                        <td className="px-6 py-5 text-center font-medium text-slate-500">{formatDate(params.locale, item.purchaseOrder.orderDate)}</td>
+                        <td className="px-6 py-5 text-right font-bold text-slate-950">
                           {formatCurrency(params.locale, item.unitCost.toString())}
                         </td>
                       </tr>
@@ -358,27 +370,27 @@ export default async function ProductDetailPage({
             </div>
           </section>
 
-          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <h2 className="text-lg font-semibold text-slate-900">Recent movements</h2>
+          <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+            <h2 className="text-xl font-bold text-slate-900">Recent Movements</h2>
             {recentMovements.length === 0 ? (
               <EmptyPanel message="No receiving, transfer, or adjustment history yet." />
             ) : (
-              <div className="mt-5 space-y-3">
+              <div className="mt-8 space-y-4">
                 {recentMovements.map((movement) => (
-                  <div key={movement.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm">
-                        <movement.icon className="h-4 w-4" />
+                  <div key={movement.id} className="rounded-[24px] border border-slate-100 bg-slate-50/30 p-5 transition hover:bg-white hover:shadow-md">
+                    <div className="flex items-start gap-4">
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm border border-slate-100">
+                        <movement.icon className="h-5 w-5" />
                       </span>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-semibold text-slate-900">{movement.title}</p>
-                          <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                          <p className="text-sm font-bold text-slate-950">{movement.title}</p>
+                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-500">
                             {movement.kind}
                           </span>
                         </div>
                         <p className="mt-1 text-sm text-slate-500">{movement.detail}</p>
-                        <p className="mt-2 text-xs text-slate-400">{formatDate(params.locale, movement.timestamp)}</p>
+                        <p className="mt-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">{formatDate(params.locale, movement.timestamp)}</p>
                       </div>
                     </div>
                   </div>
@@ -388,64 +400,69 @@ export default async function ProductDetailPage({
           </section>
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
+          <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
             <div className="flex items-center justify-between gap-4">
-              <h2 className="text-lg font-semibold text-slate-900">Labels</h2>
+              <h2 className="text-xl font-bold text-slate-900">Labeling Identity</h2>
               <Link
                 href={`/${params.locale}/labels?tab=products&product=${product.id}`}
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
               >
                 <Printer className="h-4 w-4" />
-                Open in label center
+                ZPL Center
               </Link>
             </div>
-            <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-              <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
-                <div className="rounded-[20px] border border-slate-300 bg-white p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Label preview</p>
-                  <p className="mt-4 text-2xl font-semibold tracking-tight text-slate-900">{product.compoundId}</p>
-                  <div className="mt-4 rounded-xl border border-dashed border-slate-300 px-3 py-4 text-center text-xs font-semibold tracking-[0.3em] text-slate-500">
+            <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.1fr]">
+              <div className="rounded-[28px] border border-slate-100 bg-slate-50/50 p-6">
+                <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Physical Label Preview</p>
+                  <p className="mt-6 text-3xl font-extrabold tracking-tight text-slate-950">{product.compoundId}</p>
+                  <div className="mt-6 flex h-16 items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-[10px] font-black uppercase tracking-[0.5em] text-slate-400">
                     BARCODE
                   </div>
-                  <p className="mt-4 text-sm text-slate-600">{product.name}</p>
+                  <p className="mt-6 text-sm font-medium text-slate-600 truncate">{product.name}</p>
                 </div>
               </div>
-              <pre className="max-h-[280px] overflow-auto rounded-[24px] bg-slate-950 p-4 text-xs text-slate-100">
-                {productZpl}
-              </pre>
+              <div className="relative group">
+                <pre className="h-full max-h-[300px] overflow-auto rounded-[28px] bg-slate-950 p-6 text-[11px] font-mono leading-relaxed text-slate-300 scrollbar-hide">
+                  {productZpl}
+                </pre>
+                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition">
+                  <span className="rounded-lg bg-white/10 px-2 py-1 text-[10px] font-bold text-white uppercase tracking-wider backdrop-blur-sm">ZPL II</span>
+                </div>
+              </div>
             </div>
           </section>
 
-          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
             <div className="flex items-center justify-between gap-4">
-              <h2 className="text-lg font-semibold text-slate-900">Linked defects</h2>
-              <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-rose-600">
-                {product.defectItems.length} records
+              <h2 className="text-xl font-bold text-slate-900">Quality Exceptions</h2>
+              <span className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${product.defectItems.length > 0 ? "bg-rose-50 text-rose-600 ring-1 ring-inset ring-rose-200" : "bg-slate-50 text-slate-400 ring-1 ring-inset ring-slate-200"}`}>
+                {product.defectItems.length} Incidents
               </span>
             </div>
             {product.defectItems.length === 0 ? (
               <EmptyPanel message="No defect history is linked to this product." />
             ) : (
-              <div className="mt-5 space-y-3">
+              <div className="mt-8 space-y-4">
                 {product.defectItems.map((item) => (
-                  <div key={item.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                    <div className="flex items-start gap-3">
-                      <span className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-rose-600 shadow-sm">
-                        <AlertTriangle className="h-4 w-4" />
+                  <div key={item.id} className="rounded-[24px] border border-slate-100 bg-slate-50/30 p-5 transition hover:bg-white hover:shadow-md">
+                    <div className="flex items-start gap-4">
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-rose-600 shadow-sm border border-slate-100">
+                        <AlertTriangle className="h-5 w-5" />
                       </span>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-semibold text-slate-900">{item.defectReport.reportNumber}</p>
-                          <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                          <p className="text-sm font-bold text-slate-950">{item.defectReport.reportNumber}</p>
+                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-500">
                             {item.defectReport.status}
                           </span>
                         </div>
-                        <p className="mt-1 text-sm text-slate-500">
-                          {item.quantity} units / {item.reason.name} / {item.reason.faultType}
+                        <p className="mt-1 text-sm text-slate-600">
+                          <span className="font-bold text-slate-900">{item.quantity}</span> units • {item.reason.name}
                         </p>
-                        <p className="mt-2 text-xs text-slate-400">
-                          {item.defectReport.source} / {formatDate(params.locale, item.defectReport.createdAt)}
+                        <p className="mt-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                          {item.defectReport.source} • {formatDate(params.locale, item.defectReport.createdAt)}
                         </p>
                       </div>
                     </div>
@@ -456,8 +473,8 @@ export default async function ProductDetailPage({
           </section>
         </div>
 
-        <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <h2 className="text-lg font-semibold text-slate-900 mb-5">Activity history</h2>
+        <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+          <h2 className="text-xl font-bold text-slate-900 mb-8">System Activity Audit</h2>
           <ActivityTimeline entityType="Product" entityId={product.id} />
         </section>
       </div>

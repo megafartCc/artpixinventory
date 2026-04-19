@@ -12,17 +12,21 @@ export default async function LocationsPage() {
   });
 
   return (
-    <div className="p-6 lg:p-8 h-full flex flex-col">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">{t("locations")}</h1>
-          <p className="text-slate-500 mt-1 text-sm">
-            Map out your physical warehouse hierarchy with native identity tags.
-          </p>
+    <div className="p-4 sm:p-6 lg:p-10 h-full flex flex-col">
+      <div className="mx-auto w-full max-w-[1600px] flex flex-col flex-1">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-10">
+          <div>
+            <h1 className="text-4xl font-extrabold tracking-tight text-slate-950">{t("locations")}</h1>
+            <p className="text-slate-500 mt-2 text-lg">
+              Map out your physical warehouse hierarchy with native identity tags.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex-1 min-h-0 bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden p-1">
+          <LocationManager locations={locations} />
         </div>
       </div>
-
-      <LocationManager locations={locations} />
     </div>
   );
 }

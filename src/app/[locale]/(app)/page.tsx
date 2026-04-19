@@ -11,6 +11,7 @@ import {
   Truck,
 } from "lucide-react";
 import { RecentActivityPanel } from "@/components/dashboard/RecentActivityPanel";
+import { DefectsGraph } from "@/components/dashboard/DefectsGraph";
 import prisma from "@/lib/prisma";
 
 function startOfToday() {
@@ -45,6 +46,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
   const today = startOfToday();
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const [
     totalProducts,
     allStockRows,
@@ -57,9 +59,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
     activeCounts,
     activeTransfers,
     todayReceipts,
-    latestProductionSync,
-    latestReasonSync,
-    mappedProducts,
+    defectReports,
     mappedMachines,
     erpixFailures,
   ] = await Promise.all([
@@ -108,16 +108,10 @@ export default async function DashboardPage({ params }: { params: { locale: stri
       _sum: { receivedQty: true },
       _count: { id: true },
     }),
-    prisma.productionQueueItem.findFirst({
-      orderBy: { erpixSyncedAt: "desc" },
-      select: { erpixSyncedAt: true },
+    prisma.defectReport.findMany({
+      where: { createdAt: { gte: thirtyDaysAgo } },
+      select: { createdAt: true },
     }),
-    prisma.defectReason.findFirst({
-      where: { syncedAt: { not: null } },
-      orderBy: { syncedAt: "desc" },
-      select: { syncedAt: true },
-    }),
-    prisma.product.count({ where: { erpixId: { not: null } } }),
     prisma.machine.count({ where: { erpixMachineId: { not: null } } }),
     prisma.notification.count({
       where: {
@@ -126,6 +120,16 @@ export default async function DashboardPage({ params }: { params: { locale: stri
       },
     }),
   ]);
+
+  const defectData = Array.from({ length: 30 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().split("T")[0];
+    const count = defectReports.filter(
+      (def) => def.createdAt.toISOString().split("T")[0] === dateStr
+    ).length;
+    return { date: dateStr, count };
+  }).reverse();
 
   const localeMap: Record<string, string> = {
     en: "en-US",
@@ -179,14 +183,14 @@ export default async function DashboardPage({ params }: { params: { locale: stri
   const todayReceiptLines = todayReceipts._count.id;
 
   return (
-    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
-      <div className="flex w-full flex-col gap-6">
-        <div className="flex flex-col gap-4 px-1 sm:px-2 xl:flex-row xl:items-end xl:justify-between">
+    <div className="p-4 sm:p-6 lg:p-10">
+      <div className="mx-auto w-full max-w-[1600px] space-y-10">
+        <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+            <h1 className="text-4xl font-extrabold tracking-tight text-slate-950 sm:text-5xl">
               {t("title")}
             </h1>
-            <p className="mt-2 max-w-3xl text-sm text-slate-500 sm:text-base">
+            <p className="mt-3 max-w-4xl text-lg text-slate-500 leading-relaxed">
               {t("description")}
             </p>
           </div>
@@ -256,26 +260,8 @@ export default async function DashboardPage({ params }: { params: { locale: stri
         </div>
 
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1.3fr)_minmax(360px,0.9fr)]">
-          <DashboardPanel title={t("erpixSyncHealth")}>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <SyncHealthCard
-                label={t("productionQueue")}
-                value={formatRelativeSync(latestProductionSync?.erpixSyncedAt ?? null, common)}
-              />
-              <SyncHealthCard
-                label={t("defectReasons")}
-                value={formatRelativeSync(latestReasonSync?.syncedAt ?? null, common)}
-              />
-              <SyncHealthCard
-                label={t("mappedProducts")}
-                value={`${mappedProducts}/${totalProducts}`}
-              />
-              <SyncHealthCard
-                label={t("sevenDayFailures")}
-                value={String(erpixFailures)}
-                alert={erpixFailures > 0}
-              />
-            </div>
+          <DashboardPanel title={t("defectReasons")}>
+            <DefectsGraph data={defectData} />
           </DashboardPanel>
 
           <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
@@ -398,17 +384,17 @@ function StatCard({
   iconClassName: string;
 }) {
   return (
-    <div className="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm transition-transform duration-200 hover:-translate-y-0.5 sm:min-h-[170px] sm:p-6">
+    <div className="group rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1">
       <div className="flex items-start justify-between gap-4">
-        <p className="max-w-[12rem] text-sm font-medium uppercase tracking-[0.18em] text-slate-500">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
           {title}
         </p>
-        <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${iconClassName}`}>
+        <div className={`flex h-12 w-12 items-center justify-center rounded-2xl shadow-sm transition group-hover:scale-110 ${iconClassName}`}>
           <Icon className="h-5 w-5" />
         </div>
       </div>
 
-      <p className="mt-10 text-4xl font-semibold tracking-tight text-slate-900">{value}</p>
+      <p className="mt-8 text-5xl font-extrabold tracking-tight text-slate-950">{value}</p>
     </div>
   );
 }
@@ -427,24 +413,24 @@ function InsightCard({
   iconClassName: string;
 }) {
   return (
-    <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+    <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+          <h2 className="text-xl font-bold text-slate-950">{title}</h2>
           <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
         </div>
-        <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${iconClassName}`}>
+        <div className={`flex h-12 w-12 items-center justify-center rounded-2xl shadow-sm ${iconClassName}`}>
           <Icon className="h-5 w-5" />
         </div>
       </div>
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+      <div className="mt-8 grid gap-4 sm:grid-cols-3">
         {metrics.map((metric) => (
-          <div key={metric.label} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+          <div key={metric.label} className="rounded-[24px] border border-slate-100 bg-slate-50/50 p-6">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
               {metric.label}
             </p>
-            <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">
+            <p className="mt-3 text-4xl font-extrabold tracking-tight text-slate-950">
               {metric.value}
             </p>
           </div>
@@ -456,17 +442,17 @@ function InsightCard({
 
 function DashboardPanel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-      <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
-      <div className="mt-5 space-y-3">{children}</div>
+    <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+      <h2 className="text-xl font-bold text-slate-950">{title}</h2>
+      <div className="mt-8 space-y-4">{children}</div>
     </section>
   );
 }
 
 function DashboardListItem({ title, detail }: { title: string; detail: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3">
-      <p className="text-sm font-medium text-slate-900">{title}</p>
+    <div className="rounded-[24px] border border-slate-100 bg-slate-50/50 px-6 py-4 transition hover:bg-white hover:shadow-sm">
+      <p className="text-sm font-bold text-slate-950">{title}</p>
       <p className="mt-1 text-xs text-slate-500">{detail}</p>
     </div>
   );
@@ -490,23 +476,23 @@ function ActiveMetricCard({
   icon: React.ElementType;
 }) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-sm font-medium text-slate-600">{title}</p>
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm">
+    <div className="rounded-[24px] border border-slate-100 bg-slate-50/50 p-6 transition hover:bg-white hover:shadow-md">
+      <div className="flex items-start justify-between gap-4">
+        <p className="text-sm font-bold text-slate-600">{title}</p>
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm border border-slate-100">
           <Icon className="h-5 w-5" />
         </div>
       </div>
-      <p className="mt-8 text-4xl font-semibold tracking-tight text-slate-900">{value}</p>
+      <p className="mt-8 text-4xl font-extrabold tracking-tight text-slate-950">{value}</p>
     </div>
   );
 }
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl bg-white px-4 py-3">
-      <p className="text-sm font-medium text-slate-600">{label}</p>
-      <p className="text-lg font-semibold text-slate-900">{value}</p>
+    <div className="flex items-center justify-between gap-4 rounded-[20px] bg-white px-5 py-4 shadow-sm border border-slate-100">
+      <p className="text-sm font-bold text-slate-500">{label}</p>
+      <p className="text-xl font-black text-slate-950">{value}</p>
     </div>
   );
 }

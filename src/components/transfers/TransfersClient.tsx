@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { ArrowLeftRight, Package2 } from "lucide-react";
+import { PdfExportButton } from "@/components/PdfExportButton";
 
 export function TransfersClient({
   locale,
@@ -21,60 +23,92 @@ export function TransfersClient({
   const t = useTranslations("Transfers");
 
   return (
-    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
-      <div className="flex w-full flex-col gap-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
-            <p className="mt-1 text-slate-500">
-              {t("subtitle")}
-            </p>
+    <div className="p-4 sm:p-6 lg:p-10">
+      <div className="mx-auto max-w-[1600px] space-y-10">
+        <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h1 className="text-4xl font-extrabold tracking-tight text-slate-950">
+                {t("title")}
+              </h1>
+              <p className="mt-2 text-lg text-slate-500">
+                {t("subtitle")}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <PdfExportButton
+                filename={`transfers_${new Date().toISOString().slice(0, 10)}.pdf`}
+                title="Transfers Log"
+                headers={["Reference", "Status", "Created By", "Started", "Items", "Completed"]}
+                rows={transfers.map((t) => [
+                  t.reference,
+                  t.status,
+                  t.createdBy,
+                  t.startedAt,
+                  t.itemsCount,
+                  t.completedAt,
+                ])}
+              />
+              <Link
+                href={`/${locale}/transfers/new`}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-slate-950 px-6 text-sm font-bold text-white shadow-lg transition hover:bg-slate-800"
+              >
+                <ArrowLeftRight className="h-4 w-4" />
+                {t("newTransfer")}
+              </Link>
+            </div>
           </div>
-          <Link
-            href={`/${locale}/transfers/new`}
-            className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
-          >
-            {t("newTransfer")}
-          </Link>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-slate-200">
-              <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <table className="min-w-full divide-y divide-slate-100">
+              <thead className="bg-slate-50/50 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                 <tr>
-                  <th className="px-4 py-3">{t("columns.reference")}</th>
-                  <th className="px-4 py-3">{t("columns.status")}</th>
-                  <th className="px-4 py-3">{t("columns.createdBy")}</th>
-                  <th className="px-4 py-3">{t("columns.started")}</th>
-                  <th className="px-4 py-3">{t("columns.itemsCount")}</th>
-                  <th className="px-4 py-3">{t("columns.completed")}</th>
+                  <th className="px-8 py-4">{t("columns.reference")}</th>
+                  <th className="px-8 py-4">{t("columns.status")}</th>
+                  <th className="px-8 py-4">{t("columns.createdBy")}</th>
+                  <th className="px-8 py-4">{t("columns.started")}</th>
+                  <th className="px-8 py-4 text-center">{t("columns.itemsCount")}</th>
+                  <th className="px-8 py-4">{t("columns.completed")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                 {transfers.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-16 text-center text-slate-400">
+                    <td colSpan={6} className="px-8 py-20 text-center font-medium text-slate-400">
                       {t("noTransfers")}
                     </td>
                   </tr>
                 ) : (
                   transfers.map((transfer) => (
-                    <tr key={transfer.id} className="hover:bg-slate-50">
-                      <td className="px-4 py-4 font-semibold text-slate-900">
-                        <Link href={`/${locale}/transfers/${transfer.id}`}>
+                    <tr key={transfer.id} className="transition hover:bg-slate-50/50">
+                      <td className="px-8 py-5">
+                        <Link
+                          href={`/${locale}/transfers/${transfer.id}`}
+                          className="font-black text-slate-950 hover:underline decoration-slate-300 underline-offset-4"
+                        >
                           {transfer.reference}
                         </Link>
                       </td>
-                      <td className="px-4 py-4">
-                        <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusTone(transfer.status)}`}>
+                      <td className="px-8 py-5">
+                        <span
+                          className={`inline-flex rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${statusTone(
+                            transfer.status
+                          )}`}
+                        >
                           {t(`status.${transfer.status}`)}
                         </span>
                       </td>
-                      <td className="px-4 py-4">{transfer.createdBy}</td>
-                      <td className="px-4 py-4">{transfer.startedAt}</td>
-                      <td className="px-4 py-4">{transfer.itemsCount}</td>
-                      <td className="px-4 py-4">{transfer.completedAt}</td>
+                      <td className="px-8 py-5 font-medium text-slate-500">{transfer.createdBy}</td>
+                      <td className="px-8 py-5 text-slate-500">{transfer.startedAt}</td>
+                      <td className="px-8 py-5 text-center font-bold text-slate-950">
+                        <div className="flex items-center justify-center gap-2">
+                          <Package2 className="h-3.5 w-3.5 text-slate-400" />
+                          {transfer.itemsCount}
+                        </div>
+                      </td>
+                      <td className="px-8 py-5 text-slate-500">{transfer.completedAt}</td>
                     </tr>
                   ))
                 )}
@@ -84,20 +118,20 @@ export function TransfersClient({
         </div>
       </div>
     </div>
-  );
+);
 }
 
 function statusTone(status: string) {
-  switch (status) {
-    case "COLLECTING":
-      return "bg-sky-100 text-sky-700";
-    case "DROPPING":
-      return "bg-amber-100 text-amber-700";
-    case "COMPLETED":
-      return "bg-emerald-100 text-emerald-700";
-    case "CANCELLED":
-      return "bg-slate-200 text-slate-600";
-    default:
-      return "bg-slate-100 text-slate-700";
-  }
+switch (status) {
+  case "COLLECTING":
+    return "bg-sky-100 text-sky-700";
+  case "DROPPING":
+    return "bg-amber-100 text-amber-700";
+  case "COMPLETED":
+    return "bg-emerald-100 text-emerald-700";
+  case "CANCELLED":
+    return "bg-slate-200 text-slate-600";
+  default:
+    return "bg-slate-100 text-slate-700";
+}
 }

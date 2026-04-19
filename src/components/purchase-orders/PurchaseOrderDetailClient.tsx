@@ -273,53 +273,56 @@ export function PurchaseOrderDetailClient({
   };
 
   return (
-    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
-      <div className="flex w-full flex-col gap-6">
-        <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div className="p-4 sm:p-6 lg:p-10">
+      <div className="mx-auto max-w-[1600px] space-y-8">
+        <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <Link
                 href={`/${locale}/purchase-orders`}
-                className="text-sm font-medium text-slate-500 transition hover:text-slate-700"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-indigo-600"
               >
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 group-hover:bg-indigo-50">
+                  ←
+                </span>
                 {t("back")}
               </Link>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
+              <div className="mt-4 flex flex-wrap items-center gap-4">
+                <h1 className="text-4xl font-extrabold tracking-tight text-slate-950">
                   {purchaseOrder.poNumber}
                 </h1>
-                <span className={`rounded-full px-3 py-1 text-sm font-medium ${getPoStatusTone(purchaseOrder.status)}`}>
+                <span className={`rounded-2xl px-4 py-1.5 text-xs font-bold uppercase tracking-widest ring-1 ring-inset ${getPoStatusTone(purchaseOrder.status)}`}>
                   {formatPoStatus(purchaseOrder.status)}
                 </span>
               </div>
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-3 text-lg text-slate-500 font-medium">
                 {purchaseOrder.vendorName}
                 {purchaseOrder.vendorCountry ? `, ${purchaseOrder.vendorCountry}` : ""}
               </p>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3 lg:w-[520px]">
+            <div className="grid gap-4 sm:grid-cols-3 lg:w-[600px]">
               <MetricCard title="Line items" value={String(purchaseOrder.items.length)} icon={ReceiptText} />
               <MetricCard title="Documents" value={String(readiness.documentCount)} icon={FileText} />
-              <MetricCard title="Total" value={`$${purchaseOrder.totalCost}`} icon={ClipboardCheck} />
+              <MetricCard title="Total value" value={`$${purchaseOrder.totalCost}`} icon={ClipboardCheck} />
             </div>
           </div>
         </div>
 
-        <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <div className="grid gap-3 sm:grid-cols-4">
-            <FlowStep label="Draft" detail="Create and revise" state={stepState(purchaseOrder.status, "draft")} />
-            <FlowStep label="Approval" detail="Manager/admin signoff" state={stepState(purchaseOrder.status, "approval")} />
+        <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="grid gap-6 sm:grid-cols-4">
+            <FlowStep label="Draft" detail="Initial revision" state={stepState(purchaseOrder.status, "draft")} />
+            <FlowStep label="Approval" detail="Manager signoff" state={stepState(purchaseOrder.status, "approval")} />
             <FlowStep label="Ordered" detail="Sent to vendor" state={stepState(purchaseOrder.status, "ordered")} />
-            <FlowStep label="Receiving" detail="Inbound and palletized" state={stepState(purchaseOrder.status, "received")} />
+            <FlowStep label="Receiving" detail="Inbound logistics" state={stepState(purchaseOrder.status, "received")} />
           </div>
         </section>
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-          <div className="space-y-6">
-            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <h2 className="text-lg font-semibold text-slate-900">{t("summary")}</h2>
-              <dl className="mt-5 grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-8 xl:grid-cols-[1fr_400px]">
+          <div className="space-y-8">
+            <section className="group rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md">
+              <h2 className="text-xl font-bold text-slate-900">{t("summary")}</h2>
+              <dl className="mt-8 grid gap-6 sm:grid-cols-2">
                 <Info label={t("vendor")} value={purchaseOrder.vendorName} />
                 <Info label={t("vendorOrderId")} value={purchaseOrder.vendorOrderId || "-"} />
                 <Info label={t("orderDate")} value={purchaseOrder.orderDate} />
@@ -329,21 +332,24 @@ export function PurchaseOrderDetailClient({
                 <Info label={t("approvedAt")} value={purchaseOrder.approvedAt || "-"} />
                 <Info
                   label={t("metricsLabel")}
-                  value={`${purchaseOrder.totalWeightKg ?? "0"} kg / ${purchaseOrder.totalPallets ?? 0} / ${purchaseOrder.totalLooseBoxes ?? 0}`}
+                  value={`${purchaseOrder.totalWeightKg ?? "0"} kg / ${purchaseOrder.totalPallets ?? 0} pallets / ${purchaseOrder.totalLooseBoxes ?? 0} boxes`}
                 />
               </dl>
-              <div className="mt-4 rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{t("notes")}</p>
-                <p className="mt-2 text-sm text-slate-600">{purchaseOrder.notes || t("noNotes")}</p>
+              <div className="mt-6 rounded-[24px] border border-slate-100 bg-slate-50/50 p-6 transition group-hover:bg-white">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">{t("notes")}</p>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">{purchaseOrder.notes || t("noNotes")}</p>
               </div>
               {purchaseOrder.constraintWarnings.length > 0 && (
-                <div className="mt-4 rounded-3xl border border-amber-200 bg-amber-50 p-4">
-                  <div className="flex items-start gap-3">
-                    <ShieldCheck className="mt-0.5 h-5 w-5 text-amber-600" />
+                <div className="mt-6 rounded-[24px] border border-amber-200 bg-amber-50/50 p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+                      <ShieldCheck className="h-5 w-5" />
+                    </div>
                     <div className="space-y-2">
+                      <p className="text-sm font-bold text-amber-900">Constraint Compliance Alerts</p>
                       {purchaseOrder.constraintWarnings.map((warning) => (
                         <p key={warning} className="text-sm text-amber-700">
-                          {warning}
+                          • {warning}
                         </p>
                       ))}
                     </div>
@@ -352,34 +358,38 @@ export function PurchaseOrderDetailClient({
               )}
             </section>
 
-            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <h2 className="text-lg font-semibold text-slate-900">{t("lineItems")}</h2>
-              <div className="mt-5 overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-200">
-                  <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm overflow-hidden">
+              <h2 className="text-xl font-bold text-slate-900">{t("lineItems")}</h2>
+              <div className="mt-8 overflow-hidden rounded-[24px] border border-slate-100">
+                <table className="min-w-full divide-y divide-slate-100">
+                  <thead className="bg-slate-50/50 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                     <tr>
-                      <th className="px-4 py-3">{t("columnProduct")}</th>
-                      <th className="px-4 py-3">{t("columnOrdered")}</th>
-                      <th className="px-4 py-3">{t("columnReceived")}</th>
-                      <th className="px-4 py-3">{t("columnUnitCost")}</th>
-                      <th className="px-4 py-3">{t("columnTotal")}</th>
-                      <th className="px-4 py-3">{t("columnNotes")}</th>
+                      <th className="px-6 py-4">{t("columnProduct")}</th>
+                      <th className="px-6 py-4 text-center">{t("columnOrdered")}</th>
+                      <th className="px-6 py-4 text-center">{t("columnReceived")}</th>
+                      <th className="px-6 py-4 text-right">{t("columnUnitCost")}</th>
+                      <th className="px-6 py-4 text-right">{t("columnTotal")}</th>
+                      <th className="px-6 py-4">{t("columnNotes")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                     {purchaseOrder.items.map((item) => (
-                      <tr key={item.id}>
-                        <td className="px-4 py-4">
+                      <tr key={item.id} className="transition hover:bg-slate-50/50">
+                        <td className="px-6 py-5">
                           <div className="flex flex-col">
-                            <span className="font-semibold text-slate-900">{item.compoundId}</span>
-                            <span>{item.name}</span>
+                            <span className="font-bold text-slate-950">{item.compoundId}</span>
+                            <span className="text-xs text-slate-500">{item.name}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-4">{item.orderedQty}</td>
-                        <td className="px-4 py-4">{item.receivedQty}</td>
-                        <td className="px-4 py-4">${item.unitCost}</td>
-                        <td className="px-4 py-4">${item.totalCost}</td>
-                        <td className="px-4 py-4">{item.notes || "-"}</td>
+                        <td className="px-6 py-5 text-center font-medium">{item.orderedQty}</td>
+                        <td className="px-6 py-5 text-center">
+                          <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${item.receivedQty >= item.orderedQty ? "bg-emerald-50 text-emerald-600" : item.receivedQty > 0 ? "bg-blue-50 text-blue-600" : "bg-slate-50 text-slate-400"}`}>
+                            {item.receivedQty}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5 text-right font-medium">${item.unitCost}</td>
+                        <td className="px-6 py-5 text-right font-bold text-slate-950">${item.totalCost}</td>
+                        <td className="px-6 py-5 text-xs text-slate-500 italic max-w-[200px] truncate">{item.notes || "-"}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -387,38 +397,38 @@ export function PurchaseOrderDetailClient({
               </div>
             </section>
 
-            <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-              <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-lg font-semibold text-slate-900">{t("documents")}</h2>
+            <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
+              <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+                <div className="flex items-center justify-between gap-4">
+                  <h2 className="text-xl font-bold text-slate-900">{t("documents")}</h2>
                   <a
                     href={`/api/purchase-orders/${purchaseOrder.id}/pdf`}
-                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                    className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
                   >
                     {t("exportPdf")}
                   </a>
                 </div>
 
                 {canManage && (
-                  <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                    <p className="text-sm font-medium text-slate-700">Upload PO document</p>
-                    <div className="mt-3 flex flex-wrap gap-2">
+                  <div className="mt-8 rounded-[28px] border border-slate-100 bg-slate-50/50 p-6">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-4">Repository Upload</p>
+                    <div className="flex flex-wrap gap-2">
                       {documentPresets.map((preset) => (
                         <button
                           key={preset}
                           type="button"
                           onClick={() => setLabel(preset)}
-                          className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                          className={`rounded-xl border px-4 py-2 text-xs font-bold uppercase tracking-wider transition ${
                             label === preset
-                              ? "border-slate-900 bg-slate-900 text-white"
-                              : "border-slate-200 bg-white text-slate-600 hover:bg-slate-100"
+                              ? "border-slate-900 bg-slate-900 text-white shadow-md"
+                              : "border-slate-200 bg-white text-slate-500 hover:bg-slate-100"
                           }`}
                         >
                           {preset}
                         </button>
                       ))}
                     </div>
-                    <div className="mt-4">
+                    <div className="mt-6">
                       <input
                         value={label}
                         onChange={(event) => setLabel(event.target.value)}
@@ -433,58 +443,60 @@ export function PurchaseOrderDetailClient({
                       }}
                       onDragLeave={() => setDragActive(false)}
                       onDrop={(event) => void handleDrop(event)}
-                      className={`mt-4 flex cursor-pointer flex-col items-center justify-center rounded-3xl border border-dashed px-4 py-8 text-center transition ${
+                      className={`mt-6 flex cursor-pointer flex-col items-center justify-center rounded-[24px] border-2 border-dashed px-6 py-12 text-center transition ${
                         dragActive
-                          ? "border-slate-900 bg-white"
-                          : "border-slate-300 bg-white"
+                          ? "border-indigo-400 bg-white"
+                          : "border-slate-200 bg-white"
                       }`}
                     >
-                      <Upload className="h-6 w-6 text-slate-400" />
-                      <span className="mt-3 text-sm font-medium text-slate-700">
-                        Drop a file here or click to browse
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-slate-400">
+                        <Upload className="h-6 w-6" />
+                      </div>
+                      <span className="mt-4 text-sm font-bold text-slate-900">
+                        Drop file or browse
                       </span>
                       <span className="mt-1 text-xs text-slate-400">
-                        Stores one document at a time on this record.
+                        Max 10MB per document
                       </span>
                       <input type="file" onChange={(event) => void handleFileChange(event)} className="hidden" />
                     </label>
                     {fileName && (
-                      <div className="mt-4 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
-                        Ready to upload: <span className="font-semibold text-slate-900">{fileName}</span>
+                      <div className="mt-6 rounded-2xl border border-indigo-100 bg-indigo-50/50 px-5 py-4 text-sm font-medium text-indigo-700">
+                        Queue: <span className="font-bold">{fileName}</span>
                       </div>
                     )}
                     <button
                       onClick={() => void uploadDocument()}
                       disabled={submitting}
-                      className="mt-4 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60"
+                      className="mt-6 w-full rounded-[20px] bg-slate-950 px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:bg-slate-800 disabled:opacity-60"
                     >
                       {t("uploadDocument")}
                     </button>
                   </div>
                 )}
 
-                <div className="mt-5 space-y-3">
+                <div className="mt-8 space-y-4">
                   {purchaseOrder.documents.length === 0 ? (
-                    <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
+                    <div className="rounded-[24px] border border-dashed border-slate-200 bg-slate-50 px-6 py-16 text-center text-sm font-medium text-slate-400">
                       {t("noDocuments")}
                     </div>
                   ) : (
                     purchaseOrder.documents.map((document) => (
-                      <div key={document.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
+                      <div key={document.id} className="group rounded-[24px] border border-slate-100 bg-slate-50/30 p-5 transition hover:bg-white hover:shadow-md">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                              <p className="text-sm font-semibold text-slate-900">{document.label}</p>
-                              <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                              <p className="text-sm font-bold text-slate-950">{document.label}</p>
+                              <span className="rounded-full bg-white px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-500 ring-1 ring-inset ring-slate-200">
                                 {document.uploadedAt}
                               </span>
                             </div>
-                            <p className="mt-2 text-sm text-slate-500">{document.fileName}</p>
+                            <p className="mt-2 text-xs text-slate-500 truncate">{document.fileName}</p>
                           </div>
                           <a
                             href={document.fileUrl}
                             download={document.fileName}
-                            className="rounded-xl border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition hover:bg-white"
+                            className="shrink-0 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
                           >
                             {t("download")}
                           </a>
@@ -495,22 +507,22 @@ export function PurchaseOrderDetailClient({
                 </div>
               </section>
 
-              <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                <h2 className="text-lg font-semibold text-slate-900">{t("receivingHistory")}</h2>
+              <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+                <h2 className="text-xl font-bold text-slate-900">{t("receivingHistory")}</h2>
                 {purchaseOrder.receivingSessions.length === 0 ? (
-                  <div className="mt-5 rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
+                  <div className="mt-8 rounded-[24px] border border-dashed border-slate-200 bg-slate-50 px-6 py-16 text-center text-sm font-medium text-slate-400">
                     {t("noReceivingSessions")}
                   </div>
                 ) : (
-                  <div className="mt-5 space-y-3">
+                  <div className="mt-8 space-y-4">
                     {purchaseOrder.receivingSessions.map((sessionRow) => (
-                      <div key={sessionRow.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                        <div className="flex items-start justify-between gap-3">
+                      <div key={sessionRow.id} className="rounded-[24px] border border-slate-100 bg-slate-50/30 p-5 transition hover:bg-white hover:shadow-md">
+                        <div className="flex items-start justify-between gap-4">
                           <div>
-                            <p className="text-sm font-semibold text-slate-900">{sessionRow.status}</p>
-                            <p className="mt-1 text-sm text-slate-500">Started {sessionRow.startedAt}</p>
-                            <p className="mt-1 text-xs text-slate-400">
-                              {sessionRow.completedAt ? `Completed ${sessionRow.completedAt}` : "Still open"} / {sessionRow.receivedBy}
+                            <p className={`text-sm font-bold uppercase tracking-wider ${sessionRow.status === "COMPLETED" ? "text-emerald-600" : "text-blue-600"}`}>{sessionRow.status}</p>
+                            <p className="mt-2 text-sm font-medium text-slate-900">Agent: {sessionRow.receivedBy}</p>
+                            <p className="mt-1 text-xs text-slate-500">
+                              {sessionRow.completedAt ? `Closed ${sessionRow.completedAt}` : `Open since ${sessionRow.startedAt}`}
                             </p>
                           </div>
                         </div>
@@ -521,38 +533,38 @@ export function PurchaseOrderDetailClient({
               </section>
             </div>
 
-            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <h2 className="mb-5 text-lg font-semibold text-slate-900">{t("activityHistory")}</h2>
+            <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+              <h2 className="mb-8 text-xl font-bold text-slate-900">{t("activityHistory")}</h2>
               <ActivityTimeline entityType="PurchaseOrder" entityId={purchaseOrder.id} />
             </section>
           </div>
 
-          <div className="space-y-6 xl:sticky xl:top-20 xl:self-start">
-            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <h2 className="text-lg font-semibold text-slate-900">{t("actions")}</h2>
-              <p className="mt-1 text-sm text-slate-500">
-                High-signal action rail for editing, approval, ordering, receiving, and cancellation.
+          <div className="space-y-8 xl:sticky xl:top-20 xl:self-start">
+            <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+              <h2 className="text-xl font-bold text-slate-900">{t("actions")}</h2>
+              <p className="mt-2 text-sm text-slate-500 leading-relaxed">
+                Primary workflow controls for state transition and record maintenance.
               </p>
-              <div className="mt-5 grid gap-3">
+              <div className="mt-8 grid gap-4">
                 {purchaseOrder.status === "DRAFT" && canManage && (
                   <>
                     <Link
                       href={`/${locale}/purchase-orders/${purchaseOrder.id}/edit`}
-                      className="rounded-2xl border border-slate-200 px-4 py-3 text-center text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                      className="rounded-[20px] border border-slate-200 bg-white px-6 py-4 text-center text-sm font-bold text-slate-950 shadow-sm transition hover:bg-slate-50"
                     >
                       {t("edit")}
                     </Link>
                     <button
                       onClick={() => void runAction("SUBMIT")}
                       disabled={submitting}
-                      className="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60"
+                      className="rounded-[20px] bg-slate-950 px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:bg-slate-800 disabled:opacity-60"
                     >
                       {t("submitApproval")}
                     </button>
                     <button
                       onClick={() => void deleteDraft()}
                       disabled={submitting}
-                      className="rounded-2xl border border-rose-200 px-4 py-3 text-sm font-medium text-rose-600 transition hover:bg-rose-50 disabled:opacity-60"
+                      className="rounded-[20px] border border-rose-100 bg-rose-50 px-6 py-4 text-sm font-bold text-rose-600 transition hover:bg-rose-100 disabled:opacity-60"
                     >
                       {t("delete")}
                     </button>
@@ -564,7 +576,7 @@ export function PurchaseOrderDetailClient({
                     {canManage && (
                       <Link
                         href={`/${locale}/purchase-orders/${purchaseOrder.id}/edit`}
-                        className="rounded-2xl border border-slate-200 px-4 py-3 text-center text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                        className="rounded-[20px] border border-slate-200 bg-white px-6 py-4 text-center text-sm font-bold text-slate-950 shadow-sm transition hover:bg-slate-50"
                       >
                         {t("edit")}
                       </Link>
@@ -574,14 +586,14 @@ export function PurchaseOrderDetailClient({
                         <button
                           onClick={() => void runAction("APPROVE")}
                           disabled={submitting}
-                          className="rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-60"
+                          className="rounded-[20px] bg-emerald-600 px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:bg-emerald-700 disabled:opacity-60"
                         >
                           {t("approve")}
                         </button>
                         <button
                           onClick={() => void runAction("REJECT")}
                           disabled={submitting}
-                          className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+                          className="rounded-[20px] border border-slate-200 bg-white px-6 py-4 text-sm font-bold text-slate-950 transition hover:bg-slate-50 disabled:opacity-60"
                         >
                           {t("reject")}
                         </button>
@@ -594,7 +606,7 @@ export function PurchaseOrderDetailClient({
                   <button
                     onClick={() => void runAction("MARK_ORDERED")}
                     disabled={submitting}
-                    className="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60"
+                    className="rounded-[20px] bg-slate-950 px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:bg-slate-800 disabled:opacity-60"
                   >
                     {t("markOrdered")}
                   </button>
@@ -603,7 +615,7 @@ export function PurchaseOrderDetailClient({
                 {purchaseOrder.status === "ORDERED" && (
                   <Link
                     href={`/${locale}/receiving`}
-                    className="rounded-2xl bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-800"
+                    className="rounded-[20px] bg-indigo-600 px-6 py-4 text-center text-sm font-bold text-white shadow-lg transition hover:bg-indigo-700"
                   >
                     {t("goToReceiving")}
                   </Link>
@@ -612,7 +624,7 @@ export function PurchaseOrderDetailClient({
                 <button
                   onClick={() => void duplicate()}
                   disabled={submitting}
-                  className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-60"
+                  className="rounded-[20px] border border-slate-200 bg-white px-6 py-4 text-sm font-bold text-slate-950 transition hover:bg-slate-50 disabled:opacity-60"
                 >
                   {t("duplicatePo")}
                 </button>
@@ -621,7 +633,7 @@ export function PurchaseOrderDetailClient({
                   <button
                     onClick={() => void runAction("CANCEL")}
                     disabled={submitting}
-                    className="rounded-2xl border border-rose-200 px-4 py-3 text-sm font-medium text-rose-600 transition hover:bg-rose-50 disabled:opacity-60"
+                    className="rounded-[20px] border border-rose-100 bg-rose-50 px-6 py-4 text-sm font-bold text-rose-600 transition hover:bg-rose-100 disabled:opacity-60"
                   >
                     {t("cancelPo")}
                   </button>
@@ -629,26 +641,30 @@ export function PurchaseOrderDetailClient({
               </div>
             </section>
 
-            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <h2 className="text-lg font-semibold text-slate-900">Approval summary</h2>
-              <div className="mt-5 grid gap-3">
-                <SummaryMetric label="Constraint warnings" value={String(readiness.warningCount)} tone={readiness.warningCount > 0 ? "amber" : "slate"} />
-                <SummaryMetric label="Vendor reference" value={readiness.hasVendorReference ? "Yes" : "No"} tone={readiness.hasVendorReference ? "slate" : "amber"} />
-                <SummaryMetric label="Receiving started" value={readiness.hasReceivingStarted ? "Yes" : "No"} tone={readiness.hasReceivingStarted ? "emerald" : "slate"} />
+            <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+              <h2 className="text-xl font-bold text-slate-900">Health Monitor</h2>
+              <div className="mt-8 grid gap-4">
+                <SummaryMetric label="Compliance warnings" value={String(readiness.warningCount)} tone={readiness.warningCount > 0 ? "amber" : "slate"} />
+                <SummaryMetric label="Vendor mapped" value={readiness.hasVendorReference ? "Yes" : "No"} tone={readiness.hasVendorReference ? "slate" : "amber"} />
+                <SummaryMetric label="Logistics started" value={readiness.hasReceivingStarted ? "Yes" : "No"} tone={readiness.hasReceivingStarted ? "emerald" : "slate"} />
               </div>
             </section>
 
-            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <h2 className="text-lg font-semibold text-slate-900">Cost summary</h2>
-              <div className="mt-5 space-y-3">
+            <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+              <h2 className="text-xl font-bold text-slate-900">Financial Summary</h2>
+              <div className="mt-8 space-y-4">
                 <SummaryRow label={t("subtotal")} value={`$${purchaseOrder.subtotal}`} />
                 <SummaryRow label={t("shippingCost")} value={`$${purchaseOrder.shippingCost}`} />
                 <SummaryRow label={t("otherCosts")} value={`$${purchaseOrder.otherCosts}`} />
-                <SummaryRow label={t("total")} value={`$${purchaseOrder.totalCost}`} emphasize />
+                <div className="pt-4 border-t border-slate-100">
+                  <SummaryRow label={t("total")} value={`$${purchaseOrder.totalCost}`} emphasize />
+                </div>
               </div>
             </section>
           </div>
         </div>
+      </div>
+    </div>
       </div>
     </div>
   );

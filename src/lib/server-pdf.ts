@@ -3,6 +3,8 @@ import path from "path";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+let cachedFontBase64: string | null = null;
+
 /**
  * Creates a jsPDF instance with Roboto font pre-loaded for Cyrillic support.
  */
@@ -14,11 +16,15 @@ export function createCyrillicPdf() {
   });
 
   try {
-    // Read font from public/fonts
-    const fontPath = path.join(process.cwd(), "public", "fonts", "Roboto-Regular.ttf");
-    if (fs.existsSync(fontPath)) {
-      const fontBase64 = fs.readFileSync(fontPath, { encoding: "base64" });
-      doc.addFileToVFS("Roboto-Regular.ttf", fontBase64);
+    if (!cachedFontBase64) {
+      const fontPath = path.join(process.cwd(), "public", "fonts", "Roboto-Regular.ttf");
+      if (fs.existsSync(fontPath)) {
+        cachedFontBase64 = fs.readFileSync(fontPath, { encoding: "base64" });
+      }
+    }
+
+    if (cachedFontBase64) {
+      doc.addFileToVFS("Roboto-Regular.ttf", cachedFontBase64);
       doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
       doc.setFont("Roboto");
     }

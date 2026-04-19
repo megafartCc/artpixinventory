@@ -255,117 +255,125 @@ export function ProductsClient({
   };
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">{t("title")}</h1>
-            <p className="mt-1 text-slate-500">{t("subtitle")}</p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="../indexes" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
-              {t("indexes")}
-            </Link>
-            <Link href="../categories" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
-              {t("categories")}
-            </Link>
-            <Link href="./import" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
-              {t("csvImport")}
-            </Link>
-            {canManageProducts && (
-              <button onClick={openCreate} className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800">
-                <PackagePlus className="h-4 w-4" />
-                {t("addProduct")}
-              </button>
-            )}
+    <div className="p-4 sm:p-6 lg:p-10">
+      <div className="mx-auto max-w-[1600px] space-y-10">
+        <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h1 className="text-4xl font-extrabold tracking-tight text-slate-950">{t("title")}</h1>
+              <p className="mt-2 text-lg text-slate-500">{t("subtitle")}</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <PdfExportButton
+                filename={`products_${new Date().toISOString().slice(0, 10)}.pdf`}
+                title="Product Catalog"
+                headers={["ID", "Name", "Index", "Unit", "Min Stock", "Status"]}
+                rows={filteredProducts.map((p) => [
+                  p.compoundId,
+                  p.name,
+                  p.indexName,
+                  p.uom.toUpperCase(),
+                  p.minStock,
+                  p.active ? "Active" : "Inactive",
+                ])}
+              />
+              <Link href="../indexes" className="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
+                {t("indexes")}
+              </Link>
+              <Link href="../categories" className="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
+                {t("categories")}
+              </Link>
+              <Link href="./import" className="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
+                {t("csvImport")}
+              </Link>
+              {canManageProducts && (
+                <button onClick={openCreate} className="inline-flex items-center gap-2 rounded-2xl bg-slate-950 px-6 py-2.5 text-sm font-bold text-white shadow-lg transition hover:bg-slate-800">
+                  <PackagePlus className="h-4 w-4" />
+                  {t("addProduct")}
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-4">
-          <label className="relative md:col-span-2">
-            <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
-            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t("searchPlaceholder")} className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm text-slate-700 outline-none focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-200" />
-          </label>
-          <select value={indexFilter} onChange={(event) => setIndexFilter(event.target.value)} className={inputClassName}>
+        <div className="grid gap-4 rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-4">
+          <div className="relative md:col-span-2">
+            <Search className="pointer-events-none absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
+            <input 
+              value={search} 
+              onChange={(event) => setSearch(event.target.value)} 
+              placeholder={t("searchPlaceholder")} 
+              className="w-full rounded-2xl border border-slate-100 bg-slate-50 py-3 pl-11 pr-4 text-sm font-medium text-slate-700 outline-none transition focus:border-slate-200 focus:bg-white focus:ring-4 focus:ring-slate-50" 
+            />
+          </div>
+          <select value={indexFilter} onChange={(event) => setIndexFilter(event.target.value)} className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 outline-none transition focus:border-slate-200 focus:bg-white">
             <option value="all">{t("allIndexes")}</option>
             {indexes.map((index) => <option key={index.id} value={index.id}>{index.name}</option>)}
           </select>
-          <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)} className={inputClassName}>
-            <option value="all">{t("allCategories")}</option>
-            {categories.map((category) => <option key={category.id} value={category.name}>{category.name}</option>)}
-          </select>
-          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className={inputClassName}>
+          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 outline-none transition focus:border-slate-200 focus:bg-white">
             <option value="active">{t("activeOnly")}</option>
             <option value="inactive">{t("inactiveOnly")}</option>
             <option value="all">{t("allStatuses")}</option>
           </select>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-slate-200">
-              <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <table className="min-w-full divide-y divide-slate-100">
+              <thead className="bg-slate-50/50 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                 <tr>
-                  <th className="px-4 py-3">{t("columns.compoundId")}</th>
-                  <th className="px-4 py-3">{t("columns.name")}</th>
-                  <th className="px-4 py-3">{t("columns.index")}</th>
-                  <th className="px-4 py-3">{t("columns.categories")}</th>
-                  <th className="px-4 py-3">{t("columns.dimensions")}</th>
-                  <th className="px-4 py-3">{t("columns.uom")}</th>
-                  <th className="px-4 py-3">{t("columns.minStock")}</th>
-                  <th className="px-4 py-3">{t("columns.avgCost")}</th>
-                  <th className="px-4 py-3">{t("columns.active")}</th>
-                  <th className="px-4 py-3 text-right">{t("columns.actions")}</th>
+                  <th className="px-8 py-4">{t("columns.compoundId")}</th>
+                  <th className="px-8 py-4">{t("columns.name")}</th>
+                  <th className="px-8 py-4">{t("columns.index")}</th>
+                  <th className="px-8 py-4">{t("columns.categories")}</th>
+                  <th className="px-8 py-4">{t("columns.dimensions")}</th>
+                  <th className="px-8 py-4 text-center">{t("columns.minStock")}</th>
+                  <th className="px-8 py-4 text-right">{t("columns.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                 {filteredProducts.length === 0 ? (
-                  <tr><td colSpan={10} className="px-4 py-16 text-center text-slate-400">{t("noMatch")}</td></tr>
+                  <tr><td colSpan={7} className="px-8 py-24 text-center font-medium text-slate-400">{t("noMatch")}</td></tr>
                 ) : filteredProducts.map((product) => (
-                  <tr key={product.id}>
-                    <td className="px-4 py-4 font-semibold text-slate-900">
-                      <Link href={`/${locale}/products/${product.id}`} className="hover:text-slate-600">
+                  <tr key={product.id} className="transition hover:bg-slate-50/50">
+                    <td className="px-8 py-5">
+                      <Link href={`/${locale}/products/${product.id}`} className="font-black text-slate-950 hover:underline decoration-slate-300 underline-offset-4">
                         {product.compoundId}
                       </Link>
                     </td>
-                    <td className="px-4 py-4">
-                      <Link href={`/${locale}/products/${product.id}`} className="hover:text-slate-600">
-                        {product.name}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-4">{product.indexName}</td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-wrap gap-1.5">
-                        {product.categories.length ? product.categories.map((category) => (
-                          <span key={`${product.id}-${category}`} className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">{category}</span>
-                        )) : <span className="text-slate-400">-</span>}
+                    <td className="px-8 py-5">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-slate-900">{product.name}</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{product.uom}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-slate-500">{formatDimensions(product)}</td>
-                    <td className="px-4 py-4 uppercase">{product.uom}</td>
-                    <td className="px-4 py-4">{product.minStock}</td>
-                    <td className="px-4 py-4">${product.avgCost}</td>
-                    <td className="px-4 py-4">{product.active ? t("yes") : t("no")}</td>
-                    <td className="px-4 py-4">
-                      <div className="flex justify-end gap-2">
+                    <td className="px-8 py-5 font-medium text-slate-500">{product.indexName}</td>
+                    <td className="px-8 py-5">
+                      <div className="flex flex-wrap gap-1.5">
+                        {product.categories.length ? product.categories.map((category) => (
+                          <span key={`${product.id}-${category}`} className="rounded-lg bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-600 tracking-tighter">{category}</span>
+                        )) : <span className="text-slate-300 text-[10px] font-bold uppercase">None</span>}
+                      </div>
+                    </td>
+                    <td className="px-8 py-5 text-slate-500 font-medium">{formatDimensions(product)}</td>
+                    <td className="px-8 py-5 text-center font-black text-slate-950">{product.minStock}</td>
+                    <td className="px-8 py-5">
+                      <div className="flex justify-end gap-3">
+                        {canManageProducts && (
+                          <button 
+                            onClick={() => openEdit(product)} 
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-600 hover:bg-slate-50 transition shadow-sm"
+                          >
+                            <Pencil className="h-3 w-3" />
+                            {t("edit")}
+                          </button>
+                        )}
                         <Link
                           href={`/${locale}/products/${product.id}`}
-                          className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                          className="inline-flex items-center gap-1.5 rounded-xl bg-slate-100 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-950 hover:bg-slate-200 transition"
                         >
                           {t("view")}
                         </Link>
-                        {canManageProducts ? (
-                          <>
-                            <button onClick={() => openEdit(product)} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">
-                              <Pencil className="h-3.5 w-3.5" />
-                              {t("edit")}
-                            </button>
-                            <button onClick={() => toggleActive(product)} disabled={submitting} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-60">
-                              <Power className="h-3.5 w-3.5" />
-                              {product.active ? t("deactivate") : t("reactivate")}
-                            </button>
-                          </>
-                        ) : <span className="text-xs text-slate-400">{t("readOnly")}</span>}
                       </div>
                     </td>
                   </tr>
@@ -377,67 +385,60 @@ export function ProductsClient({
       </div>
 
       {drawerOpen && (
-        <div className="fixed inset-0 z-[60] flex justify-end bg-slate-950/35">
+        <div className="fixed inset-0 z-[60] flex justify-end bg-slate-950/40 backdrop-blur-sm transition-all">
           <button type="button" onClick={() => setDrawerOpen(false)} className="h-full flex-1 cursor-default" />
-          <div className="flex h-full w-full max-w-xl flex-col border-l border-slate-200 bg-white shadow-2xl">
-            <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
+          <div className="flex h-full w-full max-w-xl flex-col border-l border-slate-200 bg-white shadow-2xl animate-in slide-in-from-right duration-300">
+            <div className="flex items-start justify-between border-b border-slate-100 px-8 py-8">
               <div>
-                <h2 className="text-xl font-semibold text-slate-900">{editingProductId ? t("editProduct") : t("addProductTitle")}</h2>
-                <p className="mt-1 text-sm text-slate-500">{t("drawerSubtitle")}</p>
+                <h2 className="text-3xl font-black tracking-tight text-slate-950">{editingProductId ? t("editProduct") : t("addProductTitle")}</h2>
+                <p className="mt-2 text-sm font-medium text-slate-400 uppercase tracking-widest">{t("drawerSubtitle")}</p>
               </div>
-              <button onClick={() => setDrawerOpen(false)} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
-                <X className="h-5 w-5" />
+              <button onClick={() => setDrawerOpen(false)} className="rounded-2xl p-3 text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition">
+                <X className="h-6 w-6" />
               </button>
             </div>
 
             <form onSubmit={submitProduct} className="flex min-h-0 flex-1 flex-col">
-              <div className="grid flex-1 gap-5 overflow-y-auto px-6 py-5 md:grid-cols-2">
-                <Field label={t("compoundId")}><input value={form.compoundId} onChange={(event) => setForm((current) => ({ ...current, compoundId: event.target.value }))} className={inputClassName} required /></Field>
-                <Field label={t("name")}><input value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} className={inputClassName} required /></Field>
-                <Field label={t("index")}><select value={form.indexId} onChange={(event) => setForm((current) => ({ ...current, indexId: event.target.value }))} className={inputClassName} required>{indexes.map((index) => <option key={index.id} value={index.id}>{index.name}</option>)}</select></Field>
-                <Field label={t("unit")}><select value={form.uom} onChange={(event) => setForm((current) => ({ ...current, uom: event.target.value as (typeof productUnits)[number] }))} className={inputClassName}>{productUnits.map((unit) => <option key={unit} value={unit}>{unit.toUpperCase()}</option>)}</select></Field>
-                <Field label={t("barcode")}><input value={form.barcode} onChange={(event) => setForm((current) => ({ ...current, barcode: event.target.value }))} className={inputClassName} /></Field>
-                <Field label={t("minStock")}><input value={form.minStock} onChange={(event) => setForm((current) => ({ ...current, minStock: event.target.value }))} className={inputClassName} inputMode="numeric" /></Field>
-                <Field label={t("length")}><input value={form.length} onChange={(event) => setForm((current) => ({ ...current, length: event.target.value }))} className={inputClassName} inputMode="decimal" /></Field>
-                <Field label={t("width")}><input value={form.width} onChange={(event) => setForm((current) => ({ ...current, width: event.target.value }))} className={inputClassName} inputMode="decimal" /></Field>
-                <Field label={t("height")}><input value={form.height} onChange={(event) => setForm((current) => ({ ...current, height: event.target.value }))} className={inputClassName} inputMode="decimal" /></Field>
-                <Field label={t("dimensionUnit")}><input value={form.dimensionUnit} onChange={(event) => setForm((current) => ({ ...current, dimensionUnit: event.target.value }))} className={inputClassName} /></Field>
+              <div className="grid flex-1 gap-6 overflow-y-auto px-8 py-8 md:grid-cols-2">
+                <Field label={t("compoundId")}><input value={form.compoundId} onChange={(event) => setForm((current) => ({ ...current, compoundId: event.target.value }))} className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-slate-50 transition" required /></Field>
+                <Field label={t("name")}><input value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-slate-50 transition" required /></Field>
+                <Field label={t("index")}><select value={form.indexId} onChange={(event) => setForm((current) => ({ ...current, indexId: event.target.value }))} className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-slate-50 transition" required>{indexes.map((index) => <option key={index.id} value={index.id}>{index.name}</option>)}</select></Field>
+                <Field label={t("unit")}><select value={form.uom} onChange={(event) => setForm((current) => ({ ...current, uom: event.target.value as (typeof productUnits)[number] }))} className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-slate-50 transition">{productUnits.map((unit) => <option key={unit} value={unit}>{unit.toUpperCase()}</option>)}</select></Field>
+                <Field label={t("barcode")}><input value={form.barcode} onChange={(event) => setForm((current) => ({ ...current, barcode: event.target.value }))} className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-slate-50 transition" /></Field>
+                <Field label={t("minStock")}><input value={form.minStock} onChange={(event) => setForm((current) => ({ ...current, minStock: event.target.value }))} className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:ring-4 focus:ring-slate-50 transition" inputMode="numeric" /></Field>
+                <div className="md:col-span-2 grid grid-cols-4 gap-3">
+                   <div className="col-span-1"><Field label="L"><input value={form.length} onChange={(event) => setForm((current) => ({ ...current, length: event.target.value }))} className="w-full rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700 focus:bg-white transition" inputMode="decimal" /></Field></div>
+                   <div className="col-span-1"><Field label="W"><input value={form.width} onChange={(event) => setForm((current) => ({ ...current, width: event.target.value }))} className="w-full rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700 focus:bg-white transition" inputMode="decimal" /></Field></div>
+                   <div className="col-span-1"><Field label="H"><input value={form.height} onChange={(event) => setForm((current) => ({ ...current, height: event.target.value }))} className="w-full rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700 focus:bg-white transition" inputMode="decimal" /></Field></div>
+                   <div className="col-span-1"><Field label="Unit"><input value={form.dimensionUnit} onChange={(event) => setForm((current) => ({ ...current, dimensionUnit: event.target.value }))} className="w-full rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-sm font-bold text-slate-700 focus:bg-white transition" /></Field></div>
+                </div>
                 <div className="md:col-span-2">
                   <Field label={t("categoriesLabel")}>
-                    <div className="rounded-xl border border-slate-200 p-3">
+                    <div className="rounded-[24px] border border-slate-100 bg-slate-50/50 p-4">
                       <div className="flex flex-wrap gap-2">
                         {form.categories.length ? form.categories.map((category) => (
-                          <button key={category} type="button" onClick={() => setForm((current) => ({ ...current, categories: current.categories.filter((entry) => entry !== category) }))} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                          <button key={category} type="button" onClick={() => setForm((current) => ({ ...current, categories: current.categories.filter((entry) => entry !== category) }))} className="inline-flex items-center gap-1 rounded-full bg-slate-950 px-3 py-1 text-[10px] font-bold uppercase text-white tracking-wider">
                             {category}
                             <X className="h-3 w-3" />
                           </button>
-                        )) : <span className="text-sm text-slate-400">{t("noCategoriesSelected")}</span>}
+                        )) : <span className="text-xs font-bold uppercase tracking-widest text-slate-300">None selected</span>}
                       </div>
-                      <div className="mt-3 flex gap-2">
-                        <input value={form.categoryInput} onChange={(event) => setForm((current) => ({ ...current, categoryInput: event.target.value }))} onKeyDown={(event) => { if (event.key === "Enter" || event.key === ",") { event.preventDefault(); addCategory(form.categoryInput); } }} className={inputClassName} placeholder={t("categoryPlaceholder")} />
-                        <button type="button" onClick={() => addCategory(form.categoryInput)} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">{t("addCategory")}</button>
+                      <div className="mt-4 flex gap-2">
+                        <input value={form.categoryInput} onChange={(event) => setForm((current) => ({ ...current, categoryInput: event.target.value }))} onKeyDown={(event) => { if (event.key === "Enter" || event.key === ",") { event.preventDefault(); addCategory(form.categoryInput); } }} className="flex-1 rounded-xl border border-slate-100 bg-white px-4 py-2 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-slate-50 outline-none transition" placeholder={t("categoryPlaceholder")} />
+                        <button type="button" onClick={() => addCategory(form.categoryInput)} className="rounded-xl bg-slate-200 px-4 py-2 text-xs font-black uppercase tracking-wider text-slate-700 hover:bg-slate-300 transition">{t("add")}</button>
                       </div>
-                      {categories.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {categories.map((category) => (
-                            <button key={category.id} type="button" onClick={() => addCategory(category.name)} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 hover:bg-slate-200">
-                              {category.name}
-                            </button>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   </Field>
                 </div>
                 <div className="md:col-span-2">
-                  <Field label={t("notesLabel")}><textarea value={form.notes} onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))} className={`${inputClassName} min-h-24 resize-y`} /></Field>
+                  <Field label={t("notesLabel")}><textarea value={form.notes} onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))} className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-4 text-sm font-medium text-slate-600 focus:bg-white transition min-h-32 resize-none" /></Field>
                 </div>
               </div>
 
-              <div className="border-t border-slate-200 px-6 py-4">
-                <div className="flex items-center justify-end gap-3">
-                  <button type="button" onClick={() => setDrawerOpen(false)} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">{t("cancel")}</button>
-                  <button type="submit" disabled={submitting} className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60">
+              <div className="border-t border-slate-100 px-8 py-6 bg-slate-50/30">
+                <div className="flex items-center justify-end gap-4">
+                  <button type="button" onClick={() => setDrawerOpen(false)} className="rounded-2xl px-6 py-3 text-sm font-bold text-slate-400 hover:text-slate-600 transition">{t("cancel")}</button>
+                  <button type="submit" disabled={submitting} className="inline-flex items-center gap-2 rounded-2xl bg-slate-950 px-10 py-3 text-sm font-bold text-white shadow-xl hover:bg-slate-800 transition disabled:opacity-60">
                     {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
                     {editingProductId ? t("saveChanges") : t("createProduct")}
                   </button>
@@ -459,9 +460,9 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-      <span>{label}</span>
+    <div className="flex flex-col gap-2">
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">{label}</span>
       {children}
-    </label>
+    </div>
   );
 }

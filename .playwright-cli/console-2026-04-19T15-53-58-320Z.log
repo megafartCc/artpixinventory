@@ -1,0 +1,678 @@
+[     403ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js:38559
+[   29730ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js:38559
+[ 2685600ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 2685823ms] [LOG] [Fast Refresh] done in 224ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 2695858ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 2696292ms] [LOG] [Fast Refresh] done in 434ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 2711058ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 2711180ms] [LOG] [Fast Refresh] done in 123ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 2725984ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 2726097ms] [LOG] [Fast Refresh] done in 114ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 2738770ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 2738868ms] [LOG] [Fast Refresh] done in 98ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 2754037ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 2754155ms] [LOG] [Fast Refresh] done in 117ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 2760254ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 2760366ms] [LOG] [Fast Refresh] done in 112ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 5572179ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 5572372ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 5572425ms] [LOG] [Fast Refresh] done in 52ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 5572529ms] [LOG] [Fast Refresh] done in 156ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 5577980ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 5578104ms] [LOG] [Fast Refresh] done in 124ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 5583822ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 5583950ms] [LOG] [Fast Refresh] done in 128ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 5593340ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 5593469ms] [LOG] [Fast Refresh] done in 128ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 5965320ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 5965931ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:112
+[ 5966452ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js:38559
+[ 5994667ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 5994997ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:112
+[ 5995448ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js:38559
+[ 5997519ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 5997768ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:112
+[ 5998144ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js:38559
+[ 6004556ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6004684ms] [LOG] [Fast Refresh] done in 128ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 6028718ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6028826ms] [LOG] [Fast Refresh] done in 108ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 6555989ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6556265ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6556265ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6556265ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6556265ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6585065ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6585180ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6585180ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6585180ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6585180ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6626695ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6626802ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6626802ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6626802ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6626802ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6674243ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6674352ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6674352ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6674352ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6674352ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6731426ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6731547ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6731547ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6731547ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6731547ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6777406ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6777498ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6777498ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6777498ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6777498ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6785996ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6786111ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6786111ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6786111ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6786111ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6799882ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6799992ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6799992ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6799992ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6799992ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6808395ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6808479ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6808479ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6808479ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6808480ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6858036ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6858139ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6858139ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6858139ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6858139ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6880853ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6880941ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6880941ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6880941ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6880941ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6891731ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6891837ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6891837ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6891837ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6891837ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6901035ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6901120ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6901120ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6901120ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6901120ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6928608ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6928714ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6928714ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6928714ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6928714ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6940254ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6940355ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6940355ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6940355ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6940355ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6952045ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6952134ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6952135ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6952135ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6952135ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6967871ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6968039ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6968039ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6968039ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6968039ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6982287ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 6982375ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6982375ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6982375ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 6982375ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7008687ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 7008780ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7008780ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7008780ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7008780ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7094039ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 7094150ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7094150ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7094150ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7094150ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7110625ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 7110711ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7110711ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7110711ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7110711ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7157064ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 7157153ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7157153ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7157153ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7157153ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7177251ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 7177326ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7177326ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7177326ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7177326ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7181719ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 7181797ms] [ERROR] ./node_modules/next-auth/react/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\next-auth\react\index.js'
+
+Import trace for requested module:
+./node_modules/next-auth/react/index.js
+./src/app/[locale]/(auth)/login/page.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7181797ms] [ERROR] ./node_modules/sonner/dist/index.mjs
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\sonner\dist\index.mjs'
+
+Import trace for requested module:
+./node_modules/sonner/dist/index.mjs
+./src/app/providers.tsx @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7181797ms] [ERROR] ./node_modules/use-intl/dist/esm/development/index.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\index.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/index.js
+./node_modules/next-intl/dist/esm/development/navigation/shared/BaseLink.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7181797ms] [ERROR] ./node_modules/use-intl/dist/esm/development/react.js
+Error: ENOENT: no such file or directory, open 'C:\out\project\artpix-inventory\node_modules\use-intl\dist\esm\development\react.js'
+
+Import trace for requested module:
+./node_modules/use-intl/dist/esm/development/react.js
+./node_modules/next-intl/dist/esm/development/shared/NextIntlClientProvider.js @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/app-index.js:32
+[ 7277636ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 7278058ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:112
+[ 7278463ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom.development.js:38559
+[ 7283892ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 7284009ms] [LOG] [Fast Refresh] done in 116ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 7293919ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 7294029ms] [LOG] [Fast Refresh] done in 109ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 7326190ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 7326281ms] [LOG] [Fast Refresh] done in 90ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43
+[ 7330957ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:186
+[ 7331059ms] [LOG] [Fast Refresh] done in 102ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:43

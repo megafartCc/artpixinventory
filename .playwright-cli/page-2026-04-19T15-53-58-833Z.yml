@@ -1,0 +1,15 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e6]: A
+      - heading "ArtPix 3D" [level=1] [ref=e7]
+      - paragraph [ref=e8]: Inventory Management System
+    - generic [ref=e9]:
+      - button "Continue with Google" [ref=e10] [cursor=pointer]:
+        - img [ref=e11]
+        - text: Continue with Google
+      - generic [ref=e18]: DEVELOPER FALLBACKS
+      - button "Mock Admin" [ref=e20] [cursor=pointer]: Mock Admin
+      - button "Mock Manager" [ref=e22] [cursor=pointer]: Mock Manager
+  - region "Notifications alt+T"
+  - alert [ref=e24]

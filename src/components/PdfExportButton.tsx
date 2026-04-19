@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { FileText, Loader2 } from "lucide-react";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import { generateTablePdf } from "@/lib/pdf-utils";
 
 type PdfExportButtonProps = {
   filename: string;
@@ -23,63 +22,12 @@ export function PdfExportButton({
   const handleExport = async () => {
     setExporting(true);
     try {
-      const doc = new jsPDF({
-        orientation: "landscape",
-        unit: "mm",
-        format: "a4",
+      await generateTablePdf({
+        filename,
+        title,
+        headers,
+        rows,
       });
-
-      // Load Cyrillic font
-      try {
-        const fontUrl = "/fonts/Roboto-Regular.ttf";
-        const response = await fetch(fontUrl);
-        if (!response.ok) throw new Error("Font not found");
-        
-        const fontBlob = await response.blob();
-        const reader = new FileReader();
-        
-        const base64Font = await new Promise<string>((resolve) => {
-          reader.onloadend = () => {
-            const base64 = (reader.result as string).split(",")[1];
-            resolve(base64);
-          };
-          reader.readAsDataURL(fontBlob);
-        });
-
-        doc.addFileToVFS("Roboto-Regular.ttf", base64Font);
-        doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
-        doc.setFont("Roboto");
-      } catch (fontError) {
-        console.warn("Could not load Cyrillic font, falling back to default", fontError);
-      }
-
-      // Title
-      doc.setFontSize(18);
-      doc.text(title, 14, 22);
-      
-      doc.setFontSize(10);
-      doc.text(`Date: ${new Date().toLocaleString()}`, 14, 30);
-
-      // Table
-      autoTable(doc, {
-        startY: 35,
-        head: [headers],
-        body: rows,
-        styles: {
-          font: "Roboto",
-          fontStyle: "normal",
-        },
-        headStyles: {
-          fillColor: [51, 65, 85], // slate-700
-          textColor: 255,
-        },
-        alternateRowStyles: {
-          fillColor: [248, 250, 252], // slate-50
-        },
-        margin: { top: 35 },
-      });
-
-      doc.save(filename);
     } catch (error) {
       console.error("PDF export failed", error);
     } finally {
@@ -91,14 +39,14 @@ export function PdfExportButton({
     <button
       onClick={() => void handleExport()}
       disabled={exporting}
-      className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+      className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-50 active:scale-95"
     >
       {exporting ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
+        <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
       ) : (
-        <FileText className="h-4 w-4" />
+        <FileText className="h-4 w-4 text-slate-400" />
       )}
-      Export PDF
+      <span>Export PDF</span>
     </button>
   );
 }

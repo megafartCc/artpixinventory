@@ -1,0 +1,56 @@
+{
+    "unauthVendorCreditsStatus":  200,
+    "purchaserReceivingStatus":  403,
+    "purchaserReceivingError":  null,
+    "syncReasonsStatus":  200,
+    "poCreate":  {
+                     "Status":  500,
+                     "Message":  null,
+                     "Id":  null
+                 },
+    "poStatusFlow":  {
+                         "MarkOrdered":  308,
+                         "Submit":  308,
+                         "Approve":  308
+                     },
+    "poPdf":  {
+                  "ContentType":  null,
+                  "Status":  308,
+                  "Bytes":  24
+              },
+    "receiving":  {
+                      "Status":  500,
+                      "Message":  null,
+                      "SessionId":  null
+                  },
+    "palletCreate":  {
+                         "Status":  null,
+                         "PalletNumber":  null,
+                         "Message":  null
+                     },
+    "palletPlace":  {
+                        "Message":  null,
+                        "Status":  400
+                    },
+    "transferFlow":  {
+                         "StartDropoff":  308,
+                         "WrongDropNeedsConfirmation":  null,
+                         "Collect":  null,
+                         "ConfirmDrop":  null,
+                         "Start":  200,
+                         "WrongDrop":  null,
+                         "ConfirmDropWarnings":  null
+                     },
+    "countFlow":  {
+                      "Submit":  308,
+                      "Create":  400,
+                      "Entry":  308,
+                      "Review":  308
+                  },
+    "defectCreditFlow":  {
+                             "DefectCreate":  null,
+                             "DefectReview":  308,
+                             "VendorCreditCreate":  null
+                         },
+    "dbVerification":  null
+}

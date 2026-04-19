@@ -8,6 +8,7 @@ import { Download } from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { sendZplToBrowserPrint } from "@/lib/browser-print";
+import { PdfExportButton } from "@/components/PdfExportButton";
 
 const inputClassName =
   "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-200";
@@ -223,27 +224,29 @@ export function ReceivingClient({
   };
 
   return (
-    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
-      <div className="flex w-full flex-col gap-6">
-        <div className="flex flex-col gap-4 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{t("title")}</h1>
-            <p className="mt-2 text-sm text-slate-500">
-              {t("subtitle")}
-            </p>
+    <div className="p-4 sm:p-6 lg:p-10">
+      <div className="mx-auto max-w-[1600px] space-y-8">
+        <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h1 className="text-4xl font-extrabold tracking-tight text-slate-950">{t("title")}</h1>
+              <p className="mt-2 text-lg text-slate-500">
+                {t("subtitle")}
+              </p>
+            </div>
+            <Link
+              href={`/${locale}/receiving/place`}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-6 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 active:scale-95"
+            >
+              {t("palletPlacement")}
+            </Link>
           </div>
-          <Link
-            href={`/${locale}/receiving/place`}
-            className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-slate-200 px-5 py-3 text-base font-medium text-slate-700 transition hover:bg-slate-50 lg:min-h-0 lg:text-sm"
-          >
-            {t("palletPlacement")}
-          </Link>
         </div>
 
-        <div className="grid gap-6 2xl:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)]">
-          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <h2 className="text-lg font-semibold text-slate-900">{t("receivePo")}</h2>
-            <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <div className="grid gap-8 2xl:grid-cols-[1fr_420px]">
+          <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+            <h2 className="text-xl font-bold text-slate-900">{t("receivePo")}</h2>
+            <div className="mt-8 grid gap-6 md:grid-cols-2">
               <Field label={t("step1")}>
                 <select
                   value={vendorId}
@@ -293,23 +296,23 @@ export function ReceivingClient({
             </div>
 
             {!selectedPurchaseOrder ? (
-              <div className="mt-5 rounded-[26px] border border-dashed border-slate-200 bg-slate-50 px-6 py-14 text-center text-sm text-slate-400">
+              <div className="mt-8 flex flex-col items-center justify-center rounded-[24px] border border-dashed border-slate-200 bg-slate-50 px-6 py-20 text-center font-medium text-slate-400">
                 {t("emptyTable")}
               </div>
             ) : (
               <>
-                <div className="mt-5 overflow-hidden rounded-[26px] border border-slate-200">
+                <div className="mt-8 overflow-hidden rounded-[24px] border border-slate-100">
                   <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-slate-200">
-                      <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <table className="min-w-full divide-y divide-slate-100">
+                      <thead className="bg-slate-50/50 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                         <tr>
-                          <th className="px-4 py-3">{t("columns.product")}</th>
-                          <th className="px-4 py-3">{t("columns.ordered")}</th>
-                          <th className="px-4 py-3">{t("columns.received")}</th>
-                          <th className="px-4 py-3">{t("columns.remaining")}</th>
-                          <th className="px-4 py-3">{t("columns.receiveQty")}</th>
-                          <th className="px-4 py-3">{t("columns.damaged")}</th>
-                          <th className="px-4 py-3">{t("columns.notes")}</th>
+                          <th className="px-6 py-4">{t("columns.product")}</th>
+                          <th className="px-6 py-4 text-center">{t("columns.ordered")}</th>
+                          <th className="px-6 py-4 text-center">{t("columns.received")}</th>
+                          <th className="px-6 py-4 text-center">{t("columns.remaining")}</th>
+                          <th className="px-6 py-4 text-center">{t("columns.receiveQty")}</th>
+                          <th className="px-6 py-4 text-center">{t("columns.damaged")}</th>
+                          <th className="px-6 py-4">{t("columns.notes")}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
@@ -324,19 +327,19 @@ export function ReceivingClient({
                             };
 
                           return (
-                            <tr key={item.poItemId}>
-                              <td className="px-4 py-4">
+                            <tr key={item.poItemId} className="transition hover:bg-slate-50/50">
+                              <td className="px-6 py-5">
                                 <div className="flex flex-col">
-                                  <span className="font-semibold text-slate-900">
+                                  <span className="font-bold text-slate-950">
                                     {item.compoundId}
                                   </span>
-                                  <span>{item.productName}</span>
+                                  <span className="text-xs text-slate-500">{item.productName}</span>
                                 </div>
                               </td>
-                              <td className="px-4 py-4">{item.orderedQty}</td>
-                              <td className="px-4 py-4">{item.receivedQty}</td>
-                              <td className="px-4 py-4">{item.remainingQty}</td>
-                              <td className="px-4 py-4">
+                              <td className="px-6 py-5 text-center font-medium">{item.orderedQty}</td>
+                              <td className="px-6 py-5 text-center font-medium">{item.receivedQty}</td>
+                              <td className="px-6 py-5 text-center font-bold text-slate-950">{item.remainingQty}</td>
+                              <td className="px-6 py-5 text-center">
                                 <input
                                   value={row.receiveQty}
                                   onChange={(event) =>
@@ -348,11 +351,11 @@ export function ReceivingClient({
                                       )
                                     )
                                   }
-                                  className={inputClassName}
+                                  className={`${inputClassName} max-w-[100px] text-center font-bold`}
                                   inputMode="numeric"
                                 />
                               </td>
-                              <td className="px-4 py-4">
+                              <td className="px-6 py-5 text-center">
                                 <input
                                   value={row.damagedQty}
                                   onChange={(event) =>
@@ -364,11 +367,11 @@ export function ReceivingClient({
                                       )
                                     )
                                   }
-                                  className={inputClassName}
+                                  className={`${inputClassName} max-w-[100px] text-center text-rose-600 font-bold`}
                                   inputMode="numeric"
                                 />
                               </td>
-                              <td className="px-4 py-4">
+                              <td className="px-6 py-5">
                                 <input
                                   value={row.notes}
                                   onChange={(event) =>
@@ -391,7 +394,7 @@ export function ReceivingClient({
                   </div>
                 </div>
 
-                <div className="mt-5 rounded-[26px] border border-slate-200 bg-slate-50 p-4">
+                <div className="mt-8 rounded-[24px] border border-slate-100 bg-slate-50/50 p-6">
                   <Field label={t("sessionNotes")}>
                     <textarea
                       value={receivingNotes}
@@ -401,11 +404,11 @@ export function ReceivingClient({
                   </Field>
                 </div>
 
-                <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-end">
                   <button
                     onClick={() => void submitReceiving()}
                     disabled={submitting || !selectedPurchaseOrder}
-                    className="rounded-2xl bg-slate-900 px-5 py-3.5 text-sm font-semibold text-white transition disabled:opacity-60"
+                    className="rounded-2xl bg-slate-950 px-8 py-4 text-sm font-bold text-white shadow-lg transition hover:bg-slate-800 disabled:opacity-60"
                   >
                     {t("completeReceiving")}
                   </button>
@@ -414,49 +417,65 @@ export function ReceivingClient({
             )}
           </section>
 
-          <section className="space-y-6">
-            <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <h2 className="text-lg font-semibold text-slate-900">{t("createPallet")}</h2>
-              <Field label={t("recentSession")}>
-                <select
-                  value={selectedSessionId}
-                  onChange={(event) => setSelectedSessionId(event.target.value)}
-                  className={inputClassName}
-                >
-                  <option value="">{t("chooseSession")}</option>
-                  {recentSessions.map((session) => (
-                    <option key={session.id} value={session.id}>
-                      {session.poNumber} - {session.startedAt}
-                    </option>
-                  ))}
-                </select>
-              </Field>
+          <section className="space-y-8">
+            <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+              <h2 className="text-xl font-bold text-slate-900">{t("createPallet")}</h2>
+              <div className="mt-8">
+                <Field label={t("recentSession")}>
+                  <div className="flex gap-3">
+                    <select
+                      value={selectedSessionId}
+                      onChange={(event) => setSelectedSessionId(event.target.value)}
+                      className={inputClassName}
+                    >
+                      <option value="">{t("chooseSession")}</option>
+                      {recentSessions.map((session) => (
+                        <option key={session.id} value={session.id}>
+                          {session.poNumber} — {session.startedAt}
+                        </option>
+                      ))}
+                    </select>
+                    {selectedSession && (
+                      <PdfExportButton
+                        filename={`receiving_${selectedSession.poNumber}_${selectedSession.startedAt.slice(0, 10)}.pdf`}
+                        title={`Receiving Report: ${selectedSession.poNumber}`}
+                        headers={["Product", "Received", "Damaged"]}
+                        rows={selectedSession.items.map((item) => [
+                          item.compoundId,
+                          item.receivedQty,
+                          item.damagedQty,
+                        ])}
+                      />
+                    )}
+                  </div>
+                </Field>
+              </div>
 
               {!selectedSession ? (
-                <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
+                <div className="mt-8 flex flex-col items-center justify-center rounded-[24px] border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center font-medium text-slate-400">
                   {t("noSession")}
                 </div>
               ) : (
                 <>
-                <div className="mt-5 space-y-3">
+                <div className="mt-8 space-y-4">
                   {palletAvailability.length === 0 ? (
-                      <div className="rounded-[26px] border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
+                      <div className="rounded-[24px] border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center font-medium text-slate-400">
                         {t("allPalletized")}
                       </div>
                     ) : (
                       palletAvailability.map((item) => (
                         <div
                           key={item.productId}
-                          className="rounded-[26px] border border-slate-200 bg-slate-50 p-4"
+                          className="rounded-[24px] border border-slate-100 bg-slate-50/50 p-6 transition hover:bg-white hover:shadow-md"
                         >
                           <div className="flex items-center justify-between gap-4">
-                            <div>
-                              <p className="font-semibold text-slate-900">
+                            <div className="min-w-0">
+                              <p className="font-bold text-slate-950 truncate">
                                 {item.compoundId}
                               </p>
-                              <p className="text-sm text-slate-500">{item.productName}</p>
+                              <p className="text-xs text-slate-500 truncate">{item.productName}</p>
                             </div>
-                            <div className="w-32">
+                            <div className="w-24 shrink-0">
                               <input
                                 value={palletQuantities[item.productId] ?? ""}
                                 onChange={(event) =>
@@ -465,25 +484,26 @@ export function ReceivingClient({
                                     [item.productId]: event.target.value,
                                   }))
                                 }
-                                placeholder={`0 / ${item.remainingQty}`}
-                                className={inputClassName}
+                                placeholder={`/ ${item.remainingQty}`}
+                                className={`${inputClassName} px-2 text-center text-sm font-bold`}
                                 inputMode="numeric"
                               />
                             </div>
                           </div>
-                          <p className="mt-2 text-xs text-slate-500">
-                            {t("remainingToPalletize")}: {item.remainingQty}
-                          </p>
+                          <div className="mt-3 flex items-center justify-between">
+                             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Avail to Palletize</span>
+                             <span className="text-sm font-bold text-slate-700">{item.remainingQty}</span>
+                          </div>
                         </div>
                       ))
                     )}
                   </div>
 
-                  <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                  <div className="mt-8">
                     <button
                       onClick={() => void createPallet()}
                       disabled={submitting || palletAvailability.length === 0}
-                      className="rounded-2xl bg-slate-900 px-5 py-3.5 text-sm font-semibold text-white transition disabled:opacity-60"
+                      className="w-full rounded-2xl bg-indigo-600 px-8 py-4 text-sm font-bold text-white shadow-lg transition hover:bg-indigo-700 disabled:opacity-60"
                     >
                       {t("createPallet")}
                     </button>
@@ -493,46 +513,48 @@ export function ReceivingClient({
             </div>
 
             {zplBundle && (
-              <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
                 <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <h2 className="text-lg font-semibold text-slate-900">
+                  <div className="min-w-0">
+                    <h2 className="text-xl font-bold text-slate-900 truncate">
                       {zplBundle.palletNumber}
                     </h2>
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-xs text-slate-500">
                       {t("zebraReady")}
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-3">
-                    <button
-                      onClick={() => void printToZebra(zplBundle.zpl, setError, setFeedback)}
-                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                    >
-                      {t("printQr")}
-                    </button>
-                    <button
-                      onClick={() => downloadText(`${zplBundle.palletNumber}.zpl`, zplBundle.zpl)}
-                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                    >
-                      <Download className="h-4 w-4" />
-                      Download ZPL
-                    </button>
-                  </div>
                 </div>
-                <pre className="mt-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs text-emerald-300">
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <button
+                    onClick={() => void printToZebra(zplBundle.zpl, setError, setFeedback)}
+                    className="flex-1 rounded-xl bg-slate-950 px-4 py-3 text-xs font-bold text-white shadow-md transition hover:bg-slate-800"
+                  >
+                    {t("printQr")}
+                  </button>
+                  <button
+                    onClick={() => downloadText(`${zplBundle.palletNumber}.zpl`, zplBundle.zpl)}
+                    className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
+                  >
+                    <Download className="h-4 w-4" />
+                    ZPL
+                  </button>
+                </div>
+                <pre className="mt-6 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-[10px] font-mono leading-relaxed text-emerald-400">
                   {zplBundle.zpl}
                 </pre>
               </div>
             )}
 
             {selectedSession && (
-              <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                <h2 className="text-lg font-semibold text-slate-900 mb-5">{t("activity")}</h2>
+              <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+                <h2 className="text-xl font-bold text-slate-900 mb-8">{t("activity")}</h2>
                 <ActivityTimeline entityType="ReceivingSession" entityId={selectedSession.id} />
               </div>
             )}
           </section>
         </div>
+      </div>
+    </div>
       </div>
     </div>
   );

@@ -382,22 +382,22 @@ export function TransferWorkflowClient({
   };
 
   return (
-    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
-      <div className="flex w-full flex-col gap-6">
-        <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div className="p-4 sm:p-6 lg:p-10">
+      <div className="mx-auto max-w-[1600px] space-y-10">
+        <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <Link
                 href={`/${locale}/transfers`}
-                className="text-sm font-medium text-slate-500 transition hover:text-slate-700"
+                className="text-sm font-bold text-slate-400 transition hover:text-slate-600 uppercase tracking-widest"
               >
-                {t("back")}
+                ← {t("back")}
               </Link>
-              <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+              <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-slate-950">
                 {t("title")}
               </h1>
-              <p className="mt-2 max-w-3xl text-sm text-slate-500">
-                Mobile-first collection and drop confirmation flow. Scan or paste location QR codes, confirm the pick cart, then finish controlled drops with exception approval when needed.
+              <p className="mt-2 max-w-4xl text-lg text-slate-500 leading-relaxed">
+                Mobile-optimized collection and drop confirmation flow. Scan or paste location QR codes, confirm the pick cart, then finish controlled drops with exception approval.
               </p>
             </div>
 
@@ -405,13 +405,13 @@ export function TransferWorkflowClient({
               <button
                 onClick={() => void startTransfer()}
                 disabled={submitting}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60"
+                className="inline-flex items-center justify-center gap-3 rounded-2xl bg-slate-950 px-8 py-4 text-sm font-bold text-white shadow-lg transition hover:bg-slate-800 disabled:opacity-60"
               >
-                <ScanLine className="h-4 w-4" />
+                <ScanLine className="h-5 w-5" />
                 {t("startTransfer")}
               </button>
             ) : (
-              <div className="grid gap-3 sm:grid-cols-3 lg:w-[480px]">
+              <div className="grid gap-4 sm:grid-cols-3 lg:w-[540px]">
                 <MetricCard title="Transfer" value={currentTransfer.reference} icon={ArrowLeftRight} />
                 <MetricCard title="Picked" value={String(progress.picked)} icon={Package2} />
                 <MetricCard title="Dropped" value={String(progress.dropped)} icon={CheckCircle2} />
@@ -422,9 +422,9 @@ export function TransferWorkflowClient({
 
         {currentTransfer && (
           <>
-            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                <div className="grid gap-3 sm:grid-cols-4">
+            <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+              <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+                <div className="grid gap-6 sm:grid-cols-4">
                   <FlowStep
                     label="Collect"
                     state={stepState(currentTransfer.status, "collect")}
@@ -447,21 +447,21 @@ export function TransferWorkflowClient({
                   />
                 </div>
 
-                <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-4 lg:min-w-[260px]">
-                  <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                    <span>Progress</span>
-                    <span>{progress.percent}%</span>
+                <div className="rounded-[28px] border border-slate-100 bg-slate-50/50 p-6 lg:min-w-[320px]">
+                  <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                    <span>Overall Progress</span>
+                    <span className="text-slate-950">{progress.percent}%</span>
                   </div>
-                  <div className="mt-3 h-2 rounded-full bg-slate-200">
+                  <div className="mt-4 h-3 rounded-full bg-slate-200 overflow-hidden shadow-inner">
                     <div
-                      className="h-2 rounded-full bg-slate-900 transition-all"
+                      className="h-full bg-indigo-600 transition-all duration-500 ease-out shadow-sm"
                       style={{ width: `${Math.min(progress.percent, 100)}%` }}
                     />
                   </div>
-                  <p className="mt-3 text-sm text-slate-500">
+                  <p className="mt-4 text-sm font-medium text-slate-500">
                     {progress.openLines === 0
-                      ? "No open lines left in the cart."
-                      : `${progress.openLines} product lines still need a destination drop.`}
+                      ? "Cart cleared. Waiting for completion."
+                      : `${progress.openLines} line items pending destination drop.`}
                   </p>
                 </div>
               </div>
@@ -470,24 +470,23 @@ export function TransferWorkflowClient({
             <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
               <section className="space-y-6">
                 {currentTransfer.status === "COLLECTING" && (
-                  <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                    <div>
+                  <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+                    <div className="mb-10">
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-600">
-                          Collection mode
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-600">
+                          Collection Mode
                         </p>
-                        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
-                          Scan source location first
+                        <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-950">
+                          1. Scan Source Location
                         </h2>
-                        <p className="mt-2 max-w-2xl text-sm text-slate-500">
-                          Paste or scan a location QR, confirm the source, then pick items directly from that source stock list.
+                        <p className="mt-3 max-w-2xl text-lg text-slate-500 leading-relaxed">
+                          Scan the location QR code to reveal its current inventory. Then pick the items to move.
                         </p>
                       </div>
 
-                      <div className="mt-4 flex flex-wrap gap-2">
+                      <div className="mt-6 flex flex-wrap gap-3">
                         <InlineNote>Pick only from the scanned location.</InlineNote>
                         <InlineNote>Switch to drop-off only after the cart is correct.</InlineNote>
-                        <InlineNote>Cancel returns every pick to origin.</InlineNote>
                       </div>
                     </div>
 
@@ -624,24 +623,23 @@ export function TransferWorkflowClient({
                 )}
 
                 {currentTransfer.status === "DROPPING" && (
-                  <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-                    <div>
+                  <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+                    <div className="mb-10">
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-600">
-                          Drop-off mode
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-600">
+                          Drop-off Mode
                         </p>
-                        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
-                          Scan destination and confirm the drop
+                        <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-950">
+                          2. Scan Destination & Drop
                         </h2>
-                        <p className="mt-2 max-w-2xl text-sm text-slate-500">
-                          Pick a remaining cart line, scan the destination, and confirm the exact quantity. Flagged destinations require an explicit exception approval.
+                        <p className="mt-3 max-w-2xl text-lg text-slate-500 leading-relaxed">
+                          Select a product from your cart, scan the destination QR, and confirm the drop quantity.
                         </p>
                       </div>
 
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        <InlineNote tone="amber">No switching back to collect mode.</InlineNote>
+                      <div className="mt-6 flex flex-wrap gap-3">
                         <InlineNote tone="amber">Wrong-location drops require approval.</InlineNote>
-                        <InlineNote tone="amber">Transfer auto-completes when the cart reaches zero.</InlineNote>
+                        <InlineNote tone="amber">Transfer auto-completes when cart is empty.</InlineNote>
                       </div>
                     </div>
 
@@ -932,41 +930,56 @@ function MetricCard({
 }: {
   title: string;
   value: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ElementType;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+    <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-5 shadow-sm">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{title}</p>
-        <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">{title}</p>
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-700 shadow-sm border border-slate-50">
           <Icon className="h-4 w-4" />
-        </span>
+        </div>
       </div>
-      <p className="mt-4 text-2xl font-semibold tracking-tight text-slate-900">{value}</p>
+      <p className="mt-4 text-2xl font-black tracking-tight text-slate-950">{value}</p>
     </div>
   );
 }
 
 function FlowStep({
   label,
-  detail,
   state,
+  detail,
 }: {
   label: string;
-  detail: string;
   state: "active" | "complete" | "upcoming";
+  detail: string;
 }) {
-  const tone =
-    state === "active"
-      ? "border-slate-900 bg-slate-900 text-white"
-      : state === "complete"
-        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-        : "border-slate-200 bg-slate-50 text-slate-500";
+  const active = state === "active";
+  const complete = state === "complete";
 
   return (
-    <div className={`rounded-3xl border px-4 py-4 ${tone}`}>
-      <p className="text-xs font-semibold uppercase tracking-[0.18em]">{label}</p>
-      <p className="mt-2 text-sm font-medium">{detail}</p>
+    <div className="flex items-start gap-4">
+      <div
+        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 transition-all duration-300 ${
+          active
+            ? "border-indigo-600 bg-indigo-50 text-indigo-600 scale-110 shadow-md"
+            : complete
+            ? "border-emerald-500 bg-emerald-500 text-white"
+            : "border-slate-200 bg-white text-slate-300"
+        }`}
+      >
+        {complete ? (
+          <CheckCircle2 className="h-6 w-6" />
+        ) : (
+          <span className="text-lg font-black">{label[0]}</span>
+        )}
+      </div>
+      <div className="min-w-0">
+        <p className={`text-sm font-bold uppercase tracking-wider ${active ? "text-slate-950" : "text-slate-400"}`}>
+          {label}
+        </p>
+        <p className="mt-1 text-xs font-medium text-slate-500 truncate">{detail}</p>
+      </div>
     </div>
   );
 }
@@ -998,17 +1011,17 @@ function PanelTitle({
 }: {
   title: string;
   description: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ElementType;
 }) {
   return (
-    <div className="flex items-start gap-3">
-      <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm">
-        <Icon className="h-4 w-4" />
-      </span>
-      <span className="min-w-0">
-        <span className="block text-sm font-semibold text-slate-900">{title}</span>
-        <span className="mt-1 block text-sm text-slate-500">{description}</span>
-      </span>
+    <div className="flex items-start gap-4">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm border border-slate-100">
+        <Icon className="h-5 w-5" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-base font-bold text-slate-950">{title}</p>
+        <p className="mt-1 text-sm text-slate-500 leading-relaxed">{description}</p>
+      </div>
     </div>
   );
 }
@@ -1051,10 +1064,10 @@ function SelectedItemCard({
   meta: string;
 }) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-4">
-      <p className="text-lg font-semibold tracking-tight text-slate-900">{title}</p>
-      <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
-      <p className="mt-3 text-xs font-medium uppercase tracking-[0.16em] text-slate-400">{meta}</p>
+    <div className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm">
+      <p className="text-2xl font-black tracking-tight text-slate-950">{title}</p>
+      <p className="mt-1 text-sm font-medium text-slate-500">{subtitle}</p>
+      <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">{meta}</p>
     </div>
   );
 }
@@ -1070,7 +1083,7 @@ function StepButton({
     <button
       type="button"
       onClick={onClick}
-      className="flex h-[52px] w-[52px] items-center justify-center rounded-2xl border border-slate-200 bg-white text-lg font-semibold text-slate-700 transition hover:bg-slate-50"
+      className="flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white text-xl font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 active:scale-95"
     >
       {children}
     </button>
