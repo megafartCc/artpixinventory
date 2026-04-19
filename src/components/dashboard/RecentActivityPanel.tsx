@@ -60,7 +60,7 @@ export function RecentActivityPanel({
         </label>
       </div>
 
-      <div className="mt-5 space-y-3">
+      <div className="mt-5 max-h-[760px] space-y-3 overflow-y-auto pr-1">
         {filteredItems.length === 0 ? (
           <div className="flex min-h-[280px] items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 text-center text-sm text-slate-400">
             {emptyMessage}

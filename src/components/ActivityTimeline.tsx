@@ -153,7 +153,7 @@ export function ActivityTimeline({ entityType, entityId }: { entityType: string;
   }
 
   return (
-    <div className="relative space-y-4 before:absolute before:bottom-0 before:left-5 before:top-0 before:border-l-2 before:border-slate-200">
+    <div className="relative max-h-[560px] space-y-4 overflow-y-auto pr-1 before:absolute before:bottom-0 before:left-5 before:top-0 before:border-l-2 before:border-slate-200">
       {logs.map((log) => (
         <div key={log.id} className="relative flex items-start gap-4">
           <div className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-4 border-white bg-white shadow">

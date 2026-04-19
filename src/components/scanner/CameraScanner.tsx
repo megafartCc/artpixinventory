@@ -153,17 +153,40 @@ export function CameraScanner({
         frameRef.current = window.requestAnimationFrame(() => {
           void detect();
         });
-      },
+    },
     [onDetected]
   );
 
-  const startScanner = async () => {
-    setError("");
-
-    if (!supported || !detectorRef.current) {
-      setError("Camera scanning is not supported in this browser.");
+  useEffect(() => {
+    if (!scanning || !streamRef.current || !videoRef.current) {
       return;
     }
+
+    const video = videoRef.current;
+    video.srcObject = streamRef.current;
+
+    const startDetection = async () => {
+      try {
+        await video.play();
+      } catch {
+        // Some browsers need a second paint before playback can start.
+      }
+
+      if (!detectorRef.current) {
+        setStatus("Camera preview is active. Manual scan entry is still available.");
+        return;
+      }
+
+      frameRef.current = window.requestAnimationFrame(() => {
+        void detectionLoop();
+      });
+    };
+
+    void startDetection();
+  }, [detectionLoop, scanning]);
+
+  const startScanner = async () => {
+    setError("");
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -174,16 +197,9 @@ export function CameraScanner({
       });
 
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
 
       setScanning(true);
       setStatus("Point the camera at a QR code or barcode.");
-      frameRef.current = window.requestAnimationFrame(() => {
-        void detectionLoop();
-      });
     } catch (scanError) {
       setError(
         scanError instanceof Error ? scanError.message : "Unable to access the device camera."
@@ -216,11 +232,18 @@ export function CameraScanner({
       </div>
 
       <div className="mt-4 overflow-hidden rounded-[22px] border border-slate-200 bg-slate-950">
-        <div className="relative aspect-[4/3] w-full">
-          {scanning ? (
-            <video ref={videoRef} className="h-full w-full object-cover" muted playsInline />
-          ) : (
-            <div className="flex h-full items-center justify-center px-8 text-center text-sm text-slate-300">
+        <div className="relative aspect-[4/3] min-h-[260px] w-full">
+          <video
+            ref={videoRef}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
+              scanning ? "opacity-100" : "opacity-0"
+            }`}
+            autoPlay
+            muted
+            playsInline
+          />
+          {!scanning && (
+            <div className="absolute inset-0 flex items-center justify-center px-8 text-center text-sm text-slate-300">
               {supported
                 ? "Live camera preview appears here."
                 : "Live scanning is not supported in this browser. Use manual scan entry below."}
