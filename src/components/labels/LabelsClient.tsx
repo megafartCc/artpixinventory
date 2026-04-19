@@ -141,6 +141,7 @@ export function LabelsClient({
     pallets: "standard",
   });
   const [queueItems, setQueueItems] = useState<QueueItem[]>([]);
+  const [selectionSearch, setSelectionSearch] = useState("");
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   useToastFeedback(errorMessage, feedbackMessage);
@@ -207,6 +208,38 @@ export function LabelsClient({
   const previewZpl = currentLabels.map((label) => label.zpl).join("\n\n");
   const previewCards = currentLabels.slice(0, 6);
 
+  const normalizedSelectionSearch = selectionSearch.trim().toLowerCase();
+
+  const filteredProducts = useMemo(() => {
+    if (!normalizedSelectionSearch) {
+      return products;
+    }
+
+    return products.filter((product) =>
+      `${product.compoundId} ${product.name}`.toLowerCase().includes(normalizedSelectionSearch)
+    );
+  }, [normalizedSelectionSearch, products]);
+
+  const filteredLocations = useMemo(() => {
+    if (!normalizedSelectionSearch) {
+      return locations;
+    }
+
+    return locations.filter((location) =>
+      `${location.name} ${location.type} ${location.qrCode}`.toLowerCase().includes(normalizedSelectionSearch)
+    );
+  }, [locations, normalizedSelectionSearch]);
+
+  const filteredPallets = useMemo(() => {
+    if (!normalizedSelectionSearch) {
+      return pallets;
+    }
+
+    return pallets.filter((pallet) =>
+      `${pallet.palletNumber} ${pallet.status}`.toLowerCase().includes(normalizedSelectionSearch)
+    );
+  }, [normalizedSelectionSearch, pallets]);
+
   const selectionSummary =
     tab === "products"
       ? `${selectedProductIds.length} products selected`
@@ -242,7 +275,7 @@ export function LabelsClient({
       tab === "products"
         ? `${selectedProductIds.length} product batches`
         : tab === "locations"
-          ? `${selectedLocationIds.length} location batches`
+        ? `${selectedLocationIds.length} location batches`
           : "Pallet batch";
 
     setQueueItems((current) => [
@@ -281,6 +314,13 @@ export function LabelsClient({
       setErrorMessage((error as Error).message);
     }
   };
+
+  const selectionSearchPlaceholder =
+    tab === "products"
+      ? "Search product labels"
+      : tab === "locations"
+        ? "Search locations or QR"
+        : "Search pallet labels";
 
   const printQueue = () => {
     const queueLabels = queueItems.flatMap((item) =>
@@ -344,340 +384,372 @@ export function LabelsClient({
   return (
     <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
       <div className="flex w-full flex-col gap-6">
-        <div className="grid gap-5 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 2xl:grid-cols-[minmax(0,1fr)_420px] 2xl:items-center">
-          <div className="space-y-4">
+        <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
             <div>
               <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{t("title")}</h1>
-              <p className="mt-2 max-w-2xl text-sm text-slate-500">{t("subtitle")}</p>
+              <p className="mt-2 max-w-3xl text-sm text-slate-500">{t("subtitle")}</p>
             </div>
 
             <div className="flex flex-wrap gap-2">
               <button
-                onClick={() => setTab("products")}
+                onClick={() => {
+                  setTab("products");
+                  setSelectionSearch("");
+                }}
                 className={`${tabButtonClass} ${tab === "products" ? "bg-slate-900 text-white" : "border border-slate-200 bg-white text-slate-700"}`}
               >
                 {t("tabs.products")}
               </button>
               <button
-                onClick={() => setTab("locations")}
+                onClick={() => {
+                  setTab("locations");
+                  setSelectionSearch("");
+                }}
                 className={`${tabButtonClass} ${tab === "locations" ? "bg-slate-900 text-white" : "border border-slate-200 bg-white text-slate-700"}`}
               >
                 {t("tabs.locations")}
               </button>
               <button
-                onClick={() => setTab("pallets")}
+                onClick={() => {
+                  setTab("pallets");
+                  setSelectionSearch("");
+                }}
                 className={`${tabButtonClass} ${tab === "pallets" ? "bg-slate-900 text-white" : "border border-slate-200 bg-white text-slate-700"}`}
               >
                 {t("tabs.pallets")}
               </button>
             </div>
           </div>
-
-          <div className="grid gap-3 sm:grid-cols-3 2xl:grid-cols-1">
-            <StatCard title="Ready labels" value={String(currentLabels.length)} icon={Printer} compact />
-            <StatCard title="Queue jobs" value={String(queueItems.length)} icon={Layers3} compact />
-            <StatCard title="Preset copies" value={String(activePreset.copies)} icon={Copy} compact />
-          </div>
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(360px,0.9fr)]">
-          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h2 className="text-lg font-semibold text-slate-900">Selection</h2>
-                <p className="mt-1 text-sm text-slate-500">{selectionSummary}</p>
-              </div>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                {activePreset.label}
-              </span>
-            </div>
-
-            {tab === "products" ? (
-              <div className="mt-5 space-y-2">
-                <p className="text-sm text-slate-600">{t("selectProducts")}</p>
-                <div className="max-h-[660px] space-y-2 overflow-y-auto pr-1">
-                  {products.map((product) => {
-                    const checked = selectedProductIds.includes(product.id);
-                    return (
-                      <div key={product.id} className="grid grid-cols-[auto_minmax(0,1fr)_88px] items-center gap-3 rounded-2xl border border-slate-200 px-3 py-3">
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={(event) => {
-                            if (event.target.checked) {
-                              setSelectedProductIds((current) => [...current, product.id]);
-                              setProductQty((current) => ({ ...current, [product.id]: current[product.id] ?? "1" }));
-                            } else {
-                              setSelectedProductIds((current) => current.filter((id) => id !== product.id));
-                            }
-                          }}
-                        />
-                        <span className="min-w-0">
-                          <span className="block text-sm font-medium text-slate-800">{product.compoundId}</span>
-                          <span className="block truncate text-xs text-slate-500">{product.name}</span>
-                        </span>
-                        <input
-                          type="number"
-                          min={1}
-                          value={productQty[product.id] ?? "1"}
-                          onChange={(event) =>
-                            setProductQty((current) => ({ ...current, [product.id]: event.target.value }))
-                          }
-                          className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : null}
-
-            {tab === "locations" ? (
-              <div className="mt-5 space-y-2">
-                <p className="text-sm text-slate-600">{t("selectLocations")}</p>
-                <div className="max-h-[660px] space-y-2 overflow-y-auto pr-1">
-                  {locations.map((location) => (
-                    <label key={location.id} className="flex items-center gap-3 rounded-2xl border border-slate-200 px-3 py-3">
-                      <input
-                        type="checkbox"
-                        checked={selectedLocationIds.includes(location.id)}
-                        onChange={(event) => {
-                          if (event.target.checked) {
-                            setSelectedLocationIds((current) => [...current, location.id]);
-                          } else {
-                            setSelectedLocationIds((current) => current.filter((id) => id !== location.id));
-                          }
-                        }}
-                      />
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-medium text-slate-800">{location.name}</span>
-                        <span className="block text-xs text-slate-500">{location.type}</span>
-                      </span>
-                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                        {location.qrCode}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-
-            {tab === "pallets" ? (
-              <div className="mt-5 space-y-2">
-                <p className="text-sm text-slate-600">{t("recentPallets")}</p>
-                <div className="max-h-[660px] space-y-2 overflow-y-auto pr-1">
-                  {pallets.map((pallet) => (
-                    <label key={pallet.id} className="flex items-center gap-3 rounded-2xl border border-slate-200 px-3 py-3">
-                      <input
-                        type="radio"
-                        name="pallet"
-                        checked={selectedPalletId === pallet.id}
-                        onChange={() => setSelectedPalletId(pallet.id)}
-                      />
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-medium text-slate-800">{pallet.palletNumber}</span>
-                        <span className="block text-xs text-slate-500">Status {pallet.status}</span>
-                      </span>
-                      {selectedPalletId === pallet.id ? (
-                        <Check className="h-4 w-4 text-emerald-600" />
-                      ) : null}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </section>
-
-          <section className="self-start rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 xl:sticky xl:top-4">
-            <h2 className="text-lg font-semibold text-slate-900">Print presets</h2>
-            <div className="mt-5 space-y-3">
-              {presetConfig[tab].map((preset) => {
-                const active = preset.id === selectedPreset[tab];
-                return (
-                  <button
-                    key={preset.id}
-                    type="button"
-                    onClick={() =>
-                      setSelectedPreset((current) => ({
-                        ...current,
-                        [tab]: preset.id,
-                      }))
-                    }
-                    className={`flex w-full items-start gap-3 rounded-3xl border px-4 py-4 text-left transition ${
-                      active
-                        ? "border-slate-900 bg-slate-900 text-white"
-                        : "border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-white"
-                    }`}
-                  >
-                    <span className={`mt-0.5 flex h-10 w-10 items-center justify-center rounded-2xl ${active ? "bg-white/10 text-white" : "bg-white text-slate-700 shadow-sm"}`}>
-                      {tab === "products" ? <Package2 className="h-4 w-4" /> : tab === "locations" ? <QrCode className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold">{preset.label}</span>
-                      <span className={`mt-1 block text-xs ${active ? "text-slate-200" : "text-slate-500"}`}>
-                        {preset.description}
-                      </span>
-                    </span>
-                    <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${active ? "bg-white/10 text-white" : "bg-white text-slate-500"}`}>
-                      {preset.copies}x
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-4">
-              <div className="space-y-3">
-                <SummaryRow label="Current preset" value={activePreset.label} />
-                <SummaryRow label="Prepared labels" value={String(currentLabels.length)} />
-                <SummaryRow label="Queue jobs" value={String(queueItems.length)} />
-              </div>
-            </div>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <ActionButton onClick={() => void handleCopy(previewZpl, "Current ZPL copied.")} icon={Copy}>
-                {t("copyZpl")}
-              </ActionButton>
-              <ActionButton onClick={addCurrentToQueue} icon={Layers3}>
-                Queue Current
-              </ActionButton>
-              <ActionButton onClick={() => void printCurrentToZebra()} icon={Printer}>
-                Send to Zebra
-              </ActionButton>
-              <ActionButton onClick={printCurrent} icon={Printer}>
-                Print Preview
-              </ActionButton>
-            </div>
-          </section>
+        <div className="grid gap-4 md:grid-cols-3">
+          <StatCard title="Ready labels" value={String(currentLabels.length)} icon={Printer} compact />
+          <StatCard title="Queue jobs" value={String(queueItems.length)} icon={Layers3} compact />
+          <StatCard title="Preset copies" value={String(activePreset.copies)} icon={Copy} compact />
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
-          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h2 className="text-lg font-semibold text-slate-900">Preview thumbnails</h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  First {Math.min(previewCards.length, 6)} labels from the current selection.
-                </p>
-              </div>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                {currentLabels.length} total
-              </span>
-            </div>
-
-            {previewCards.length === 0 ? (
-              <EmptyState message={t("previewEmpty")} />
-            ) : (
-              <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {previewCards.map((label) => (
-                  <article key={label.key} className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label.meta}</p>
-                    <p className="mt-4 text-2xl font-semibold tracking-tight text-slate-900">{label.title}</p>
-                    <div className="mt-4 rounded-xl border border-dashed border-slate-300 bg-white px-3 py-4 text-center text-[11px] font-semibold tracking-[0.3em] text-slate-500">
-                      BARCODE
-                    </div>
-                    <p className="mt-4 text-sm text-slate-600">{label.subtitle}</p>
-                  </article>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-5 rounded-[24px] bg-slate-950 p-4">
+        <div className="grid gap-5 2xl:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)]">
+          <div className="space-y-5">
+            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-white">ZPL output</h3>
-                <button
-                  type="button"
-                  onClick={() => void handleCopy(previewZpl, "Current ZPL copied.")}
-                  disabled={!previewZpl}
-                  className="rounded-xl border border-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/10 disabled:opacity-50"
-                >
-                  {t("copyZpl")}
-                </button>
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">Selection</h2>
+                  <p className="mt-1 text-sm text-slate-500">{selectionSummary}</p>
+                </div>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  {activePreset.label}
+                </span>
               </div>
-              <pre className="mt-3 max-h-96 overflow-auto text-xs text-slate-100">
-                {previewZpl || t("previewEmpty")}
-              </pre>
-            </div>
-          </section>
 
-          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h2 className="text-lg font-semibold text-slate-900">Batch queue</h2>
-                <p className="mt-1 text-sm text-slate-500">Stage multiple print jobs before copying or printing them together.</p>
-              </div>
-              <div className="flex flex-wrap items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => void printQueueToZebra()}
-                  className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-                >
-                  Send Queue
-                </button>
-                <button
-                  type="button"
-                  onClick={printQueue}
-                  className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-                >
-                  Print Queue
-                </button>
-                <button
-                  type="button"
-                  onClick={copyQueue}
-                  className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-                >
-                  Copy Queue ZPL
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setQueueItems([])}
-                  className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
+              <div className="mt-5 space-y-2">
+                <input
+                  value={selectionSearch}
+                  onChange={(event) => setSelectionSearch(event.target.value)}
+                  placeholder={selectionSearchPlaceholder}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-200"
+                />
 
-            {queueItems.length === 0 ? (
-              <EmptyState message="No queued jobs yet." />
-            ) : (
-              <div className="mt-5 space-y-3">
-                {queueItems.map((item) => (
-                  <div key={item.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-semibold text-slate-900">{item.title}</p>
-                          <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                            {item.presetLabel}
-                          </span>
-                        </div>
-                        <p className="mt-1 text-xs text-slate-500">
-                          {item.labelCount} labels / queued at {item.createdAt}
-                        </p>
+                {tab === "products" ? (
+                  <>
+                    <p className="text-sm text-slate-600">{t("selectProducts")}</p>
+                    <div className="max-h-[760px] space-y-2 overflow-y-auto pr-1">
+                      {filteredProducts.length === 0 ? (
+                        <EmptyState message="No products match this search." />
+                      ) : (
+                        filteredProducts.map((product) => {
+                          const checked = selectedProductIds.includes(product.id);
+                          return (
+                            <div key={product.id} className="grid grid-cols-[auto_minmax(0,1fr)_96px] items-center gap-3 rounded-2xl border border-slate-200 px-3 py-3">
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={(event) => {
+                                  if (event.target.checked) {
+                                    setSelectedProductIds((current) => [...current, product.id]);
+                                    setProductQty((current) => ({ ...current, [product.id]: current[product.id] ?? "1" }));
+                                  } else {
+                                    setSelectedProductIds((current) => current.filter((id) => id !== product.id));
+                                  }
+                                }}
+                              />
+                              <span className="min-w-0">
+                                <span className="block text-sm font-medium text-slate-800">{product.compoundId}</span>
+                                <span className="block truncate text-xs text-slate-500">{product.name}</span>
+                              </span>
+                              <input
+                                type="number"
+                                min={1}
+                                value={productQty[product.id] ?? "1"}
+                                onChange={(event) =>
+                                  setProductQty((current) => ({ ...current, [product.id]: event.target.value }))
+                                }
+                                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                              />
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </>
+                ) : null}
+
+                {tab === "locations" ? (
+                  <>
+                    <p className="text-sm text-slate-600">{t("selectLocations")}</p>
+                    <div className="max-h-[760px] space-y-2 overflow-y-auto pr-1">
+                      {filteredLocations.length === 0 ? (
+                        <EmptyState message="No locations match this search." />
+                      ) : (
+                        filteredLocations.map((location) => (
+                          <label key={location.id} className="flex items-center gap-3 rounded-2xl border border-slate-200 px-3 py-3">
+                            <input
+                              type="checkbox"
+                              checked={selectedLocationIds.includes(location.id)}
+                              onChange={(event) => {
+                                if (event.target.checked) {
+                                  setSelectedLocationIds((current) => [...current, location.id]);
+                                } else {
+                                  setSelectedLocationIds((current) => current.filter((id) => id !== location.id));
+                                }
+                              }}
+                            />
+                            <span className="min-w-0 flex-1">
+                              <span className="block text-sm font-medium text-slate-800">{location.name}</span>
+                              <span className="block text-xs text-slate-500">{location.type}</span>
+                            </span>
+                            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                              {location.qrCode}
+                            </span>
+                          </label>
+                        ))
+                      )}
+                    </div>
+                  </>
+                ) : null}
+
+                {tab === "pallets" ? (
+                  <>
+                    <p className="text-sm text-slate-600">{t("recentPallets")}</p>
+                    <div className="max-h-[760px] space-y-2 overflow-y-auto pr-1">
+                      {filteredPallets.length === 0 ? (
+                        <EmptyState message="No pallets match this search." />
+                      ) : (
+                        filteredPallets.map((pallet) => (
+                          <label key={pallet.id} className="flex items-center gap-3 rounded-2xl border border-slate-200 px-3 py-3">
+                            <input
+                              type="radio"
+                              name="pallet"
+                              checked={selectedPalletId === pallet.id}
+                              onChange={() => setSelectedPalletId(pallet.id)}
+                            />
+                            <span className="min-w-0 flex-1">
+                              <span className="block text-sm font-medium text-slate-800">{pallet.palletNumber}</span>
+                              <span className="block text-xs text-slate-500">Status {pallet.status}</span>
+                            </span>
+                            {selectedPalletId === pallet.id ? (
+                              <Check className="h-4 w-4 text-emerald-600" />
+                            ) : null}
+                          </label>
+                        ))
+                      )}
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            </section>
+
+            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">Preview thumbnails</h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    First {Math.min(previewCards.length, 6)} labels from the current selection.
+                  </p>
+                </div>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  {currentLabels.length} total
+                </span>
+              </div>
+
+              {previewCards.length === 0 ? (
+                <EmptyState message={t("previewEmpty")} />
+              ) : (
+                <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  {previewCards.map((label) => (
+                    <article key={label.key} className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label.meta}</p>
+                      <p className="mt-4 text-2xl font-semibold tracking-tight text-slate-900">{label.title}</p>
+                      <div className="mt-4 rounded-xl border border-dashed border-slate-300 bg-white px-3 py-4 text-center text-[11px] font-semibold tracking-[0.3em] text-slate-500">
+                        BARCODE
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => void handleCopy(item.zpl, "Queued job copied.")}
-                          className="rounded-xl border border-slate-200 p-2 text-slate-500 transition hover:bg-white hover:text-slate-700"
-                        >
-                          <Copy className="h-4 w-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setQueueItems((current) => current.filter((entry) => entry.id !== item.id))}
-                          className="rounded-xl border border-slate-200 p-2 text-slate-500 transition hover:bg-white hover:text-slate-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                      <p className="mt-4 text-sm text-slate-600">{label.subtitle}</p>
+                    </article>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-5 rounded-[24px] bg-slate-950 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="text-sm font-semibold text-white">ZPL output</h3>
+                  <button
+                    type="button"
+                    onClick={() => void handleCopy(previewZpl, "Current ZPL copied.")}
+                    disabled={!previewZpl}
+                    className="rounded-xl border border-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/10 disabled:opacity-50"
+                  >
+                    {t("copyZpl")}
+                  </button>
+                </div>
+                <pre className="mt-3 max-h-96 overflow-auto text-xs text-slate-100">
+                  {previewZpl || t("previewEmpty")}
+                </pre>
+              </div>
+            </section>
+          </div>
+
+          <div className="space-y-5">
+            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <h2 className="text-lg font-semibold text-slate-900">Print presets</h2>
+              <div className="mt-5 space-y-3">
+                {presetConfig[tab].map((preset) => {
+                  const active = preset.id === selectedPreset[tab];
+                  return (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() =>
+                        setSelectedPreset((current) => ({
+                          ...current,
+                          [tab]: preset.id,
+                        }))
+                      }
+                      className={`flex w-full items-start gap-3 rounded-3xl border px-4 py-4 text-left transition ${
+                        active
+                          ? "border-slate-900 bg-slate-900 text-white"
+                          : "border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-white"
+                      }`}
+                    >
+                      <span className={`mt-0.5 flex h-10 w-10 items-center justify-center rounded-2xl ${active ? "bg-white/10 text-white" : "bg-white text-slate-700 shadow-sm"}`}>
+                        {tab === "products" ? <Package2 className="h-4 w-4" /> : tab === "locations" ? <QrCode className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-semibold">{preset.label}</span>
+                        <span className={`mt-1 block text-xs ${active ? "text-slate-200" : "text-slate-500"}`}>
+                          {preset.description}
+                        </span>
+                      </span>
+                      <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${active ? "bg-white/10 text-white" : "bg-white text-slate-500"}`}>
+                        {preset.copies}x
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                <div className="space-y-3">
+                  <SummaryRow label="Current preset" value={activePreset.label} />
+                  <SummaryRow label="Prepared labels" value={String(currentLabels.length)} />
+                  <SummaryRow label="Queue jobs" value={String(queueItems.length)} />
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <ActionButton onClick={() => void handleCopy(previewZpl, "Current ZPL copied.")} icon={Copy}>
+                  {t("copyZpl")}
+                </ActionButton>
+                <ActionButton onClick={addCurrentToQueue} icon={Layers3}>
+                  Queue Current
+                </ActionButton>
+                <ActionButton onClick={() => void printCurrentToZebra()} icon={Printer}>
+                  Send to Zebra
+                </ActionButton>
+                <ActionButton onClick={printCurrent} icon={Printer}>
+                  Print Preview
+                </ActionButton>
+              </div>
+            </section>
+
+            <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">Batch queue</h2>
+                  <p className="mt-1 text-sm text-slate-500">Stage multiple print jobs before copying or printing them together.</p>
+                </div>
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void printQueueToZebra()}
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                  >
+                    Send Queue
+                  </button>
+                  <button
+                    type="button"
+                    onClick={printQueue}
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                  >
+                    Print Queue
+                  </button>
+                  <button
+                    type="button"
+                    onClick={copyQueue}
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                  >
+                    Copy Queue ZPL
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setQueueItems([])}
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                  >
+                    Clear
+                  </button>
+                </div>
+              </div>
+
+              {queueItems.length === 0 ? (
+                <EmptyState message="No queued jobs yet." />
+              ) : (
+                <div className="mt-5 space-y-3">
+                  {queueItems.map((item) => (
+                    <div key={item.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-sm font-semibold text-slate-900">{item.title}</p>
+                            <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                              {item.presetLabel}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-xs text-slate-500">
+                            {item.labelCount} labels / queued at {item.createdAt}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => void handleCopy(item.zpl, "Queued job copied.")}
+                            className="rounded-xl border border-slate-200 p-2 text-slate-500 transition hover:bg-white hover:text-slate-700"
+                          >
+                            <Copy className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setQueueItems((current) => current.filter((entry) => entry.id !== item.id))}
+                            className="rounded-xl border border-slate-200 p-2 text-slate-500 transition hover:bg-white hover:text-slate-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
         </div>
       </div>
     </div>
