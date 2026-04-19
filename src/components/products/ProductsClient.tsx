@@ -114,9 +114,6 @@ export function ProductsClient({
   if (indexFilter !== "all") {
     filteredProducts = filteredProducts.filter((product) => product.indexId === indexFilter);
   }
-  if (categoryFilter !== "all") {
-    filteredProducts = filteredProducts.filter((product) => product.categories.includes(categoryFilter));
-  }
   if (statusFilter !== "all") {
     filteredProducts = filteredProducts.filter((product) =>
       statusFilter === "active" ? product.active : !product.active
@@ -216,8 +213,6 @@ export function ProductsClient({
       return;
     }
     setForm(createEmptyForm(indexes));
-  };
-
   };
 
   return (
