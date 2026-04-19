@@ -15,7 +15,7 @@ export default async function NewCountPage({
   const session = await getServerSession(authOptions);
   if (!session?.user || !canManageCounts(session.user.role)) {
     return (
-      <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="p-6 lg:p-8">
         <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
           You need manager permissions to create count sessions.
         </div>

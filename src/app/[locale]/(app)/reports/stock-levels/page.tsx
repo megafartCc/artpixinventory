@@ -43,7 +43,7 @@ export default async function StockLevelsReportPage({ params }: { params: { loca
   ]);
 
   return (
-    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+    <div className="p-6 lg:p-8">
       <div className="flex w-full flex-col gap-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>

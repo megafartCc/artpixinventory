@@ -347,7 +347,7 @@ export function PurchaseOrderFormClient({
 
   if (!canManage) {
     return (
-      <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+      <div className="p-6 lg:p-8">
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-700">
           {t("errorPermission")}
         </div>
@@ -356,7 +356,7 @@ export function PurchaseOrderFormClient({
   }
 
   return (
-    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+    <div className="p-6 lg:p-8">
       <div className="flex w-full flex-col gap-6">
         <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">

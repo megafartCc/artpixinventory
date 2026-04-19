@@ -153,7 +153,7 @@ export function MachinesClient({
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+    <div className="flex h-full min-h-0 flex-col p-6 lg:p-8">
       <div className="flex min-h-0 flex-1 flex-col gap-5">
         <div className="flex flex-col gap-4 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:flex-row lg:items-end lg:justify-between">
           <div>

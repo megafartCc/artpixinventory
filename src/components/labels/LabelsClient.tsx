@@ -383,7 +383,7 @@ export function LabelsClient({
   };
 
   return (
-    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+    <div className="p-6 lg:p-8">
       <div className="flex w-full flex-col gap-6">
         <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">

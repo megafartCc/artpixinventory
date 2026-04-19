@@ -37,7 +37,7 @@ export function TransferDetailClient({
   const t = useTranslations("TransferDetail");
 
   return (
-    <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+    <div className="p-6 lg:p-8">
       <div className="flex w-full flex-col gap-6">
         <div>
           <Link

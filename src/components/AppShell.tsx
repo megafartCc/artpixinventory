@@ -678,8 +678,8 @@ export function AppShell({
           </div>
         )}
 
-        <main className="min-h-0 flex-1 overflow-y-auto pb-32 lg:pb-0">
-          <div className="w-full">{children}</div>
+        <main className="min-h-0 flex flex-1 flex-col overflow-y-auto pb-32 lg:pb-0">
+          <div className="flex h-full min-h-0 w-full flex-col">{children}</div>
         </main>
 
         <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-slate-200 bg-white px-2 py-2 lg:hidden">

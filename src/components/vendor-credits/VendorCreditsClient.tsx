@@ -22,7 +22,7 @@ export function VendorCreditsClient({
   const t = useTranslations("Credits");
 
   return (
-    <div className="flex h-full min-h-0 flex-col px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
+    <div className="flex h-full min-h-0 flex-col p-6 lg:p-8">
       <div className="flex min-h-0 flex-1 flex-col gap-6">
         <div className="flex items-center justify-between gap-3">
           <div>
