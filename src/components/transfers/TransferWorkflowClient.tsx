@@ -382,8 +382,8 @@ export function TransferWorkflowClient({
   };
 
   return (
-    <div className="p-4 pb-40 sm:p-6 sm:pb-40 lg:p-10 lg:pb-10">
-      <div className="mx-auto w-full max-w-[1760px] space-y-10">
+    <div className="p-4 pb-40 sm:p-6 sm:pb-40 lg:p-8 lg:pb-10">
+      <div className="w-full space-y-10">
         <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>

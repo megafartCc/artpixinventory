@@ -46,8 +46,8 @@ export default async function MachineDetailPage({
   });
 
   return (
-    <div className="p-4 sm:p-6 lg:p-10">
-      <div className="mx-auto max-w-[1600px] space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="w-full space-y-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <Link
