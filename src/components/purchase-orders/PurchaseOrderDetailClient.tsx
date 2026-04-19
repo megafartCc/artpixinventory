@@ -274,7 +274,7 @@ export function PurchaseOrderDetailClient({
 
   return (
     <div className="p-4 sm:p-6 lg:p-10">
-      <div className="mx-auto max-w-[1600px] space-y-8">
+      <div className="mx-auto max-w-[1800px] space-y-8">
         <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
@@ -322,7 +322,7 @@ export function PurchaseOrderDetailClient({
           <div className="space-y-8">
             <section className="group rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-md">
               <h2 className="text-xl font-bold text-slate-900">{t("summary")}</h2>
-              <dl className="mt-8 grid gap-6 sm:grid-cols-2">
+              <dl className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <Info label={t("vendor")} value={purchaseOrder.vendorName} />
                 <Info label={t("vendorOrderId")} value={purchaseOrder.vendorOrderId || "-"} />
                 <Info label={t("orderDate")} value={purchaseOrder.orderDate} />
@@ -746,9 +746,9 @@ function Info({
   value: string;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-      <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</dt>
-      <dd className="mt-2 text-base font-semibold text-slate-900">{value}</dd>
+    <div className="rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-2.5 transition hover:bg-white hover:shadow-sm">
+      <dt className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">{label}</dt>
+      <dd className="mt-0.5 text-sm font-bold text-slate-900">{value}</dd>
     </div>
   );
 }
