@@ -31,7 +31,8 @@ type QueueItem = {
   zpl: string;
 };
 
-const tabButtonClass = "rounded-xl px-4 py-2.5 text-sm font-medium transition";
+const tabButtonClass =
+  "inline-flex h-11 items-center justify-center rounded-xl px-4 text-sm font-medium transition";
 
 const presetConfig: Record<
   TabKey,
@@ -385,13 +386,13 @@ export function LabelsClient({
     <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
       <div className="flex w-full flex-col gap-6">
         <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div>
               <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{t("title")}</h1>
               <p className="mt-2 max-w-3xl text-sm text-slate-500">{t("subtitle")}</p>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2 xl:justify-end">
               <button
                 onClick={() => {
                   setTab("products");
@@ -768,10 +769,10 @@ function StatCard({
   compact?: boolean;
 }) {
   return (
-    <div className={`rounded-2xl border border-slate-200 bg-slate-50 ${compact ? "px-4 py-4" : "px-4 py-5"}`}>
+    <div className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${compact ? "px-4 py-4" : "px-4 py-5"}`}>
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{title}</p>
-        <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm">
+        <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-700">
           <Icon className="h-4 w-4" />
         </span>
       </div>
