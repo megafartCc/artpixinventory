@@ -4,6 +4,7 @@ import { startTransition, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { Trash2 } from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { canManagePurchaseOrders } from "@/lib/permissions";
@@ -90,6 +91,7 @@ export function PurchaseOrderFormClient({
   purchaseOrderId?: string;
   initialValue?: PurchaseOrderFormState;
 }) {
+  const t = useTranslations("PurchaseOrderForm");
   const router = useRouter();
   const { data: session } = useSession();
   const canManage = canManagePurchaseOrders(session?.user?.role);
@@ -313,7 +315,7 @@ export function PurchaseOrderFormClient({
     setPendingSubmitType(null);
 
     if (!response.ok || !payload.data?.id) {
-      setError(payload.error ?? "Failed to save purchase order.");
+      setError(payload.error ?? t("feedback.saveFailed"));
       return;
     }
 
@@ -325,7 +327,7 @@ export function PurchaseOrderFormClient({
     return (
       <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-700">
-          Your role does not have permission to manage purchase orders.
+          {t("errorPermission")}
         </div>
       </div>
     );
@@ -340,13 +342,13 @@ export function PurchaseOrderFormClient({
               href={`/${locale}/purchase-orders`}
               className="text-sm font-medium text-slate-500 hover:text-slate-700"
             >
-              Back to Purchase Orders
+              {t("back")}
             </Link>
             <h1 className="mt-3 text-3xl font-bold text-slate-900">
-              {mode === "create" ? "Create Purchase Order" : "Edit Purchase Order"}
+              {mode === "create" ? t("createTitle") : t("editTitle")}
             </h1>
             <p className="mt-1 text-slate-500">
-              Build vendor orders with live cost and container constraint checks.
+              {t("subtitle")}
             </p>
           </div>
         </div>
@@ -354,9 +356,9 @@ export function PurchaseOrderFormClient({
         <div className="grid gap-6 2xl:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-6">
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-slate-900">PO Header</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t("header")}</h2>
               <div className="mt-5 grid gap-4 md:grid-cols-2">
-                <Field label="Vendor">
+                <Field label={t("vendor")}>
                   <select
                     value={form.vendorId}
                     onChange={(event) => {
@@ -380,7 +382,7 @@ export function PurchaseOrderFormClient({
                     className={inputClassName}
                     required
                   >
-                    <option value="">Select vendor</option>
+                    <option value="">{t("selectVendor")}</option>
                     {vendors.map((vendor) => (
                       <option key={vendor.id} value={vendor.id}>
                         {vendor.name}
@@ -388,7 +390,7 @@ export function PurchaseOrderFormClient({
                     ))}
                   </select>
                 </Field>
-                <Field label="Vendor Order ID">
+                <Field label={t("vendorOrderId")}>
                   <input
                     value={form.vendorOrderId}
                     onChange={(event) =>
@@ -400,7 +402,7 @@ export function PurchaseOrderFormClient({
                     className={inputClassName}
                   />
                 </Field>
-                <Field label="Order Date">
+                <Field label={t("orderDate")}>
                   <input
                     value={form.orderDate}
                     onChange={(event) =>
@@ -413,7 +415,7 @@ export function PurchaseOrderFormClient({
                     type="date"
                   />
                 </Field>
-                <Field label="Lead Time (days)">
+                <Field label={t("leadTime")}>
                   <input
                     value={form.leadTimeDays}
                     onChange={(event) =>
@@ -426,11 +428,11 @@ export function PurchaseOrderFormClient({
                     inputMode="numeric"
                   />
                 </Field>
-                <Field label="Expected Date">
+                <Field label={t("expectedDate")}>
                   <input value={expectedDate} className={inputClassName} readOnly />
                 </Field>
                 {selectedVendor?.enableContainerConstraints && (
-                  <Field label="Container Template">
+                  <Field label={t("containerTemplate")}>
                     <select
                       value={form.containerTemplateId}
                       onChange={(event) =>
@@ -441,7 +443,7 @@ export function PurchaseOrderFormClient({
                       }
                       className={inputClassName}
                     >
-                      <option value="">Use vendor default</option>
+                      <option value="">{t("useVendorDefault")}</option>
                       {templates.map((template) => (
                         <option key={template.id} value={template.id}>
                           {template.name}
@@ -456,16 +458,16 @@ export function PurchaseOrderFormClient({
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold text-slate-900">Line Items</h2>
+                  <h2 className="text-lg font-semibold text-slate-900">{t("itemsTitle")}</h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    Add vendor-supplied products and review MOQ warnings.
+                    {t("itemsSubtitle")}
                   </p>
                 </div>
               </div>
 
               {!selectedVendor ? (
                 <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
-                  Select a vendor to add PO items.
+                  {t("selectVendorToAdd")}
                 </div>
               ) : (
                 <>
@@ -474,7 +476,7 @@ export function PurchaseOrderFormClient({
                       <input
                         value={search}
                         onChange={(event) => setSearch(event.target.value)}
-                        placeholder="Search vendor products by compound ID or name"
+                        placeholder={t("searchPlaceholder")}
                         className={inputClassName}
                       />
                     </div>
@@ -495,8 +497,8 @@ export function PurchaseOrderFormClient({
                             </p>
                           </div>
                           <div className="text-right text-xs text-slate-500">
-                            <p>Default cost: ${product.unitCost ?? "0.00"}</p>
-                            <p>MOQ: {product.moq ?? "-"}</p>
+                            <p>{t("defaultCost")}: ${product.unitCost ?? "0.00"}</p>
+                            <p>{t("moq")}: {product.moq ?? "-"}</p>
                           </div>
                         </button>
                       ))}
@@ -507,19 +509,19 @@ export function PurchaseOrderFormClient({
                     <table className="min-w-full divide-y divide-slate-200">
                       <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                         <tr>
-                          <th className="px-4 py-3">Product</th>
-                          <th className="px-4 py-3">Qty</th>
-                          <th className="px-4 py-3">Unit Cost</th>
-                          <th className="px-4 py-3">Total</th>
-                          <th className="px-4 py-3">Notes</th>
-                          <th className="px-4 py-3 text-right">Actions</th>
+                          <th className="px-4 py-3">{t("columnProduct")}</th>
+                          <th className="px-4 py-3">{t("columnQty")}</th>
+                          <th className="px-4 py-3">{t("columnUnitCost")}</th>
+                          <th className="px-4 py-3">{t("columnTotal")}</th>
+                          <th className="px-4 py-3">{t("columnNotes")}</th>
+                          <th className="px-4 py-3 text-right">{t("columnActions")}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                         {form.items.length === 0 ? (
                           <tr>
                             <td colSpan={6} className="px-4 py-16 text-center text-slate-400">
-                              No line items added yet.
+                              {t("noItems")}
                             </td>
                           </tr>
                         ) : (
@@ -546,7 +548,7 @@ export function PurchaseOrderFormClient({
                                     <span>{product?.productName}</span>
                                     {belowMoq && (
                                       <span className="mt-1 text-xs font-medium text-amber-600">
-                                        Below MOQ of {product?.moq}
+                                        {t("belowMoq", { moq: product?.moq })}
                                       </span>
                                     )}
                                   </div>
@@ -599,7 +601,7 @@ export function PurchaseOrderFormClient({
                                       className="inline-flex items-center gap-1 rounded-lg border border-rose-200 px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50"
                                     >
                                       <Trash2 className="h-3.5 w-3.5" />
-                                      Remove
+                                      {t("remove")}
                                     </button>
                                   </div>
                                 </td>
@@ -619,25 +621,25 @@ export function PurchaseOrderFormClient({
             {selectedVendor?.enableContainerConstraints && selectedTemplate && (
               <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <h2 className="text-lg font-semibold text-slate-900">
-                  Container Constraint Calculator
+                  {t("calculatorTitle")}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Live usage for {selectedTemplate.name}.
+                  {t("calculatorSubtitle", { template: selectedTemplate.name })}
                 </p>
                 <div className="mt-5 space-y-4">
                   <Meter
-                    label="Weight"
+                    label={t("meterWeight")}
                     value={calculation.totalWeightKg}
                     max={selectedTemplate.maxWeightKg}
                     suffix="kg"
                   />
                   <Meter
-                    label="Pallets"
+                    label={t("meterPallets")}
                     value={calculation.totalPallets}
                     max={selectedTemplate.maxPallets}
                   />
                   <Meter
-                    label="Loose Boxes"
+                    label={t("meterLooseBoxes")}
                     value={calculation.totalLooseBoxes}
                     max={selectedTemplate.maxLooseBoxes}
                   />
@@ -653,9 +655,9 @@ export function PurchaseOrderFormClient({
             )}
 
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-slate-900">Costs</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t("costsTitle")}</h2>
               <div className="mt-5 grid gap-4">
-                <Field label="Shipping Cost">
+                <Field label={t("shippingCost")}>
                   <input
                     value={form.shippingCost}
                     onChange={(event) =>
@@ -668,7 +670,7 @@ export function PurchaseOrderFormClient({
                     inputMode="decimal"
                   />
                 </Field>
-                <Field label="Other Costs">
+                <Field label={t("otherCosts")}>
                   <input
                     value={form.otherCosts}
                     onChange={(event) =>
@@ -681,7 +683,7 @@ export function PurchaseOrderFormClient({
                     inputMode="decimal"
                   />
                 </Field>
-                <Field label="Notes">
+                <Field label={t("notes")}>
                   <textarea
                     value={form.notes}
                     onChange={(event) =>
@@ -697,21 +699,21 @@ export function PurchaseOrderFormClient({
 
               <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <div className="flex items-center justify-between text-sm text-slate-600">
-                  <span>Subtotal</span>
+                  <span>{t("subtotal")}</span>
                   <span className="font-semibold text-slate-900">
                     {currency(calculation.subtotal)}
                   </span>
                 </div>
                 <div className="mt-2 flex items-center justify-between text-sm text-slate-600">
-                  <span>Shipping</span>
+                  <span>{t("shipping")}</span>
                   <span>{currency(Number(form.shippingCost) || 0)}</span>
                 </div>
                 <div className="mt-2 flex items-center justify-between text-sm text-slate-600">
-                  <span>Other Costs</span>
+                  <span>{t("otherCosts")}</span>
                   <span>{currency(Number(form.otherCosts) || 0)}</span>
                 </div>
                 <div className="mt-4 flex items-center justify-between border-t border-slate-200 pt-4 text-base font-semibold text-slate-900">
-                  <span>Total</span>
+                  <span>{t("total")}</span>
                   <span>{currency(calculation.totalCost)}</span>
                 </div>
               </div>
@@ -723,7 +725,7 @@ export function PurchaseOrderFormClient({
                   disabled={pendingSubmitType !== null || !form.vendorId}
                   className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {pendingSubmitType === "draft" ? "Saving..." : "Save as Draft"}
+                  {pendingSubmitType === "draft" ? t("saving") : t("saveDraft")}
                 </button>
                 <button
                   type="button"
@@ -732,8 +734,8 @@ export function PurchaseOrderFormClient({
                   className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {pendingSubmitType === "submit"
-                    ? "Submitting..."
-                    : "Submit for Approval"}
+                    ? t("submitting")
+                    : t("submitApproval")}
                 </button>
               </div>
             </section>

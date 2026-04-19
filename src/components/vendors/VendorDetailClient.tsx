@@ -79,6 +79,7 @@ export function VendorDetailClient({
   mappings: ProductMapping[];
   purchaseOrders: PurchaseOrderSummary[];
 }) {
+  const t = useTranslations("VendorDetail");
   const router = useRouter();
   const { data: session } = useSession();
   const canManage = canManageVendors(session?.user?.role);
@@ -142,11 +143,11 @@ export function VendorDetailClient({
     setSubmitting(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Mapping save failed.");
+      setError(payload.error ?? t("feedback.saveFailed"));
       return;
     }
 
-    setFeedback(payload.message ?? "Vendor mapping saved.");
+    setFeedback(payload.message ?? t("feedback.saved"));
     setForm({
       productId: "",
       productSearch: "",
@@ -163,7 +164,7 @@ export function VendorDetailClient({
 
   const removeMapping = async (mapping: ProductMapping) => {
     const confirmed = window.confirm(
-      `Remove ${mapping.compoundId} from ${vendorName}?`
+      t("confirmRemove", { product: mapping.compoundId, vendor: vendorName })
     );
     if (!confirmed) {
       return;
@@ -179,11 +180,11 @@ export function VendorDetailClient({
     };
 
     if (!response.ok) {
-      setError(payload.error ?? "Delete failed.");
+      setError(payload.error ?? t("feedback.deleteFailed"));
       return;
     }
 
-    setFeedback(payload.message ?? "Vendor mapping deleted.");
+    setFeedback(payload.message ?? t("feedback.deleted"));
     refresh();
   };
 
@@ -196,85 +197,85 @@ export function VendorDetailClient({
               href={`/${locale}/vendors`}
               className="text-sm font-medium text-slate-500 hover:text-slate-700"
             >
-              Back to Vendors
+              {t("back")}
             </Link>
             <h1 className="mt-3 text-3xl font-bold text-slate-900">{vendorName}</h1>
             <p className="mt-1 text-slate-500">
-              Product mapping, purchasing defaults, and PO history.
+              {t("subtitle")}
             </p>
           </div>
           <Link
             href={`/${locale}/container-templates`}
             className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
           >
-            Container Templates
+            {t("containerTemplates")}
           </Link>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Vendor Info</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t("info")}</h2>
             <dl className="mt-5 grid gap-4 sm:grid-cols-2">
-              <InfoCard label="Country" value={vendorInfo.country} />
-              <InfoCard label="Payment Terms" value={vendorInfo.paymentTerms} />
+              <InfoCard label={t("country")} value={vendorInfo.country} />
+              <InfoCard label={t("paymentTerms")} value={vendorInfo.paymentTerms} />
               <InfoCard
-                label="Lead Time"
+                label={t("leadTime")}
                 value={
                   vendorInfo.defaultLeadTimeDays === null
                     ? null
-                    : `${vendorInfo.defaultLeadTimeDays} days`
+                    : `${vendorInfo.defaultLeadTimeDays} ${t("days")}`
                 }
               />
               <InfoCard
-                label="Container Template"
+                label={t("containerTemplate")}
                 value={vendorInfo.containerTemplateName}
               />
-              <InfoCard label="Contact" value={vendorInfo.contactName} />
-              <InfoCard label="Email" value={vendorInfo.email} />
-              <InfoCard label="Phone" value={vendorInfo.phone} />
+              <InfoCard label={t("contact")} value={vendorInfo.contactName} />
+              <InfoCard label={t("email")} value={vendorInfo.email} />
+              <InfoCard label={t("phone")} value={vendorInfo.phone} />
               <InfoCard
-                label="Status"
-                value={vendorInfo.active ? "Active" : "Inactive"}
+                label={t("status")}
+                value={vendorInfo.active ? t("active") : t("inactive")}
               />
             </dl>
             <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Address
+                {t("address")}
               </p>
               <p className="mt-2 text-sm text-slate-600">
-                {vendorInfo.address || "No address on file."}
+                {vendorInfo.address || t("noAddress")}
               </p>
             </div>
             <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Notes
+                {t("notes")}
               </p>
               <p className="mt-2 text-sm text-slate-600">
-                {vendorInfo.notes || "No vendor notes yet."}
+                {vendorInfo.notes || t("noNotes")}
               </p>
             </div>
           </section>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Add Product Mapping</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t("addMapping")}</h2>
             {!canManage ? (
               <p className="mt-4 text-sm text-slate-400">
-                Your role is read-only for vendor mappings.
+                {t("readOnly")}
               </p>
             ) : (
               <form onSubmit={submit} className="mt-5 space-y-4">
                 <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                  <span>Search Product</span>
+                  <span>{t("searchProduct")}</span>
                   <input
                     value={productSearch}
                     onChange={(event) => setProductSearch(event.target.value)}
-                    placeholder="Filter by compound ID or name"
+                    placeholder={t("filterPlaceholder")}
                     className={inputClassName}
                   />
                 </label>
 
                 <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                  <span>Product</span>
+                  <span>{t("product")}</span>
                   <select
                     value={form.productId}
                     onChange={(event) =>
@@ -286,7 +287,7 @@ export function VendorDetailClient({
                     className={inputClassName}
                     required
                   >
-                    <option value="">Select a product</option>
+                    <option value="">{t("selectProduct")}</option>
                     {filteredProducts.map((product) => (
                       <option key={product.id} value={product.id}>
                         {product.compoundId} - {product.name}
@@ -297,7 +298,7 @@ export function VendorDetailClient({
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                    <span>MOQ</span>
+                    <span>{t("moq")}</span>
                     <input
                       value={form.moq}
                       onChange={(event) =>
@@ -308,7 +309,7 @@ export function VendorDetailClient({
                     />
                   </label>
                   <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                    <span>Unit Cost</span>
+                    <span>{t("unitCost")}</span>
                     <input
                       value={form.unitCost}
                       onChange={(event) =>
@@ -322,7 +323,7 @@ export function VendorDetailClient({
                     />
                   </label>
                   <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                    <span>Lead Time (days)</span>
+                    <span>{t("leadTimeDays")}</span>
                     <input
                       value={form.leadTimeDays}
                       onChange={(event) =>
@@ -336,7 +337,7 @@ export function VendorDetailClient({
                     />
                   </label>
                   <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                    <span>Vendor SKU</span>
+                    <span>{t("vendorSku")}</span>
                     <input
                       value={form.vendorSku}
                       onChange={(event) =>
@@ -361,11 +362,11 @@ export function VendorDetailClient({
                       }))
                     }
                   />
-                  Default vendor mapping
+                  {t("defaultMapping")}
                 </label>
 
                 <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                  <span>Notes</span>
+                  <span>{t("notes")}</span>
                   <textarea
                     value={form.notes}
                     onChange={(event) =>
@@ -381,7 +382,7 @@ export function VendorDetailClient({
                     disabled={submitting}
                     className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                   >
-                    {submitting ? "Saving..." : "Save Mapping"}
+                    {submitting ? t("saving") : t("saveMapping")}
                   </button>
                 </div>
               </form>
@@ -390,17 +391,17 @@ export function VendorDetailClient({
         </div>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">Product Mapping</h2>
+          <h2 className="text-lg font-semibold text-slate-900">{t("productMapping")}</h2>
           <div className="mt-5 overflow-x-auto">
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">Product</th>
-                  <th className="px-4 py-3">Default</th>
-                  <th className="px-4 py-3">MOQ</th>
-                  <th className="px-4 py-3">Unit Cost</th>
-                  <th className="px-4 py-3">Lead Time</th>
-                  <th className="px-4 py-3">Vendor SKU</th>
+                  <th className="px-4 py-3">{t("product")}</th>
+                  <th className="px-4 py-3">{t("default")}</th>
+                  <th className="px-4 py-3">{t("moq")}</th>
+                  <th className="px-4 py-3">{t("unitCost")}</th>
+                  <th className="px-4 py-3">{t("leadTime")}</th>
+                  <th className="px-4 py-3">{t("vendorSku")}</th>
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
@@ -408,7 +409,7 @@ export function VendorDetailClient({
                 {mappings.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-4 py-16 text-center text-slate-400">
-                      No product mappings yet.
+                      {t("noMappings")}
                     </td>
                   </tr>
                 ) : (
@@ -423,7 +424,7 @@ export function VendorDetailClient({
                         </div>
                       </td>
                       <td className="px-4 py-4">
-                        {mapping.isDefault ? "Yes" : "No"}
+                        {mapping.isDefault ? t("yes") : t("no")}
                       </td>
                       <td className="px-4 py-4">{mapping.moq ?? "-"}</td>
                       <td className="px-4 py-4">
@@ -432,7 +433,7 @@ export function VendorDetailClient({
                       <td className="px-4 py-4">
                         {mapping.leadTimeDays === null
                           ? "-"
-                          : `${mapping.leadTimeDays} days`}
+                          : `${mapping.leadTimeDays} ${t("days")}`}
                       </td>
                       <td className="px-4 py-4">{mapping.vendorSku || "-"}</td>
                       <td className="px-4 py-4">
@@ -443,7 +444,7 @@ export function VendorDetailClient({
                               className="inline-flex items-center gap-1 rounded-lg border border-rose-200 px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
-                              Remove
+                              {t("remove")}
                             </button>
                           )}
                         </div>
@@ -457,20 +458,20 @@ export function VendorDetailClient({
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">PO History</h2>
+          <h2 className="text-lg font-semibold text-slate-900">{t("poHistory")}</h2>
           {purchaseOrders.length === 0 ? (
             <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
-              No purchase orders for this vendor yet.
+              {t("noPo")}
             </div>
           ) : (
             <div className="mt-5 overflow-x-auto">
               <table className="min-w-full divide-y divide-slate-200">
                 <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                   <tr>
-                    <th className="px-4 py-3">PO Number</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3">Order Date</th>
-                    <th className="px-4 py-3">Total</th>
+                    <th className="px-4 py-3">{t("poNumber")}</th>
+                    <th className="px-4 py-3">{t("status")}</th>
+                    <th className="px-4 py-3">{t("orderDate")}</th>
+                    <th className="px-4 py-3">{t("total")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
@@ -491,7 +492,7 @@ export function VendorDetailClient({
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900 mb-5">Activity history</h2>
+          <h2 className="text-lg font-semibold text-slate-900 mb-5">{t("activityHistory")}</h2>
           <ActivityTimeline entityType="Vendor" entityId={vendorId} />
         </section>
       </div>

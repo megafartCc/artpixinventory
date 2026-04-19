@@ -141,6 +141,8 @@ export function AppShell({
   const reportsProduction = useTranslations("ReportsProduction");
   const reportsDefects = useTranslations("ReportsDefects");
   const reportsQbo = useTranslations("ReportsQbo");
+  const common = useTranslations("Common");
+  const appShell = useTranslations("AppShell");
   const { data: session } = useSession();
   const pathname = usePathname();
   const router = useRouter();
@@ -389,19 +391,71 @@ export function AppShell({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex min-h-[4rem] h-auto flex-shrink-0 items-center border-b border-slate-200 bg-white px-3 py-3 sm:px-4 lg:h-16 lg:px-6 lg:py-0">
-          <div className="flex w-full flex-wrap items-center gap-3 lg:grid lg:grid-cols-[auto,minmax(320px,560px),auto] lg:gap-4">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="rounded-xl p-2 text-slate-500 transition-colors hover:bg-slate-100 lg:hidden"
-                aria-label="Toggle menu"
-              >
-                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
+        <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md">
+          <div className="mx-auto flex w-full flex-col lg:h-16 lg:flex-row lg:items-center lg:px-6">
+            <div className="flex h-16 shrink-0 items-center justify-between px-3 sm:px-4 lg:w-1/4 lg:px-0">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="rounded-xl p-2 text-slate-500 transition-colors hover:bg-slate-100 lg:hidden"
+                  aria-label="Toggle menu"
+                >
+                  {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </button>
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-sky-500 shadow-sm">
+                    <span className="text-xs font-bold text-white">A</span>
+                  </div>
+                  <span className="text-sm font-bold tracking-tight text-slate-800">ArtPix</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 lg:hidden">
+                <div ref={notificationMenuRef} className="relative">
+                  <button
+                    onClick={() => setNotificationOpen(!notificationOpen)}
+                    className="relative rounded-xl p-2 text-slate-500 transition-colors hover:bg-slate-100"
+                  >
+                    <Bell className="h-5 w-5" />
+                    {notificationItems.length > 0 && (
+                      <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
+                    )}
+                  </button>
+                  {notificationOpen && (
+                    <div className="absolute right-0 top-[calc(100%+10px)] w-80 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
+                      <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-4">
+                        <h3 className="text-sm font-bold text-slate-900">{appShell("notifications")}</h3>
+                        <p className="mt-0.5 text-xs text-slate-500">{appShell("notificationsSubtitle")}</p>
+                      </div>
+                      <div className="max-h-96 overflow-y-auto p-2">
+                        {notificationItems.length === 0 ? (
+                          <div className="px-4 py-8 text-center text-sm text-slate-400">{appShell("noNotifications")}</div>
+                        ) : (
+                          notificationItems.map((item) => (
+                            <Link
+                              key={item.id}
+                              href={`/${locale}${item.href}`}
+                              onClick={() => setNotificationOpen(false)}
+                              className="group flex w-full items-start gap-3 rounded-xl p-3 text-left transition hover:bg-slate-50"
+                            >
+                              <div className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
+                                item.tone === "rose" ? "bg-rose-500" : item.tone === "amber" ? "bg-amber-500" : "bg-slate-400"
+                              }`} />
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-semibold text-slate-800 group-hover:text-indigo-600">{item.title}</p>
+                                <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{item.detail}</p>
+                              </div>
+                            </Link>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
-            <div ref={searchRef} className="order-3 w-full lg:order-none lg:w-auto">
+            <div ref={searchRef} className="flex-1 px-3 pb-3 lg:mx-auto lg:max-w-[600px] lg:px-0 lg:pb-0">
               <div className="relative">
                 <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
@@ -421,8 +475,8 @@ export function AppShell({
                       setSearchOpen(false);
                     }
                   }}
-                  placeholder="Search inventory"
-                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-slate-300 focus:bg-white focus:ring-4 focus:ring-slate-100"
+                  placeholder={appShell("searchPlaceholder")}
+                  className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-slate-300 focus:bg-white focus:ring-4 focus:ring-slate-100 lg:h-12"
                 />
                 {searchOpen && (
                   <div className="absolute inset-x-0 top-[calc(100%+10px)] z-40 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
@@ -455,12 +509,12 @@ export function AppShell({
                       </div>
                     ) : (
                       <div className="px-4 py-5 text-sm text-slate-500">
-                        No matching pages found.
+                        {appShell("noResults")}
                       </div>
                     )}
                     {searchLoading && (
                       <div className="border-t border-slate-200 px-4 py-3 text-xs text-slate-400">
-                        Searching...
+                        {appShell("searching")}
                       </div>
                     )}
                   </div>
@@ -468,56 +522,41 @@ export function AppShell({
               </div>
             </div>
 
-            <div className="ml-auto flex items-center gap-2 sm:gap-3">
+            <div className="hidden lg:flex lg:w-1/4 lg:items-center lg:justify-end lg:gap-3">
               <div ref={notificationMenuRef} className="relative">
                 <button
-                  type="button"
-                  onClick={() => setNotificationOpen((current) => !current)}
-                  className="relative flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700"
-                  aria-label="Notifications"
+                  onClick={() => setNotificationOpen(!notificationOpen)}
+                  className="relative rounded-xl p-2 text-slate-500 transition-colors hover:bg-slate-100"
                 >
-                  <Bell className="h-4 w-4" />
+                  <Bell className="h-5 w-5" />
                   {notificationItems.length > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-semibold text-white">
-                      {notificationItems.length}
-                    </span>
+                    <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
                   )}
                 </button>
                 {notificationOpen && (
-                  <div className="absolute right-0 top-[calc(100%+10px)] z-40 w-[320px] rounded-xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-200/60">
-                    <div className="px-3 py-2">
-                      <p className="text-sm font-semibold text-slate-900">Notifications</p>
-                      <p className="mt-1 text-xs text-slate-500">Alerts and operational attention items.</p>
+                  <div className="absolute right-0 top-[calc(100%+10px)] w-80 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
+                    <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-4">
+                      <h3 className="text-sm font-bold text-slate-900">{appShell("notifications")}</h3>
+                      <p className="mt-0.5 text-xs text-slate-500">{appShell("notificationsSubtitle")}</p>
                     </div>
-                    <div className="mt-1 space-y-1">
+                    <div className="max-h-96 overflow-y-auto p-2">
                       {notificationItems.length === 0 ? (
-                        <div className="rounded-lg px-3 py-4 text-sm text-slate-500">
-                          No alerts right now.
-                        </div>
+                        <div className="px-4 py-8 text-center text-sm text-slate-400">{appShell("noNotifications")}</div>
                       ) : (
                         notificationItems.map((item) => (
                           <Link
                             key={item.id}
                             href={`/${locale}${item.href}`}
-                            className="flex items-start gap-3 rounded-lg px-3 py-3 transition hover:bg-slate-50"
+                            onClick={() => setNotificationOpen(false)}
+                            className="group flex w-full items-start gap-3 rounded-xl p-3 text-left transition hover:bg-slate-50"
                           >
-                            <span
-                              className={`mt-1 h-2.5 w-2.5 rounded-full ${
-                                item.tone === "rose"
-                                  ? "bg-rose-500"
-                                  : item.tone === "amber"
-                                    ? "bg-amber-500"
-                                    : "bg-slate-400"
-                              }`}
-                            />
-                            <span className="min-w-0">
-                              <span className="block text-sm font-medium text-slate-800">
-                                {item.title}
-                              </span>
-                              <span className="mt-1 block text-xs text-slate-500">
-                                {item.detail}
-                              </span>
-                            </span>
+                            <div className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
+                              item.tone === "rose" ? "bg-rose-500" : item.tone === "amber" ? "bg-amber-500" : "bg-slate-400"
+                            }`} />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-semibold text-slate-800 group-hover:text-indigo-600">{item.title}</p>
+                              <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{item.detail}</p>
+                            </div>
                           </Link>
                         ))
                       )}
@@ -567,56 +606,35 @@ export function AppShell({
               </div>
 
               {session?.user && (
-                <>
-                  <div ref={accountMenuRef} className="relative">
-                    <div className="flex items-center gap-2">
-                      <div className="hidden min-w-[104px] flex-col items-center justify-center gap-1 text-center sm:flex">
-                        <p className="text-base font-semibold leading-none text-slate-800">
-                          {session.user.name}
-                        </p>
-                        <span
-                          className={`inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] ${roleClassName}`}
-                        >
-                          {role}
-                        </span>
-                      </div>
+                <div ref={accountMenuRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setAccountMenuOpen((current) => !current)}
+                    className="flex h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+                  >
+                    <div className="flex flex-col items-end text-right">
+                      <span className="block text-xs font-bold leading-none text-slate-900">{session.user.name}</span>
+                      <span className="mt-1 block text-[9px] font-bold uppercase tracking-wider text-slate-400">{role}</span>
+                    </div>
+                    <ChevronDown
+                      className={`h-4 w-4 text-slate-400 transition-transform ${
+                        accountMenuOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                  {accountMenuOpen && (
+                    <div className="absolute right-0 top-[calc(100%+10px)] z-40 min-w-[200px] rounded-xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-200/60">
                       <button
                         type="button"
-                        onClick={() => setAccountMenuOpen((current) => !current)}
-                        className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700"
-                        aria-label="Account"
+                        onClick={() => signOut({ callbackUrl: `/${locale}/login` })}
+                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-rose-50 hover:text-rose-600"
                       >
-                        <ChevronDown
-                          className={`h-5 w-5 transition-transform ${
-                            accountMenuOpen ? "rotate-180" : ""
-                          }`}
-                        />
+                        <LogOut className="h-4 w-4" />
+                        <span>{appShell("signOut")}</span>
                       </button>
                     </div>
-                    {accountMenuOpen && (
-                      <div className="absolute right-0 top-[calc(100%+10px)] z-40 min-w-[200px] rounded-xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-200/60">
-                        <div className="rounded-lg bg-slate-50 px-3 py-3 sm:hidden">
-                          <p className="text-sm font-semibold text-slate-800">
-                            {session.user.name}
-                          </p>
-                          <span
-                            className={`mt-2 inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] ${roleClassName}`}
-                          >
-                            {role}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => signOut({ callbackUrl: `/${locale}/login` })}
-                          className="mt-2 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-rose-50 hover:text-rose-600 sm:mt-0"
-                        >
-                          <LogOut className="h-4 w-4" />
-                          <span>Sign out</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </>
+                  )}
+                </div>
               )}
             </div>
           </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export function TransfersClient({
   locale,
@@ -17,21 +18,23 @@ export function TransfersClient({
     itemsCount: number;
   }>;
 }) {
+  const t = useTranslations("Transfers");
+
   return (
     <div className="px-2 py-4 sm:px-3 lg:px-4 xl:px-5">
       <div className="flex w-full flex-col gap-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Transfers</h1>
+            <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
             <p className="mt-1 text-slate-500">
-              Pick-and-drop stock moves between QR-enabled locations.
+              {t("subtitle")}
             </p>
           </div>
           <Link
             href={`/${locale}/transfers/new`}
             className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
           >
-            New Transfer
+            {t("newTransfer")}
           </Link>
         </div>
 
@@ -40,19 +43,19 @@ export function TransfersClient({
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">Reference</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Created By</th>
-                  <th className="px-4 py-3">Started</th>
-                  <th className="px-4 py-3">Items Count</th>
-                  <th className="px-4 py-3">Completed</th>
+                  <th className="px-4 py-3">{t("columns.reference")}</th>
+                  <th className="px-4 py-3">{t("columns.status")}</th>
+                  <th className="px-4 py-3">{t("columns.createdBy")}</th>
+                  <th className="px-4 py-3">{t("columns.started")}</th>
+                  <th className="px-4 py-3">{t("columns.itemsCount")}</th>
+                  <th className="px-4 py-3">{t("columns.completed")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                 {transfers.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-4 py-16 text-center text-slate-400">
-                      No transfers yet.
+                      {t("noTransfers")}
                     </td>
                   </tr>
                 ) : (
@@ -65,7 +68,7 @@ export function TransfersClient({
                       </td>
                       <td className="px-4 py-4">
                         <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusTone(transfer.status)}`}>
-                          {transfer.status}
+                          {t(`status.${transfer.status}`)}
                         </span>
                       </td>
                       <td className="px-4 py-4">{transfer.createdBy}</td>

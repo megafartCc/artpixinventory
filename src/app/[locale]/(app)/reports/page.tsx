@@ -8,6 +8,7 @@ export default async function ReportsHubPage({ params }: { params: { locale: str
     { href: "po-aging", title: t("cards.poAging.title"), description: t("cards.poAging.description") },
     { href: "defects", title: t("cards.defects.title"), description: t("cards.defects.description") },
     { href: "production", title: t("cards.production.title"), description: t("cards.production.description") },
+    { href: "credits", title: t("cards.credits.title"), description: t("cards.credits.description") },
     { href: "qbo-export", title: t("cards.qbo.title"), description: t("cards.qbo.description") },
   ];
   return (

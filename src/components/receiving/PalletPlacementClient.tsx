@@ -3,6 +3,7 @@
 import { startTransition, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 
 const inputClassName =
@@ -31,6 +32,7 @@ export function PalletPlacementClient({
     type: string;
   }>;
 }) {
+  const t = useTranslations("PalletPlacement");
   const router = useRouter();
   const [palletNumber, setPalletNumber] = useState("");
   const [locationQrCode, setLocationQrCode] = useState("");
@@ -64,11 +66,11 @@ export function PalletPlacementClient({
     setSubmitting(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Failed to place pallet.");
+      setError(payload.error ?? t("feedback.failed"));
       return;
     }
 
-    setFeedback(payload.message ?? "Pallet placed.");
+    setFeedback(payload.message ?? t("feedback.placed"));
     setPalletNumber("");
     setLocationQrCode("");
     refresh();
@@ -83,11 +85,11 @@ export function PalletPlacementClient({
               href={`/${locale}/receiving`}
               className="text-sm font-medium text-slate-500 hover:text-slate-700"
             >
-              Back to Receiving
+              {t("back")}
             </Link>
-            <h1 className="mt-3 text-3xl font-bold text-slate-900">Pallet Placement</h1>
+            <h1 className="mt-3 text-3xl font-bold text-slate-900">{t("title")}</h1>
             <p className="mt-1 text-slate-500">
-              Scan a pallet QR, scan a destination sublocation QR, and confirm placement.
+              {t("subtitle")}
             </p>
           </div>
         </div>
@@ -95,7 +97,7 @@ export function PalletPlacementClient({
         <div className="grid gap-6 2xl:grid-cols-[0.95fr_1.05fr]">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="space-y-5">
-              <Field label="Scan Pallet QR">
+              <Field label={t("scanPallet")}>
                 <input
                   value={palletNumber}
                   onChange={(event) => setPalletNumber(event.target.value)}
@@ -116,7 +118,7 @@ export function PalletPlacementClient({
                 ))}
               </div>
 
-              <Field label="Scan Sublocation QR">
+              <Field label={t("scanDestination")}>
                 <input
                   value={locationQrCode}
                   onChange={(event) => setLocationQrCode(event.target.value)}
@@ -145,7 +147,7 @@ export function PalletPlacementClient({
                   disabled={submitting || !palletNumber || !locationQrCode}
                   className="rounded-2xl bg-slate-900 px-4 py-4 text-base lg:py-2.5 lg:text-sm font-medium text-white disabled:opacity-60 flex-1 lg:flex-none"
                 >
-                  Confirm Placement
+                  {t("place")}
                 </button>
               </div>
             </div>
@@ -153,10 +155,10 @@ export function PalletPlacementClient({
 
           <section className="space-y-6">
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-slate-900">Scanned Pallet</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t("palletId")}</h2>
               {!selectedPallet ? (
                 <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
-                  Scan or choose a pallet to preview contents.
+                  {t("selectPallet")}
                 </div>
               ) : (
                 <div className="mt-5 space-y-3">
@@ -165,7 +167,7 @@ export function PalletPlacementClient({
                       {selectedPallet.palletNumber}
                     </p>
                     <p className="text-xs text-slate-500">
-                      Status: {selectedPallet.status}
+                      {t("status")}: {selectedPallet.status}
                     </p>
                   </div>
                   {selectedPallet.items.map((item) => (
@@ -184,10 +186,10 @@ export function PalletPlacementClient({
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-slate-900">Destination</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t("scanDestination")}</h2>
               {!selectedLocation ? (
                 <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
-                  Scan or choose a destination QR to confirm placement target.
+                  {t("scanDestination")}
                 </div>
               ) : (
                 <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">

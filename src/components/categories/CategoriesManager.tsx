@@ -3,6 +3,7 @@
 import { useMemo, useState, startTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { Pencil, Plus, Power, Trash2, X } from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { collectDescendantIds } from "@/lib/location-utils";
@@ -69,6 +70,7 @@ export function CategoriesManager({
 }: {
   initialCategories: CategoryRecord[];
 }) {
+  const t = useTranslations("Categories");
   const router = useRouter();
   const { data: session } = useSession();
   const canManage = canManageCatalog(session?.user?.role);
@@ -220,9 +222,9 @@ export function CategoriesManager({
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Categories</h1>
+            <h1 className="text-2xl font-bold text-slate-900">{t("title")}</h1>
             <p className="mt-1 text-slate-500">
-              Nested category tree for flexible catalog groupings.
+              {t("subtitle")}
             </p>
           </div>
           {canManage && (
@@ -231,7 +233,7 @@ export function CategoriesManager({
               className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
             >
               <Plus className="h-4 w-4" />
-              New Category
+              {t("newCategory")}
             </button>
           )}
         </div>
@@ -262,7 +264,7 @@ export function CategoriesManager({
                 {filteredCategories.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-4 py-16 text-center text-slate-400">
-                      No categories match the current search.
+                      {t("noCategories")}
                     </td>
                   </tr>
                 ) : (
@@ -311,7 +313,7 @@ export function CategoriesManager({
                                 className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                               >
                                 <Pencil className="h-3.5 w-3.5" />
-                                Edit
+                                {t("edit")}
                               </button>
                               <button
                                 onClick={() => toggleActive(category)}
@@ -356,7 +358,7 @@ export function CategoriesManager({
             <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">
-                  {editingId ? "Edit Category" : "Create Category"}
+                  {editingId ? t("editCategory") : t("createCategory")}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
                   Build a clean parent/child hierarchy for product grouping.
@@ -373,7 +375,7 @@ export function CategoriesManager({
             <form onSubmit={submit} className="flex flex-1 flex-col">
               <div className="grid flex-1 gap-5 overflow-y-auto px-6 py-5">
                 <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                  <span>Name</span>
+                  <span>{t("name")}</span>
                   <input
                     value={form.name}
                     onChange={(event) =>
@@ -440,14 +442,14 @@ export function CategoriesManager({
                     onClick={() => setDrawerOpen(false)}
                     className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
                   >
-                    Cancel
+                    {t("cancel")}
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
                     className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                   >
-                    {editingId ? "Save Changes" : "Create Category"}
+                    {editingId ? t("saveChanges") : t("createCategory")}
                   </button>
                 </div>
               </div>

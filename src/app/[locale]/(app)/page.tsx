@@ -18,14 +18,14 @@ function startOfToday() {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
-function formatRelativeSync(value: Date | null) {
-  if (!value) return "Not synced yet";
+function formatRelativeSync(value: Date | null, t: any) {
+  if (!value) return t("notSynced");
   const minutes = Math.max(0, Math.floor((Date.now() - value.getTime()) / 60000));
-  if (minutes < 1) return "Just now";
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 1) return t("justNow");
+  if (minutes < 60) return t("minAgo", { minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
+  if (hours < 24) return t("hoursAgo", { hours });
+  return t("daysAgo", { days: Math.floor(hours / 24) });
 }
 
 function getLowStockSeverity(minStock: number, quantity: number) {
@@ -41,6 +41,7 @@ function daysOverdue(value: Date) {
 export default async function DashboardPage({ params }: { params: { locale: string } }) {
   noStore();
   const t = await getTranslations({ locale: params.locale, namespace: "Dashboard" });
+  const common = await getTranslations({ locale: params.locale, namespace: "Common" });
   const today = startOfToday();
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
@@ -259,11 +260,11 @@ export default async function DashboardPage({ params }: { params: { locale: stri
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <SyncHealthCard
                 label={t("productionQueue")}
-                value={formatRelativeSync(latestProductionSync?.erpixSyncedAt ?? null)}
+                value={formatRelativeSync(latestProductionSync?.erpixSyncedAt ?? null, common)}
               />
               <SyncHealthCard
                 label={t("defectReasons")}
-                value={formatRelativeSync(latestReasonSync?.syncedAt ?? null)}
+                value={formatRelativeSync(latestReasonSync?.syncedAt ?? null, common)}
               />
               <SyncHealthCard
                 label={t("mappedProducts")}

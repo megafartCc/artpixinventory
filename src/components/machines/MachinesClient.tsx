@@ -4,6 +4,7 @@ import { startTransition, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { Cog, Pencil, Plus, RefreshCcw, X } from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { canManageMachines } from "@/lib/permissions";
@@ -46,6 +47,7 @@ export function MachinesClient({
   locationOptions: LocationOption[];
   locale: string;
 }) {
+  const t = useTranslations("Machines");
   const router = useRouter();
   const { data: session } = useSession();
   const canManage = canManageMachines(session?.user?.role);
@@ -135,19 +137,19 @@ export function MachinesClient({
     const result = (await response.json()) as { error?: string; message?: string };
     if (!response.ok) {
       setSubmitting(false);
-      setError(result.error ?? "Save failed.");
+      setError(result.error ?? t("feedback.saveFailed"));
       return;
     }
 
     setSubmitting(false);
-    setFeedback(result.message ?? "Machine saved.");
+    setFeedback(result.message ?? t("feedback.saved"));
     setDrawerOpen(false);
     refresh();
   };
 
   const syncPlaceholder = () => {
     setError("");
-    setFeedback("ERPIX sync not configured yet.");
+    setFeedback(t("feedback.syncNotConfigured"));
   };
 
   return (
@@ -155,9 +157,9 @@ export function MachinesClient({
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Machines</h1>
+            <h1 className="text-2xl font-bold text-slate-900">{t("title")}</h1>
             <p className="mt-1 text-slate-500">
-              Track STN and Vitro machines against their assigned production stations.
+              {t("subtitle")}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -166,7 +168,7 @@ export function MachinesClient({
               className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
             >
               <RefreshCcw className="h-4 w-4" />
-              Sync from ERPIX
+              {t("syncFromErpix")}
             </button>
             {canManage && (
               <button
@@ -174,7 +176,7 @@ export function MachinesClient({
                 className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
               >
                 <Plus className="h-4 w-4" />
-                New Machine
+                {t("newMachine")}
               </button>
             )}
           </div>
@@ -184,7 +186,7 @@ export function MachinesClient({
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search machine name, ERPIX ID, or sublocation"
+            placeholder={t("searchPlaceholder")}
             className={inputClassName}
           />
         </div>
@@ -194,19 +196,19 @@ export function MachinesClient({
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">Name</th>
-                  <th className="px-4 py-3">Type</th>
-                  <th className="px-4 py-3">Assigned Sublocation</th>
-                  <th className="px-4 py-3">ERPIX Machine ID</th>
-                  <th className="px-4 py-3">Active</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className="px-4 py-3">{t("columns.name")}</th>
+                  <th className="px-4 py-3">{t("columns.type")}</th>
+                  <th className="px-4 py-3">{t("columns.sublocation")}</th>
+                  <th className="px-4 py-3">{t("columns.erpixId")}</th>
+                  <th className="px-4 py-3">{t("columns.active")}</th>
+                  <th className="px-4 py-3 text-right">{t("columns.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                 {filteredMachines.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-4 py-16 text-center text-slate-400">
-                      No machines match the current search.
+                      {t("noMatch")}
                     </td>
                   </tr>
                 ) : (
@@ -236,7 +238,7 @@ export function MachinesClient({
                               : "bg-slate-200 text-slate-600"
                           }`}
                         >
-                          {machine.active ? "Active" : "Inactive"}
+                          {machine.active ? t("active") : t("inactive")}
                         </span>
                       </td>
                       <td className="px-4 py-4">
@@ -246,7 +248,7 @@ export function MachinesClient({
                             className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                           >
                             <Cog className="h-3.5 w-3.5" />
-                            View
+                            {t("view")}
                           </Link>
                           {canManage && (
                             <button
@@ -254,7 +256,7 @@ export function MachinesClient({
                               className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                             >
                               <Pencil className="h-3.5 w-3.5" />
-                              Edit
+                              {t("edit")}
                             </button>
                           )}
                         </div>
@@ -279,10 +281,10 @@ export function MachinesClient({
             <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">
-                  {editingId ? "Edit Machine" : "Create Machine"}
+                  {editingId ? t("editMachine") : t("createMachine")}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Assign each machine to a production station and optional ERPIX ID.
+                  {t("drawerSubtitle")}
                 </p>
               </div>
               <button
@@ -296,7 +298,7 @@ export function MachinesClient({
             <form onSubmit={submit} className="flex flex-1 flex-col">
               <div className="grid flex-1 gap-5 overflow-y-auto px-6 py-5">
                 <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                  <span>Name</span>
+                  <span>{t("name")}</span>
                   <input
                     value={form.name}
                     onChange={(event) =>
@@ -308,7 +310,7 @@ export function MachinesClient({
                 </label>
 
                 <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                  <span>Type</span>
+                  <span>{t("type")}</span>
                   <select
                     value={form.type}
                     onChange={(event) =>
@@ -325,7 +327,7 @@ export function MachinesClient({
                 </label>
 
                 <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                  <span>Assigned Sublocation</span>
+                  <span>{t("assignedSublocation")}</span>
                   <select
                     value={form.locationId}
                     onChange={(event) =>
@@ -345,7 +347,7 @@ export function MachinesClient({
                 </label>
 
                 <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                  <span>ERPIX Machine ID</span>
+                  <span>{t("erpixMachineId")}</span>
                   <input
                     value={form.erpixMachineId}
                     onChange={(event) =>
@@ -359,7 +361,7 @@ export function MachinesClient({
                 </label>
 
                 <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                  <span>Notes</span>
+                  <span>{t("notes")}</span>
                   <textarea
                     value={form.notes}
                     onChange={(event) =>
@@ -377,7 +379,7 @@ export function MachinesClient({
                       setForm((current) => ({ ...current, active: event.target.checked }))
                     }
                   />
-                  Active
+                  {t("active")}
                 </label>
               </div>
 
@@ -388,14 +390,14 @@ export function MachinesClient({
                     onClick={() => setDrawerOpen(false)}
                     className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
                   >
-                    Cancel
+                    {t("cancel")}
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
                     className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                   >
-                    {editingId ? "Save Changes" : "Create Machine"}
+                    {editingId ? t("saveChanges") : t("createMachine")}
                   </button>
                 </div>
               </div>

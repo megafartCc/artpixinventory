@@ -3,6 +3,7 @@
 import { startTransition, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { Download, Search, X } from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { canAdjustStock } from "@/lib/permissions";
@@ -94,6 +95,7 @@ export function StockLevelsClient({
   categories: CategoryOption[];
   locationColumns: LocationColumn[];
 }) {
+  const t = useTranslations("Stock");
   const router = useRouter();
   const { data: session } = useSession();
   const canAdjust = canAdjustStock(session?.user?.role);
@@ -148,14 +150,14 @@ export function StockLevelsClient({
 
   const exportCurrentView = () => {
     const headers = [
-      "Compound ID",
-      "Name",
-      "Index",
-      "Categories",
-      "Min Stock",
-      "Reserved",
-      "Available",
-      "Total",
+      t("columns.compoundId"),
+      t("columns.product"),
+      t("columns.index"),
+      t("columns.categories"),
+      t("columns.minStock"),
+      t("columns.reserved"),
+      t("columns.available"),
+      t("columns.total"),
       ...visibleLocations.map((location) => location.name),
     ];
 
@@ -245,11 +247,11 @@ export function StockLevelsClient({
     setSubmitting(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Adjustment failed.");
+      setError(payload.error ?? t("feedback.adjustFailed"));
       return;
     }
 
-    setFeedback(payload.message ?? "Stock adjusted.");
+    setFeedback(payload.message ?? t("feedback.adjusted"));
     setAdjustmentTarget(null);
     startTransition(() => router.refresh());
   };
@@ -259,9 +261,9 @@ export function StockLevelsClient({
       <div className="space-y-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Stock Levels</h1>
+            <h1 className="text-2xl font-bold text-slate-900">{t("title")}</h1>
             <p className="mt-1 text-slate-500">
-              Live stock matrix across active locations with reservation visibility.
+              {t("subtitle")}
             </p>
           </div>
           <button
@@ -269,7 +271,7 @@ export function StockLevelsClient({
             className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
           >
             <Download className="h-4 w-4" />
-            Export CSV
+            {t("exportCsv")}
           </button>
         </div>
 
@@ -279,7 +281,7 @@ export function StockLevelsClient({
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search by compound ID or name"
+              placeholder={t("searchPlaceholder")}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm text-slate-700 outline-none focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-200"
             />
           </label>
@@ -288,7 +290,7 @@ export function StockLevelsClient({
             onChange={(event) => setIndexFilter(event.target.value)}
             className={inputClassName}
           >
-            <option value="all">All Indexes</option>
+            <option value="all">{t("allIndexes")}</option>
             {indexes.map((index) => (
               <option key={index.id} value={index.id}>
                 {index.name}
@@ -300,7 +302,7 @@ export function StockLevelsClient({
             onChange={(event) => setCategoryFilter(event.target.value)}
             className={inputClassName}
           >
-            <option value="all">All Categories</option>
+            <option value="all">{t("allCategories")}</option>
             {categories.map((category) => (
               <option key={category.id} value={category.name}>
                 {category.name}
@@ -312,7 +314,7 @@ export function StockLevelsClient({
             onChange={(event) => setLocationFilter(event.target.value)}
             className={inputClassName}
           >
-            <option value="all">All Locations</option>
+            <option value="all">{t("allLocations")}</option>
             {locationColumns.map((location) => (
               <option key={location.id} value={location.id}>
                 {location.label}
@@ -327,11 +329,11 @@ export function StockLevelsClient({
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="sticky left-0 z-20 min-w-[260px] bg-slate-50 px-4 py-3">
-                    Product
+                    {t("columns.product")}
                   </th>
-                  <th className="min-w-[120px] px-4 py-3">Index</th>
-                  <th className="min-w-[90px] px-4 py-3">Min</th>
-                  <th className="min-w-[120px] px-4 py-3">Total</th>
+                  <th className="min-w-[120px] px-4 py-3">{t("columns.index")}</th>
+                  <th className="min-w-[90px] px-4 py-3">{t("columns.min")}</th>
+                  <th className="min-w-[120px] px-4 py-3">{t("columns.total")}</th>
                   {visibleLocations.map((location) => (
                     <th key={location.id} className="min-w-[120px] px-4 py-3">
                       <div className="flex flex-col">
@@ -351,7 +353,7 @@ export function StockLevelsClient({
                       colSpan={4 + visibleLocations.length}
                       className="px-4 py-16 text-center text-slate-400"
                     >
-                      No products match the current filters.
+                      {t("noMatch")}
                     </td>
                   </tr>
                 ) : (
@@ -390,7 +392,7 @@ export function StockLevelsClient({
                             <div className="font-semibold">{totalQty}</div>
                             {product.reservedQty > 0 && (
                               <div className="mt-1 text-[11px] font-medium">
-                                Available: {availableQty}
+                                {t("available")}: {availableQty}
                               </div>
                             )}
                           </div>
@@ -431,7 +433,7 @@ export function StockLevelsClient({
             <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">
-                  Adjust Stock
+                  {t("adjustStock")}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
                   {adjustmentTarget.compoundId} • {adjustmentTarget.productName}
@@ -448,15 +450,15 @@ export function StockLevelsClient({
             <form onSubmit={submitAdjustment} className="space-y-5 px-6 py-5">
               <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
                 <p>
-                  <strong>Location:</strong> {adjustmentTarget.locationName}
+                  <strong>{t("location")}:</strong> {adjustmentTarget.locationName}
                 </p>
                 <p className="mt-1">
-                  <strong>Current Qty:</strong> {adjustmentTarget.currentQty}
+                  <strong>{t("currentQty")}:</strong> {adjustmentTarget.currentQty}
                 </p>
               </div>
 
               <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                <span>New Quantity</span>
+                <span>{t("newQuantity")}</span>
                 <input
                   value={adjustmentForm.newQty}
                   onChange={(event) =>
@@ -472,7 +474,7 @@ export function StockLevelsClient({
               </label>
 
               <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                <span>Reason</span>
+                <span>{t("reason")}</span>
                 <select
                   value={adjustmentForm.reason}
                   onChange={(event) =>
@@ -485,14 +487,14 @@ export function StockLevelsClient({
                 >
                   {stockAdjustmentReasonOptions.map((reason) => (
                     <option key={reason} value={reason}>
-                      {reason}
+                      {t(`reasons.${reason}`)}
                     </option>
                   ))}
                 </select>
               </label>
 
               <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                <span>Notes</span>
+                <span>{t("notes")}</span>
                 <textarea
                   value={adjustmentForm.notes}
                   onChange={(event) =>
@@ -511,14 +513,14 @@ export function StockLevelsClient({
                   onClick={() => setAdjustmentTarget(null)}
                   className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
                   className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                 >
-                  {submitting ? "Saving..." : "Save Adjustment"}
+                  {submitting ? t("saving") : t("saveAdjustment")}
                 </button>
               </div>
             </form>

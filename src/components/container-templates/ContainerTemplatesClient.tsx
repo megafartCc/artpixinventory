@@ -4,6 +4,7 @@ import { startTransition, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { canManageVendors } from "@/lib/permissions";
@@ -48,6 +49,7 @@ export function ContainerTemplatesClient({
   templates: TemplateRecord[];
   locale: string;
 }) {
+  const t = useTranslations("ContainerTemplates");
   const router = useRouter();
   const { data: session } = useSession();
   const canManage = canManageVendors(session?.user?.role);
@@ -159,9 +161,9 @@ export function ContainerTemplatesClient({
       <div className="space-y-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Container Templates</h1>
+            <h1 className="text-2xl font-bold text-slate-900">{t("title")}</h1>
             <p className="mt-1 text-slate-500">
-              Constraint presets used by purchasing and vendor defaults.
+              {t("subtitle")}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -177,7 +179,7 @@ export function ContainerTemplatesClient({
                 className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
               >
                 <Plus className="h-4 w-4" />
-                New Template
+                {t("newTemplate")}
               </button>
             )}
           </div>
@@ -197,8 +199,8 @@ export function ContainerTemplatesClient({
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">Name</th>
-                  <th className="px-4 py-3">Max Weight</th>
+                  <th className="px-4 py-3">{t("columns.name")}</th>
+                  <th className="px-4 py-3">{t("columns.maxWeight")}</th>
                   <th className="px-4 py-3">Max Pallets</th>
                   <th className="px-4 py-3">Loose Boxes</th>
                   <th className="px-4 py-3">Active</th>
@@ -209,7 +211,7 @@ export function ContainerTemplatesClient({
                 {filteredTemplates.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-4 py-16 text-center text-slate-400">
-                      No templates match the current search.
+                      {t("noTemplates")}
                     </td>
                   </tr>
                 ) : (
@@ -248,7 +250,7 @@ export function ContainerTemplatesClient({
                                 className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                               >
                                 <Pencil className="h-3.5 w-3.5" />
-                                Edit
+                                {t("edit")}
                               </button>
                               <button
                                 onClick={() => void removeTemplate(template)}
@@ -285,7 +287,7 @@ export function ContainerTemplatesClient({
             <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">
-                  {editingId ? "Edit Template" : "Create Template"}
+                  {editingId ? t("editTemplate") : t("createTemplate")}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
                   Configure non-blocking container capacity presets.
@@ -301,7 +303,7 @@ export function ContainerTemplatesClient({
 
             <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
               <div className="grid flex-1 gap-5 overflow-y-auto px-6 py-5">
-                <Field label="Name">
+                <Field label={t("name")}>
                   <input
                     value={form.name}
                     onChange={(event) =>
@@ -312,7 +314,7 @@ export function ContainerTemplatesClient({
                   />
                 </Field>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <Field label="Max Weight (kg)">
+                  <Field label={t("maxWeight")}>
                     <input
                       value={form.maxWeightKg}
                       onChange={(event) =>
@@ -386,14 +388,14 @@ export function ContainerTemplatesClient({
                     onClick={() => setDrawerOpen(false)}
                     className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
                   >
-                    Cancel
+                    {t("cancel")}
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
                     className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                   >
-                    {editingId ? "Save Changes" : "Create Template"}
+                    {editingId ? t("saveChanges") : t("createTemplate")}
                   </button>
                 </div>
               </div>

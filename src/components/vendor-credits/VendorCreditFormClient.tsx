@@ -56,7 +56,7 @@ export function VendorCreditFormClient({
     setSaving(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Failed to create credit.");
+      setError(payload.error ?? t("feedback.createFailed"));
       return;
     }
 
@@ -97,7 +97,7 @@ export function VendorCreditFormClient({
             <span className="font-medium text-slate-700">{t("reason")}</span>
             <select value={reason} onChange={(e) => setReason(e.target.value)} className={inputClassName}>
               {reasonOptions.map((option) => (
-                <option key={option} value={option}>{option}</option>
+                <option key={option} value={option}>{t(`reasons.${option}`)}</option>
               ))}
             </select>
           </label>

@@ -4,6 +4,7 @@ import { startTransition, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { Pencil, Plus, X } from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { canManageVendors } from "@/lib/permissions";
@@ -74,6 +75,7 @@ export function VendorsClient({
   templates: TemplateOption[];
   locale: string;
 }) {
+  const t = useTranslations("Vendors");
   const router = useRouter();
   const { data: session } = useSession();
   const canManage = canManageVendors(session?.user?.role);
@@ -169,11 +171,11 @@ export function VendorsClient({
     setSubmitting(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Vendor save failed.");
+      setError(payload.error ?? t("feedback.saveFailed"));
       return;
     }
 
-    setFeedback(payload.message ?? "Vendor saved.");
+    setFeedback(payload.message ?? t("feedback.saved"));
     setDrawerOpen(false);
     refresh();
   };
@@ -183,9 +185,9 @@ export function VendorsClient({
       <div className="space-y-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Vendors</h1>
+            <h1 className="text-2xl font-bold text-slate-900">{t("title")}</h1>
             <p className="mt-1 text-slate-500">
-              Supplier records, default lead times, and product mapping ownership.
+              {t("subtitle")}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -193,7 +195,7 @@ export function VendorsClient({
               href={`/${locale}/container-templates`}
               className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
             >
-              Container Templates
+              {t("containerTemplates")}
             </Link>
             {canManage && (
               <button
@@ -201,7 +203,7 @@ export function VendorsClient({
                 className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
               >
                 <Plus className="h-4 w-4" />
-                New Vendor
+                {t("newVendor")}
               </button>
             )}
           </div>
@@ -211,7 +213,7 @@ export function VendorsClient({
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search vendor, country, payment terms, or contact"
+            placeholder={t("searchPlaceholder")}
             className={inputClassName}
           />
         </div>
@@ -221,19 +223,19 @@ export function VendorsClient({
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">Name</th>
-                  <th className="px-4 py-3">Country</th>
-                  <th className="px-4 py-3">Payment Terms</th>
-                  <th className="px-4 py-3">Lead Time</th>
-                  <th className="px-4 py-3">Active</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className="px-4 py-3">{t("columns.name")}</th>
+                  <th className="px-4 py-3">{t("columns.country")}</th>
+                  <th className="px-4 py-3">{t("columns.paymentTerms")}</th>
+                  <th className="px-4 py-3">{t("columns.leadTime")}</th>
+                  <th className="px-4 py-3">{t("columns.active")}</th>
+                  <th className="px-4 py-3 text-right">{t("columns.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                 {filteredVendors.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-4 py-16 text-center text-slate-400">
-                      No vendors match the current search.
+                      {t("noMatch")}
                     </td>
                   </tr>
                 ) : (
@@ -245,7 +247,7 @@ export function VendorsClient({
                             {vendor.name}
                           </span>
                           <span className="text-xs text-slate-400">
-                            {vendor.productCount} products mapped
+                            {vendor.productCount} {t("productsMapped")}
                           </span>
                         </div>
                       </td>
@@ -254,7 +256,7 @@ export function VendorsClient({
                       <td className="px-4 py-4">
                             {vendor.defaultLeadTimeDays === null
                               ? "-"
-                              : `${vendor.defaultLeadTimeDays} days`}
+                              : `${vendor.defaultLeadTimeDays} ${t("days")}`}
                       </td>
                       <td className="px-4 py-4">
                         <span
@@ -264,7 +266,7 @@ export function VendorsClient({
                               : "bg-slate-200 text-slate-600"
                           }`}
                         >
-                          {vendor.active ? "Active" : "Inactive"}
+                          {vendor.active ? t("active") : t("inactive")}
                         </span>
                       </td>
                       <td className="px-4 py-4">
@@ -273,7 +275,7 @@ export function VendorsClient({
                             href={`/${locale}/vendors/${vendor.id}`}
                             className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                           >
-                            View
+                            {t("view")}
                           </Link>
                           {canManage && (
                             <button
@@ -281,7 +283,7 @@ export function VendorsClient({
                               className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                             >
                               <Pencil className="h-3.5 w-3.5" />
-                              Edit
+                              {t("edit")}
                             </button>
                           )}
                         </div>
@@ -306,10 +308,10 @@ export function VendorsClient({
             <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">
-                  {editingId ? "Edit Vendor" : "Create Vendor"}
+                  {editingId ? t("editVendor") : t("createVendor")}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Capture supplier contacts, lead times, and optional container defaults.
+                  {t("drawerSubtitle")}
                 </p>
               </div>
               <button
@@ -322,7 +324,7 @@ export function VendorsClient({
 
             <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
               <div className="grid flex-1 gap-5 overflow-y-auto px-6 py-5 md:grid-cols-2">
-                <Field label="Name">
+                <Field label={t("name")}>
                   <input
                     value={form.name}
                     onChange={(event) =>
@@ -332,7 +334,7 @@ export function VendorsClient({
                     required
                   />
                 </Field>
-                <Field label="Contact Name">
+                <Field label={t("contactName")}>
                   <input
                     value={form.contactName}
                     onChange={(event) =>
@@ -344,7 +346,7 @@ export function VendorsClient({
                     className={inputClassName}
                   />
                 </Field>
-                <Field label="Email">
+                <Field label={t("email")}>
                   <input
                     value={form.email}
                     onChange={(event) =>
@@ -354,7 +356,7 @@ export function VendorsClient({
                     type="email"
                   />
                 </Field>
-                <Field label="Phone">
+                <Field label={t("phone")}>
                   <input
                     value={form.phone}
                     onChange={(event) =>
@@ -363,7 +365,7 @@ export function VendorsClient({
                     className={inputClassName}
                   />
                 </Field>
-                <Field label="Country">
+                <Field label={t("country")}>
                   <input
                     value={form.country}
                     onChange={(event) =>
@@ -372,7 +374,7 @@ export function VendorsClient({
                     className={inputClassName}
                   />
                 </Field>
-                <Field label="Payment Terms">
+                <Field label={t("paymentTerms")}>
                   <input
                     value={form.paymentTerms}
                     onChange={(event) =>
@@ -384,7 +386,7 @@ export function VendorsClient({
                     className={inputClassName}
                   />
                 </Field>
-                <Field label="Default Lead Time (days)">
+                <Field label={t("leadTimeDays")}>
                   <input
                     value={form.defaultLeadTimeDays}
                     onChange={(event) =>
@@ -398,7 +400,7 @@ export function VendorsClient({
                   />
                 </Field>
                 <div className="md:col-span-2">
-                  <Field label="Address">
+                  <Field label={t("address")}>
                     <textarea
                       value={form.address}
                       onChange={(event) =>
@@ -426,11 +428,11 @@ export function VendorsClient({
                         }))
                       }
                     />
-                    Enable container constraints
+                    {t("enableContainerConstraints")}
                   </label>
                   {form.enableContainerConstraints && (
                     <div className="mt-4">
-                      <Field label="Default Container Template">
+                      <Field label={t("defaultContainerTemplate")}>
                         <select
                           value={form.containerTemplateId}
                           onChange={(event) =>
@@ -441,7 +443,7 @@ export function VendorsClient({
                           }
                           className={inputClassName}
                         >
-                          <option value="">None selected</option>
+                          <option value="">{t("noneSelected")}</option>
                           {templates.map((template) => (
                             <option key={template.id} value={template.id}>
                               {template.name}
@@ -453,7 +455,7 @@ export function VendorsClient({
                   )}
                 </div>
                 <div className="md:col-span-2">
-                  <Field label="Notes">
+                  <Field label={t("notes")}>
                     <textarea
                       value={form.notes}
                       onChange={(event) =>
@@ -471,7 +473,7 @@ export function VendorsClient({
                       setForm((current) => ({ ...current, active: event.target.checked }))
                     }
                   />
-                  Active
+                  {t("active")}
                 </label>
               </div>
 
@@ -482,14 +484,14 @@ export function VendorsClient({
                     onClick={() => setDrawerOpen(false)}
                     className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
                   >
-                    Cancel
+                    {t("cancel")}
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
                     className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                   >
-                    {editingId ? "Save Changes" : "Create Vendor"}
+                    {editingId ? t("saveChanges") : t("createVendor")}
                   </button>
                 </div>
               </div>

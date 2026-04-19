@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
+import { ActivityTimeline } from "@/components/ActivityTimeline";
 
 const statuses = ["PENDING", "APPROVED", "APPLIED", "CLOSED"];
 
@@ -56,18 +57,18 @@ export function VendorCreditDetailClient({
         <div>
           <Link href={`/${locale}/credits`} className="text-sm text-slate-500 hover:text-slate-700">{t("detailBack")}</Link>
           <h1 className="mt-2 text-3xl font-bold text-slate-900">{credit.creditNumber}</h1>
-          <p className="mt-1 text-slate-500">{credit.vendorName} • {credit.reason} • ${credit.totalAmount}</p>
+          <p className="mt-1 text-slate-500">{credit.vendorName} • {t(`reasons.${credit.reason}`)} • ${credit.totalAmount}</p>
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-700">{t("status")}: <span className="font-medium">{credit.status}</span></p>
+          <p className="text-sm text-slate-700">{t("status")}: <span className="font-medium">{t(`statuses.${credit.status}`)}</span></p>
           <p className="text-sm text-slate-700">PO: {credit.poNumber}</p>
           <p className="mt-2 text-sm text-slate-600">{credit.notes || t("noNotes")}</p>
 
           <div className="mt-4 flex flex-wrap gap-2">
             {statuses.map((status) => (
               <button key={status} disabled={busy || status === credit.status} onClick={() => void updateStatus(status)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm disabled:opacity-50">
-                {t("set")} {status}
+                {t("set")} {t(`statuses.${status}`)}
               </button>
             ))}
           </div>
@@ -97,6 +98,11 @@ export function VendorCreditDetailClient({
             </tbody>
           </table>
         </div>
+
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-900 mb-5">{t("activity")}</h2>
+          <ActivityTimeline entityType="VendorCredit" entityId={credit.id} />
+        </section>
       </div>
     </div>
   );

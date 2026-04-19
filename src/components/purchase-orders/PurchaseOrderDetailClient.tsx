@@ -4,6 +4,7 @@ import { ChangeEvent, startTransition, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import {
   canApprovePurchaseOrders,
@@ -73,6 +74,7 @@ export function PurchaseOrderDetailClient({
   locale: string;
   purchaseOrder: PurchaseOrderDetail;
 }) {
+  const t = useTranslations("PurchaseOrderDetail");
   const router = useRouter();
   const { data: session } = useSession();
   const canManage = canManagePurchaseOrders(session?.user?.role);
@@ -104,11 +106,11 @@ export function PurchaseOrderDetailClient({
     setSubmitting(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Status update failed.");
+      setError(payload.error ?? t("feedback.statusUpdateFailed"));
       return;
     }
 
-    setFeedback(payload.message ?? "Purchase order updated.");
+    setFeedback(payload.message ?? t("feedback.statusUpdated"));
     refresh();
   };
 
@@ -130,7 +132,7 @@ export function PurchaseOrderDetailClient({
     setSubmitting(false);
 
     if (!response.ok || !payload.data?.id) {
-      setError(payload.error ?? "Duplicate failed.");
+      setError(payload.error ?? t("feedback.duplicateFailed"));
       return;
     }
 
@@ -138,7 +140,7 @@ export function PurchaseOrderDetailClient({
   };
 
   const deleteDraft = async () => {
-    const confirmed = window.confirm("Delete this draft purchase order?");
+    const confirmed = window.confirm(t("confirmDelete"));
     if (!confirmed) {
       return;
     }
@@ -153,7 +155,7 @@ export function PurchaseOrderDetailClient({
     setSubmitting(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Delete failed.");
+      setError(payload.error ?? t("feedback.deleteFailed"));
       return;
     }
 
@@ -180,7 +182,7 @@ export function PurchaseOrderDetailClient({
 
   const uploadDocument = async () => {
     if (!label || !fileName || !fileUrl) {
-      setError("Add a label and choose a file first.");
+      setError(t("chooseFileFirst"));
       return;
     }
 
@@ -204,11 +206,11 @@ export function PurchaseOrderDetailClient({
     setSubmitting(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Upload failed.");
+      setError(payload.error ?? t("feedback.uploadFailed"));
       return;
     }
 
-    setFeedback(payload.message ?? "Document uploaded.");
+    setFeedback(payload.message ?? t("feedback.documentUploaded"));
     setLabel("");
     setFileName("");
     setFileUrl("");
@@ -224,7 +226,7 @@ export function PurchaseOrderDetailClient({
               href={`/${locale}/purchase-orders`}
               className="text-sm font-medium text-slate-500 hover:text-slate-700"
             >
-              Back to Purchase Orders
+              {t("back")}
             </Link>
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <h1 className="text-3xl font-bold text-slate-900">
@@ -248,7 +250,7 @@ export function PurchaseOrderDetailClient({
               href={`/api/purchase-orders/${purchaseOrder.id}/pdf`}
               className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
             >
-              Export PDF
+              {t("exportPdf")}
             </a>
             {canManage && (
               <button
@@ -256,7 +258,7 @@ export function PurchaseOrderDetailClient({
                 disabled={submitting}
                 className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60"
               >
-                Duplicate PO
+                {t("duplicatePo")}
               </button>
             )}
           </div>
@@ -264,17 +266,17 @@ export function PurchaseOrderDetailClient({
 
         <div className="grid gap-6 2xl:grid-cols-[0.95fr_1.05fr]">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">PO Summary</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t("summary")}</h2>
             <dl className="mt-5 grid gap-4 sm:grid-cols-2">
-              <Info label="Vendor" value={purchaseOrder.vendorName} />
-              <Info label="Vendor Order ID" value={purchaseOrder.vendorOrderId || "-"} />
-              <Info label="Order Date" value={purchaseOrder.orderDate} />
-              <Info label="Expected Date" value={purchaseOrder.expectedDate || "-"} />
-              <Info label="Created By" value={purchaseOrder.createdBy} />
-              <Info label="Approved By" value={purchaseOrder.approvedBy || "-"} />
-              <Info label="Approved At" value={purchaseOrder.approvedAt || "-"} />
+              <Info label={t("vendor")} value={purchaseOrder.vendorName} />
+              <Info label={t("vendorOrderId")} value={purchaseOrder.vendorOrderId || "-"} />
+              <Info label={t("orderDate")} value={purchaseOrder.orderDate} />
+              <Info label={t("expectedDate")} value={purchaseOrder.expectedDate || "-"} />
+              <Info label={t("createdBy")} value={purchaseOrder.createdBy} />
+              <Info label={t("approvedBy")} value={purchaseOrder.approvedBy || "-"} />
+              <Info label={t("approvedAt")} value={purchaseOrder.approvedAt || "-"} />
               <Info
-                label="Weight / Pallets / Loose"
+                label={t("metricsLabel")}
                 value={`${purchaseOrder.totalWeightKg ?? "0"} kg / ${
                   purchaseOrder.totalPallets ?? 0
                 } / ${purchaseOrder.totalLooseBoxes ?? 0}`}
@@ -282,15 +284,15 @@ export function PurchaseOrderDetailClient({
             </dl>
             <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Notes
+                {t("notes")}
               </p>
               <p className="mt-2 text-sm text-slate-600">
-                {purchaseOrder.notes || "No notes."}
+                {purchaseOrder.notes || t("noNotes")}
               </p>
             </div>
             {purchaseOrder.constraintWarnings.length > 0 && (
               <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
-                <p className="font-semibold">Constraint warnings</p>
+                <p className="font-semibold">{t("constraintWarnings")}</p>
                 {purchaseOrder.constraintWarnings.map((warning) => (
                   <p key={warning} className="mt-2">
                     {warning}
@@ -301,7 +303,7 @@ export function PurchaseOrderDetailClient({
           </section>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Status Actions</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t("actions")}</h2>
             <div className="mt-5 flex flex-wrap gap-3">
               {purchaseOrder.status === "DRAFT" && canManage && (
                 <>
@@ -309,21 +311,21 @@ export function PurchaseOrderDetailClient({
                     href={`/${locale}/purchase-orders/${purchaseOrder.id}/edit`}
                     className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
                   >
-                    Edit
+                    {t("edit")}
                   </Link>
                   <button
                     onClick={() => void runAction("SUBMIT")}
                     disabled={submitting}
                     className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                   >
-                    Submit for Approval
+                    {t("submitApproval")}
                   </button>
                   <button
                     onClick={() => void deleteDraft()}
                     disabled={submitting}
                     className="rounded-xl border border-rose-200 px-4 py-2.5 text-sm font-medium text-rose-600 hover:bg-rose-50 disabled:opacity-60"
                   >
-                    Delete
+                    {t("delete")}
                   </button>
                 </>
               )}
@@ -334,7 +336,7 @@ export function PurchaseOrderDetailClient({
                       href={`/${locale}/purchase-orders/${purchaseOrder.id}/edit`}
                       className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
                     >
-                      Edit
+                      {t("edit")}
                     </Link>
                   )}
                   {canApprove && (
@@ -344,14 +346,14 @@ export function PurchaseOrderDetailClient({
                         disabled={submitting}
                         className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                       >
-                        Approve
+                        {t("approve")}
                       </button>
                       <button
                         onClick={() => void runAction("REJECT")}
                         disabled={submitting}
                         className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-60"
                       >
-                        Reject
+                        {t("reject")}
                       </button>
                     </>
                   )}
@@ -363,7 +365,7 @@ export function PurchaseOrderDetailClient({
                   disabled={submitting}
                   className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                 >
-                  Mark as Ordered
+                  {t("markOrdered")}
                 </button>
               )}
               {purchaseOrder.status === "ORDERED" && (
@@ -371,7 +373,7 @@ export function PurchaseOrderDetailClient({
                   href={`/${locale}/receiving`}
                   className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white"
                 >
-                  Go to Receiving
+                  {t("goToReceiving")}
                 </Link>
               )}
               {purchaseOrder.canCancel && canManage && (
@@ -380,26 +382,26 @@ export function PurchaseOrderDetailClient({
                   disabled={submitting}
                   className="rounded-xl border border-rose-200 px-4 py-2.5 text-sm font-medium text-rose-600 hover:bg-rose-50 disabled:opacity-60"
                 >
-                  Cancel PO
+                  {t("cancelPo")}
                 </button>
               )}
             </div>
 
             <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>Subtotal</span>
+                <span>{t("subtotal")}</span>
                 <span>${purchaseOrder.subtotal}</span>
               </div>
               <div className="mt-2 flex items-center justify-between text-sm text-slate-600">
-                <span>Shipping Cost</span>
+                <span>{t("shippingCost")}</span>
                 <span>${purchaseOrder.shippingCost}</span>
               </div>
               <div className="mt-2 flex items-center justify-between text-sm text-slate-600">
-                <span>Other Costs</span>
+                <span>{t("otherCosts")}</span>
                 <span>${purchaseOrder.otherCosts}</span>
               </div>
               <div className="mt-4 flex items-center justify-between border-t border-slate-200 pt-4 text-base font-semibold text-slate-900">
-                <span>Total</span>
+                <span>{t("total")}</span>
                 <span>${purchaseOrder.totalCost}</span>
               </div>
             </div>
@@ -407,17 +409,17 @@ export function PurchaseOrderDetailClient({
         </div>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">Line Items</h2>
+          <h2 className="text-lg font-semibold text-slate-900">{t("lineItems")}</h2>
           <div className="mt-5 overflow-x-auto">
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">Product</th>
-                  <th className="px-4 py-3">Ordered</th>
-                  <th className="px-4 py-3">Received</th>
-                  <th className="px-4 py-3">Unit Cost</th>
-                  <th className="px-4 py-3">Total</th>
-                  <th className="px-4 py-3">Notes</th>
+                  <th className="px-4 py-3">{t("columnProduct")}</th>
+                  <th className="px-4 py-3">{t("columnOrdered")}</th>
+                  <th className="px-4 py-3">{t("columnReceived")}</th>
+                  <th className="px-4 py-3">{t("columnUnitCost")}</th>
+                  <th className="px-4 py-3">{t("columnTotal")}</th>
+                  <th className="px-4 py-3">{t("columnNotes")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
@@ -445,13 +447,13 @@ export function PurchaseOrderDetailClient({
 
         <div className="grid gap-6 2xl:grid-cols-[0.9fr_1.1fr]">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Documents</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t("documents")}</h2>
             {canManage && (
               <div className="mt-5 space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                 <input
                   value={label}
                   onChange={(event) => setLabel(event.target.value)}
-                  placeholder="Label (CI, PL, Invoice)"
+                  placeholder={t("documentLabelPlaceholder")}
                   className={inputClassName}
                 />
                 <input
@@ -464,14 +466,14 @@ export function PurchaseOrderDetailClient({
                   disabled={submitting}
                   className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                 >
-                  Upload Document
+                  {t("uploadDocument")}
                 </button>
               </div>
             )}
             <div className="mt-5 space-y-3">
               {purchaseOrder.documents.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
-                  No documents uploaded yet.
+                  {t("noDocuments")}
                 </div>
               ) : (
                 purchaseOrder.documents.map((document) => (
@@ -490,7 +492,7 @@ export function PurchaseOrderDetailClient({
                       download={document.fileName}
                       className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                     >
-                      Download
+                      {t("download")}
                     </a>
                   </div>
                 ))
@@ -499,20 +501,20 @@ export function PurchaseOrderDetailClient({
           </section>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Receiving History</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t("receivingHistory")}</h2>
             {purchaseOrder.receivingSessions.length === 0 ? (
               <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
-                No receiving sessions yet.
+                {t("noReceivingSessions")}
               </div>
             ) : (
               <div className="mt-5 overflow-x-auto">
                 <table className="min-w-full divide-y divide-slate-200">
                   <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                     <tr>
-                      <th className="px-4 py-3">Status</th>
-                      <th className="px-4 py-3">Started</th>
-                      <th className="px-4 py-3">Completed</th>
-                      <th className="px-4 py-3">Received By</th>
+                      <th className="px-4 py-3">{t("columnStatus")}</th>
+                      <th className="px-4 py-3">{t("columnStarted")}</th>
+                      <th className="px-4 py-3">{t("columnCompleted")}</th>
+                      <th className="px-4 py-3">{t("columnReceivedBy")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
@@ -532,7 +534,7 @@ export function PurchaseOrderDetailClient({
         </div>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm mt-6">
-          <h2 className="text-lg font-semibold text-slate-900 mb-5">Activity history</h2>
+          <h2 className="text-lg font-semibold text-slate-900 mb-5">{t("activityHistory")}</h2>
           <ActivityTimeline entityType="PurchaseOrder" entityId={purchaseOrder.id} />
         </section>
       </div>

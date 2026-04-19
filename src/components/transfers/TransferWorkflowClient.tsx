@@ -4,6 +4,8 @@ import { startTransition, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
+import { ActivityTimeline } from "@/components/ActivityTimeline";
+import { useTranslations } from "next-intl";
 
 const inputClassName =
   "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-200";
@@ -65,6 +67,7 @@ export function TransferWorkflowClient({
   const [feedback, setFeedback] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [dropWarnings, setDropWarnings] = useState<string[]>([]);
+  const t = useTranslations("TransferWorkflow");
   useToastFeedback(error, feedback);
 
   const refresh = () => startTransition(() => router.refresh());
@@ -131,7 +134,7 @@ export function TransferWorkflowClient({
     setSubmitting(false);
 
     if (!response.ok || !payload.data?.id) {
-      setError(payload.error ?? "Failed to start transfer.");
+      setError(payload.error ?? t("feedback.startFailed"));
       return;
     }
 
@@ -159,11 +162,11 @@ export function TransferWorkflowClient({
     setSubmitting(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Failed to collect stock.");
+      setError(payload.error ?? t("feedback.collectFailed"));
       return;
     }
 
-    setFeedback(payload.message ?? "Item collected.");
+    setFeedback(payload.message ?? t("feedback.collected"));
     setPickQty("");
     setSelectedProductId("");
     refresh();
@@ -186,11 +189,11 @@ export function TransferWorkflowClient({
     setSubmitting(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Failed to switch transfer mode.");
+      setError(payload.error ?? t("feedback.modeFailed"));
       return;
     }
 
-    setFeedback(payload.message ?? "Drop-off mode started.");
+    setFeedback(payload.message ?? t("feedback.modeStarted"));
     refresh();
   };
 
@@ -220,7 +223,7 @@ export function TransferWorkflowClient({
     setSubmitting(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Failed to drop stock.");
+      setError(payload.error ?? t("feedback.dropFailed"));
       return;
     }
 
@@ -228,7 +231,7 @@ export function TransferWorkflowClient({
       setDropWarnings(payload.warnings);
     }
 
-    setFeedback(payload.message ?? "Stock dropped.");
+    setFeedback(payload.message ?? t("feedback.dropped"));
     setDropQty("");
     setDropProductId("");
     refresh();
@@ -251,11 +254,11 @@ export function TransferWorkflowClient({
     setSubmitting(false);
 
     if (!response.ok) {
-      setError(payload.error ?? "Failed to cancel transfer.");
+      setError(payload.error ?? t("feedback.cancelFailed"));
       return;
     }
 
-    setFeedback(payload.message ?? "Transfer cancelled.");
+    setFeedback(payload.message ?? t("feedback.cancelled"));
     router.push(`/${locale}/transfers`);
   };
 
@@ -268,11 +271,11 @@ export function TransferWorkflowClient({
               href={`/${locale}/transfers`}
               className="text-sm font-medium text-slate-500 hover:text-slate-700"
             >
-              Back to Transfers
+              {t("back")}
             </Link>
-            <h1 className="mt-3 text-3xl font-bold text-slate-900">New Transfer</h1>
+            <h1 className="mt-3 text-3xl font-bold text-slate-900">{t("title")}</h1>
             <p className="mt-1 text-slate-500">
-              Mobile-first pick and drop workflow using location QR codes.
+              {t("subtitle")}
             </p>
           </div>
           {!currentTransfer ? (
@@ -281,12 +284,12 @@ export function TransferWorkflowClient({
               disabled={submitting}
               className="rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
             >
-              Start Transfer
+              {t("startTransfer")}
             </button>
           ) : (
             <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
               <p className="font-semibold text-slate-900">{currentTransfer.reference}</p>
-              <p>Status: {currentTransfer.status}</p>
+              <p>{t("status")}: {currentTransfer.status}</p>
             </div>
           )}
         </div>
@@ -299,14 +302,14 @@ export function TransferWorkflowClient({
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-wide text-sky-600">
-                        Collection Mode
+                        {t("collectionMode")}
                       </p>
                       <h2 className="mt-2 text-2xl font-bold text-slate-900">
-                        Scan Location
+                        {t("scanLocation")}
                       </h2>
                     </div>
                     <button className="rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white">
-                      Scan Location
+                      {t("scanLocation")}
                     </button>
                   </div>
 
@@ -314,7 +317,7 @@ export function TransferWorkflowClient({
                     <input
                       value={sourceQr}
                       onChange={(event) => setSourceQr(event.target.value)}
-                      placeholder="Paste or scan source location QR"
+                      placeholder={t("sourcePlaceholder")}
                       className={inputClassName}
                       autoFocus
                     />
@@ -350,7 +353,7 @@ export function TransferWorkflowClient({
                         >
                           <p className="font-semibold text-slate-900">{stock.compoundId}</p>
                           <p className="text-sm text-slate-500">{stock.productName}</p>
-                          <p className="mt-1 text-xs text-slate-500">In stock: {stock.quantity}</p>
+                          <p className="mt-1 text-xs text-slate-500">{t("inStock")}: {stock.quantity}</p>
                         </button>
                       ))}
                     </div>
@@ -359,7 +362,7 @@ export function TransferWorkflowClient({
                       <input
                         value={pickQty}
                         onChange={(event) => setPickQty(event.target.value)}
-                        placeholder="Quantity"
+                        placeholder={t("qty")}
                         className={inputClassName}
                         inputMode="numeric"
                       />
@@ -368,7 +371,7 @@ export function TransferWorkflowClient({
                         disabled={submitting || !sourceQr || !selectedProductId || !pickQty}
                         className="rounded-2xl bg-sky-600 px-5 py-4 text-base lg:py-3 lg:text-sm font-semibold text-white disabled:opacity-60"
                       >
-                        Add to Cart
+                        {t("addToCart")}
                       </button>
                     </div>
 
@@ -377,14 +380,14 @@ export function TransferWorkflowClient({
                         onClick={() => setSourceQr("")}
                         className="rounded-2xl border border-slate-200 px-4 py-4 text-base lg:py-2.5 lg:text-sm font-medium text-slate-700 hover:bg-slate-50 flex-1"
                       >
-                        Scan Another Location
+                        {t("scanAnother")}
                       </button>
                       <button
                         onClick={() => void switchToDropoff()}
                         disabled={submitting || cartItems.length === 0}
                         className="rounded-2xl bg-amber-500 px-4 py-4 text-base lg:py-2.5 lg:text-sm font-semibold text-white disabled:opacity-60 flex-1"
                       >
-                        Switch to Drop-Off
+                        {t("switchToDropoff")}
                       </button>
                     </div>
                   </div>
@@ -396,14 +399,14 @@ export function TransferWorkflowClient({
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-wide text-amber-600">
-                        Drop-Off Mode
+                        {t("dropoffMode")}
                       </p>
                       <h2 className="mt-2 text-2xl font-bold text-slate-900">
-                        Scan Destination
+                        {t("scanDestination")}
                       </h2>
                     </div>
                     <button className="rounded-2xl bg-amber-500 px-5 py-3 text-sm font-semibold text-white">
-                      Scan Destination
+                      {t("scanDestination")}
                     </button>
                   </div>
 
@@ -411,7 +414,7 @@ export function TransferWorkflowClient({
                     <input
                       value={destinationQr}
                       onChange={(event) => setDestinationQr(event.target.value)}
-                      placeholder="Paste or scan destination location QR"
+                      placeholder={t("destPlaceholder")}
                       className={inputClassName}
                       autoFocus
                     />
@@ -458,7 +461,7 @@ export function TransferWorkflowClient({
                             onClick={() => setDropWarnings([])}
                             className="shrink-0 rounded-lg px-2 py-1 text-xs font-medium text-amber-600 hover:bg-amber-100"
                           >
-                            Dismiss
+                            {t("dismiss")}
                           </button>
                         </div>
                       </div>
@@ -478,7 +481,7 @@ export function TransferWorkflowClient({
                           <p className="font-semibold text-slate-900">{item.compoundId}</p>
                           <p className="text-sm text-slate-500">{item.productName}</p>
                           <p className="mt-1 text-xs text-slate-500">
-                            Remaining in cart: {item.quantity}
+                            {t("remainingInCart")}: {item.quantity}
                           </p>
                         </button>
                       ))}
@@ -488,7 +491,7 @@ export function TransferWorkflowClient({
                       <input
                         value={dropQty}
                         onChange={(event) => setDropQty(event.target.value)}
-                        placeholder="Drop quantity"
+                        placeholder={t("dropQty")}
                         className={inputClassName}
                         inputMode="numeric"
                       />
@@ -497,7 +500,7 @@ export function TransferWorkflowClient({
                         disabled={submitting || !destinationQr || !dropProductId || !dropQty}
                         className="rounded-2xl bg-amber-500 px-5 py-4 text-base lg:py-3 lg:text-sm font-semibold text-white disabled:opacity-60"
                       >
-                        Drop
+                        {t("drop")}
                       </button>
                     </div>
 
@@ -506,7 +509,7 @@ export function TransferWorkflowClient({
                         onClick={() => setDestinationQr("")}
                         className="rounded-2xl border border-slate-200 px-4 py-4 text-base lg:py-2.5 lg:text-sm font-medium text-slate-700 hover:bg-slate-50 flex-1"
                       >
-                        Scan Another Destination
+                        {t("scanAnotherDest")}
                       </button>
                     </div>
                   </div>
@@ -517,18 +520,18 @@ export function TransferWorkflowClient({
             <section className="space-y-6">
               <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-slate-900">Cart</h2>
+                  <h2 className="text-lg font-semibold text-slate-900">{t("cart")}</h2>
                   <Link
                     href={`/${locale}/transfers/${currentTransfer.id}`}
                     className="text-sm font-medium text-slate-500 hover:text-slate-700"
                   >
-                    Detail
+                    {t("detail")}
                   </Link>
                 </div>
                 <div className="mt-5 space-y-3">
                   {cartItems.length === 0 ? (
                     <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
-                      Cart is empty.
+                      {t("cartEmpty")}
                     </div>
                   ) : (
                     cartItems.map((item) => (
@@ -538,7 +541,7 @@ export function TransferWorkflowClient({
                       >
                         <p className="font-semibold text-slate-900">{item.compoundId}</p>
                         <p className="text-sm text-slate-500">{item.productName}</p>
-                        <p className="mt-1 text-xs text-slate-500">Qty: {item.quantity}</p>
+                        <p className="mt-1 text-xs text-slate-500">{t("qtyLabel")}: {item.quantity}</p>
                       </div>
                     ))
                   )}
@@ -546,31 +549,38 @@ export function TransferWorkflowClient({
               </div>
 
               <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 className="text-lg font-semibold text-slate-900">Transfer Controls</h2>
+                <h2 className="text-lg font-semibold text-slate-900">{t("transferControls")}</h2>
                 <div className="mt-5 flex flex-wrap gap-3">
                   <button
                     onClick={() => void cancelTransfer()}
                     disabled={submitting}
                     className="rounded-2xl border border-rose-200 px-4 py-2.5 text-sm font-medium text-rose-600 hover:bg-rose-50 disabled:opacity-60"
                   >
-                    Cancel Transfer
+                    {t("cancelTransfer")}
                   </button>
                   {currentTransfer.status === "COMPLETED" && (
                     <Link
                       href={`/${locale}/transfers/${currentTransfer.id}`}
                       className="rounded-2xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white"
                     >
-                      View Completed Transfer
+                      {t("viewCompletedTransfer")}
                     </Link>
                   )}
                 </div>
 
                 <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                   <p className="text-sm text-slate-600">
-                    Once you switch to drop-off mode, collection stays locked. On cancel, all picked stock is returned to its original locations.
+                    {t("controlsInfo")}
                   </p>
                 </div>
               </div>
+
+              {currentTransfer && (
+                <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+                  <h2 className="text-lg font-semibold text-slate-900 mb-5">{t("activity")}</h2>
+                  <ActivityTimeline entityType="Transfer" entityId={currentTransfer.id} />
+                </div>
+              )}
             </section>
           </div>
         )}

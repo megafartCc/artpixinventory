@@ -3,8 +3,10 @@
 import { startTransition, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Download } from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
+import { ActivityTimeline } from "@/components/ActivityTimeline";
 
 const inputClassName =
   "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-200";
@@ -62,6 +64,7 @@ export function ReceivingClient({
   vendors: VendorOption[];
   recentSessions: RecentSession[];
 }) {
+  const t = useTranslations("Receiving");
   const router = useRouter();
   const [vendorId, setVendorId] = useState("");
   const [purchaseOrderId, setPurchaseOrderId] = useState("");
@@ -157,11 +160,11 @@ export function ReceivingClient({
     setSubmitting(false);
 
     if (!response.ok || !payload.data) {
-      setError(payload.error ?? "Receiving failed.");
+      setError(payload.error ?? t("feedback.failed"));
       return;
     }
 
-    setFeedback(payload.message ?? "Receiving complete.");
+    setFeedback(payload.message ?? t("feedback.complete"));
     setSelectedSessionId(payload.data.receivingSessionId);
     setVendorId("");
     setPurchaseOrderId("");
@@ -183,7 +186,7 @@ export function ReceivingClient({
       .filter((item) => item.quantity > 0);
 
     if (items.length === 0) {
-      setError("Choose at least one pallet quantity.");
+      setError(t("feedback.chooseQty"));
       return;
     }
 
@@ -208,11 +211,11 @@ export function ReceivingClient({
     setSubmitting(false);
 
     if (!response.ok || !payload.data) {
-      setError(payload.error ?? "Failed to create pallet.");
+      setError(payload.error ?? t("feedback.palletFailed"));
       return;
     }
 
-    setFeedback(payload.message ?? "Pallet created.");
+    setFeedback(payload.message ?? t("feedback.palletCreated"));
     setZplBundle(payload.data);
     setPalletQuantities({});
     refresh();
@@ -223,24 +226,24 @@ export function ReceivingClient({
       <div className="flex w-full flex-col gap-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Receiving</h1>
+            <h1 className="text-3xl font-bold text-slate-900">{t("title")}</h1>
             <p className="mt-1 text-slate-500">
-              Receive ordered stock, create pallets, and stage placement into sublocations.
+              {t("subtitle")}
             </p>
           </div>
           <Link
             href={`/${locale}/receiving/place`}
             className="rounded-2xl border border-slate-200 px-5 py-3 text-base lg:text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
-            Pallet Placement
+            {t("palletPlacement")}
           </Link>
         </div>
 
         <div className="grid gap-6 2xl:grid-cols-[1.2fr_0.8fr]">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Receive PO</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t("receivePo")}</h2>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <Field label="Step 1: Select Vendor">
+              <Field label={t("step1")}>
                 <select
                   value={vendorId}
                   onChange={(event) => {
@@ -251,7 +254,7 @@ export function ReceivingClient({
                   className={inputClassName}
                   autoFocus
                 >
-                  <option value="">Choose vendor</option>
+                  <option value="">{t("chooseVendor")}</option>
                   {vendors.map((vendor) => (
                     <option key={vendor.id} value={vendor.id}>
                       {vendor.name}
@@ -259,7 +262,7 @@ export function ReceivingClient({
                   ))}
                 </select>
               </Field>
-              <Field label="Step 2: Select PO">
+              <Field label={t("step2")}>
                 <select
                   value={purchaseOrderId}
                   onChange={(event) => {
@@ -278,7 +281,7 @@ export function ReceivingClient({
                   className={inputClassName}
                   disabled={!selectedVendor}
                 >
-                  <option value="">Choose purchase order</option>
+                  <option value="">{t("choosePo")}</option>
                   {purchaseOrders.map((po) => (
                     <option key={po.id} value={po.id}>
                       {po.poNumber} ({po.status})
@@ -292,20 +295,20 @@ export function ReceivingClient({
               <table className="min-w-full divide-y divide-slate-200">
                 <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                   <tr>
-                    <th className="px-4 py-3">Product</th>
-                    <th className="px-4 py-3">Ordered</th>
-                    <th className="px-4 py-3">Received</th>
-                    <th className="px-4 py-3">Remaining</th>
-                    <th className="px-4 py-3">Receive Qty</th>
-                    <th className="px-4 py-3">Damaged</th>
-                    <th className="px-4 py-3">Notes</th>
+                    <th className="px-4 py-3">{t("columns.product")}</th>
+                    <th className="px-4 py-3">{t("columns.ordered")}</th>
+                    <th className="px-4 py-3">{t("columns.received")}</th>
+                    <th className="px-4 py-3">{t("columns.remaining")}</th>
+                    <th className="px-4 py-3">{t("columns.receiveQty")}</th>
+                    <th className="px-4 py-3">{t("columns.damaged")}</th>
+                    <th className="px-4 py-3">{t("columns.notes")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                   {!selectedPurchaseOrder ? (
                     <tr>
                       <td colSpan={7} className="px-4 py-16 text-center text-slate-400">
-                        Choose a vendor and purchase order to start receiving.
+                        {t("emptyTable")}
                       </td>
                     </tr>
                   ) : (
@@ -388,7 +391,7 @@ export function ReceivingClient({
             </div>
 
             <div className="mt-5 grid gap-4">
-              <Field label="Session Notes">
+              <Field label={t("sessionNotes")}>
                 <textarea
                   value={receivingNotes}
                   onChange={(event) => setReceivingNotes(event.target.value)}
@@ -403,21 +406,21 @@ export function ReceivingClient({
                 disabled={submitting || !selectedPurchaseOrder}
                 className="flex-1 lg:flex-initial rounded-2xl bg-slate-900 px-5 py-4 text-base lg:py-3 lg:text-sm font-semibold text-white disabled:opacity-60"
               >
-                Complete Receiving
+                {t("completeReceiving")}
               </button>
             </div>
           </section>
 
           <section className="space-y-6">
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-slate-900">Create Pallet</h2>
-              <Field label="Recent Receiving Session">
+              <h2 className="text-lg font-semibold text-slate-900">{t("createPallet")}</h2>
+              <Field label={t("recentSession")}>
                 <select
                   value={selectedSessionId}
                   onChange={(event) => setSelectedSessionId(event.target.value)}
                   className={inputClassName}
                 >
-                  <option value="">Choose session</option>
+                  <option value="">{t("chooseSession")}</option>
                   {recentSessions.map((session) => (
                     <option key={session.id} value={session.id}>
                       {session.poNumber} - {session.startedAt}
@@ -428,14 +431,14 @@ export function ReceivingClient({
 
               {!selectedSession ? (
                 <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
-                  No receiving session selected.
+                  {t("noSession")}
                 </div>
               ) : (
                 <>
                   <div className="mt-5 space-y-3">
                     {palletAvailability.length === 0 ? (
                       <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center text-sm text-slate-400">
-                        All received items are already palletized.
+                        {t("allPalletized")}
                       </div>
                     ) : (
                       palletAvailability.map((item) => (
@@ -466,7 +469,7 @@ export function ReceivingClient({
                             </div>
                           </div>
                           <p className="mt-2 text-xs text-slate-500">
-                            Remaining to palletize: {item.remainingQty}
+                            {t("remainingToPalletize")}: {item.remainingQty}
                           </p>
                         </div>
                       ))
@@ -479,7 +482,7 @@ export function ReceivingClient({
                       disabled={submitting || palletAvailability.length === 0}
                       className="flex-1 lg:flex-initial rounded-2xl bg-slate-900 px-5 py-4 text-base lg:py-3 lg:text-sm font-semibold text-white disabled:opacity-60"
                     >
-                      Create Pallet
+                      {t("createPallet")}
                     </button>
                   </div>
                 </>
@@ -494,7 +497,7 @@ export function ReceivingClient({
                       {zplBundle.palletNumber}
                     </h2>
                     <p className="mt-1 text-sm text-slate-500">
-                      Zebra-ready ZPL generated for the latest pallet.
+                      {t("zebraReady")}
                     </p>
                   </div>
                   <button
@@ -502,12 +505,19 @@ export function ReceivingClient({
                     className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
                   >
                     <Download className="h-4 w-4" />
-                    Print QR
+                    {t("printQr")}
                   </button>
                 </div>
                 <pre className="mt-4 overflow-x-auto rounded-2xl bg-slate-950 p-4 text-xs text-emerald-300">
                   {zplBundle.zpl}
                 </pre>
+              </div>
+            )}
+
+            {selectedSession && (
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 className="text-lg font-semibold text-slate-900 mb-5">{t("activity")}</h2>
+                <ActivityTimeline entityType="ReceivingSession" entityId={selectedSession.id} />
               </div>
             )}
           </section>

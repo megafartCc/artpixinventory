@@ -4,6 +4,7 @@ import { startTransition, useDeferredValue, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { Loader2, PackagePlus, Pencil, Power, Search, X } from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { productUnits } from "@/lib/product-schemas";
@@ -86,6 +87,7 @@ export function ProductsClient({
   indexes: Option[];
   categories: Option[];
 }) {
+  const t = useTranslations("Products");
   const router = useRouter();
   const { data: session } = useSession();
   const userRole = session?.user?.role ?? "WAREHOUSE";
@@ -206,12 +208,12 @@ export function ProductsClient({
     const result = (await response.json()) as { error?: string };
     if (!response.ok) {
       setSubmitting(false);
-      setErrorMessage(result.error ?? "Product save failed.");
+      setErrorMessage(result.error ?? t("feedback.saveFailed"));
       return;
     }
 
     setSubmitting(false);
-    setStatusMessage(editingProductId ? "Product updated." : "Product created.");
+    setStatusMessage(editingProductId ? t("feedback.updated") : t("feedback.created"));
     startTransition(() => router.refresh());
     if (editingProductId) {
       setDrawerOpen(false);
@@ -245,10 +247,10 @@ export function ProductsClient({
     const result = (await response.json()) as { error?: string };
     setSubmitting(false);
     if (!response.ok) {
-      setErrorMessage(result.error ?? "Product update failed.");
+      setErrorMessage(result.error ?? t("feedback.updateFailed"));
       return;
     }
-    setStatusMessage(product.active ? "Product deactivated." : "Product reactivated.");
+    setStatusMessage(product.active ? t("feedback.deactivated") : t("feedback.reactivated"));
     startTransition(() => router.refresh());
   };
 
@@ -257,23 +259,23 @@ export function ProductsClient({
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Products</h1>
-            <p className="mt-1 text-slate-500">Interactive catalog with live create, edit, and deactivate actions.</p>
+            <h1 className="text-2xl font-bold text-slate-900">{t("title")}</h1>
+            <p className="mt-1 text-slate-500">{t("subtitle")}</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link href="../indexes" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
-              Indexes
+              {t("indexes")}
             </Link>
             <Link href="../categories" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
-              Categories
+              {t("categories")}
             </Link>
             <Link href="./import" className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
-              CSV Import
+              {t("csvImport")}
             </Link>
             {canManageProducts && (
               <button onClick={openCreate} className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800">
                 <PackagePlus className="h-4 w-4" />
-                Add Product
+                {t("addProduct")}
               </button>
             )}
           </div>
@@ -282,20 +284,20 @@ export function ProductsClient({
         <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-4">
           <label className="relative md:col-span-2">
             <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
-            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search by SKU, name, or category" className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm text-slate-700 outline-none focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-200" />
+            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t("searchPlaceholder")} className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm text-slate-700 outline-none focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-200" />
           </label>
           <select value={indexFilter} onChange={(event) => setIndexFilter(event.target.value)} className={inputClassName}>
-            <option value="all">All Indexes</option>
+            <option value="all">{t("allIndexes")}</option>
             {indexes.map((index) => <option key={index.id} value={index.id}>{index.name}</option>)}
           </select>
           <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)} className={inputClassName}>
-            <option value="all">All Categories</option>
+            <option value="all">{t("allCategories")}</option>
             {categories.map((category) => <option key={category.id} value={category.name}>{category.name}</option>)}
           </select>
           <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className={inputClassName}>
-            <option value="active">Active Only</option>
-            <option value="inactive">Inactive Only</option>
-            <option value="all">All Statuses</option>
+            <option value="active">{t("activeOnly")}</option>
+            <option value="inactive">{t("inactiveOnly")}</option>
+            <option value="all">{t("allStatuses")}</option>
           </select>
         </div>
 
@@ -304,21 +306,21 @@ export function ProductsClient({
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">Compound ID</th>
-                  <th className="px-4 py-3">Name</th>
-                  <th className="px-4 py-3">Index</th>
-                  <th className="px-4 py-3">Categories</th>
-                  <th className="px-4 py-3">Dimensions</th>
-                  <th className="px-4 py-3">UOM</th>
-                  <th className="px-4 py-3">Min Stock</th>
-                  <th className="px-4 py-3">Avg Cost</th>
-                  <th className="px-4 py-3">Active</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className="px-4 py-3">{t("columns.compoundId")}</th>
+                  <th className="px-4 py-3">{t("columns.name")}</th>
+                  <th className="px-4 py-3">{t("columns.index")}</th>
+                  <th className="px-4 py-3">{t("columns.categories")}</th>
+                  <th className="px-4 py-3">{t("columns.dimensions")}</th>
+                  <th className="px-4 py-3">{t("columns.uom")}</th>
+                  <th className="px-4 py-3">{t("columns.minStock")}</th>
+                  <th className="px-4 py-3">{t("columns.avgCost")}</th>
+                  <th className="px-4 py-3">{t("columns.active")}</th>
+                  <th className="px-4 py-3 text-right">{t("columns.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                 {filteredProducts.length === 0 ? (
-                  <tr><td colSpan={10} className="px-4 py-16 text-center text-slate-400">No products match the current filters.</td></tr>
+                  <tr><td colSpan={10} className="px-4 py-16 text-center text-slate-400">{t("noMatch")}</td></tr>
                 ) : filteredProducts.map((product) => (
                   <tr key={product.id}>
                     <td className="px-4 py-4 font-semibold text-slate-900">
@@ -343,27 +345,27 @@ export function ProductsClient({
                     <td className="px-4 py-4 uppercase">{product.uom}</td>
                     <td className="px-4 py-4">{product.minStock}</td>
                     <td className="px-4 py-4">${product.avgCost}</td>
-                    <td className="px-4 py-4">{product.active ? "Yes" : "No"}</td>
+                    <td className="px-4 py-4">{product.active ? t("yes") : t("no")}</td>
                     <td className="px-4 py-4">
                       <div className="flex justify-end gap-2">
                         <Link
                           href={`/${locale}/products/${product.id}`}
                           className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                         >
-                          View
+                          {t("view")}
                         </Link>
                         {canManageProducts ? (
                           <>
                             <button onClick={() => openEdit(product)} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50">
                               <Pencil className="h-3.5 w-3.5" />
-                              Edit
+                              {t("edit")}
                             </button>
                             <button onClick={() => toggleActive(product)} disabled={submitting} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-60">
                               <Power className="h-3.5 w-3.5" />
-                              {product.active ? "Deactivate" : "Reactivate"}
+                              {product.active ? t("deactivate") : t("reactivate")}
                             </button>
                           </>
-                        ) : <span className="text-xs text-slate-400">Read only</span>}
+                        ) : <span className="text-xs text-slate-400">{t("readOnly")}</span>}
                       </div>
                     </td>
                   </tr>
@@ -380,8 +382,8 @@ export function ProductsClient({
           <div className="flex h-full w-full max-w-xl flex-col border-l border-slate-200 bg-white shadow-2xl">
             <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
               <div>
-                <h2 className="text-xl font-semibold text-slate-900">{editingProductId ? "Edit Product" : "Add Product"}</h2>
-                <p className="mt-1 text-sm text-slate-500">Capture SKU, categories, and dimensions in one place.</p>
+                <h2 className="text-xl font-semibold text-slate-900">{editingProductId ? t("editProduct") : t("addProductTitle")}</h2>
+                <p className="mt-1 text-sm text-slate-500">{t("drawerSubtitle")}</p>
               </div>
               <button onClick={() => setDrawerOpen(false)} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
                 <X className="h-5 w-5" />
@@ -390,18 +392,18 @@ export function ProductsClient({
 
             <form onSubmit={submitProduct} className="flex min-h-0 flex-1 flex-col">
               <div className="grid flex-1 gap-5 overflow-y-auto px-6 py-5 md:grid-cols-2">
-                <Field label="Compound ID"><input value={form.compoundId} onChange={(event) => setForm((current) => ({ ...current, compoundId: event.target.value }))} className={inputClassName} required /></Field>
-                <Field label="Name"><input value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} className={inputClassName} required /></Field>
-                <Field label="Index"><select value={form.indexId} onChange={(event) => setForm((current) => ({ ...current, indexId: event.target.value }))} className={inputClassName} required>{indexes.map((index) => <option key={index.id} value={index.id}>{index.name}</option>)}</select></Field>
-                <Field label="Unit"><select value={form.uom} onChange={(event) => setForm((current) => ({ ...current, uom: event.target.value as (typeof productUnits)[number] }))} className={inputClassName}>{productUnits.map((unit) => <option key={unit} value={unit}>{unit.toUpperCase()}</option>)}</select></Field>
-                <Field label="Barcode"><input value={form.barcode} onChange={(event) => setForm((current) => ({ ...current, barcode: event.target.value }))} className={inputClassName} /></Field>
-                <Field label="Min Stock"><input value={form.minStock} onChange={(event) => setForm((current) => ({ ...current, minStock: event.target.value }))} className={inputClassName} inputMode="numeric" /></Field>
-                <Field label="Length"><input value={form.length} onChange={(event) => setForm((current) => ({ ...current, length: event.target.value }))} className={inputClassName} inputMode="decimal" /></Field>
-                <Field label="Width"><input value={form.width} onChange={(event) => setForm((current) => ({ ...current, width: event.target.value }))} className={inputClassName} inputMode="decimal" /></Field>
-                <Field label="Height"><input value={form.height} onChange={(event) => setForm((current) => ({ ...current, height: event.target.value }))} className={inputClassName} inputMode="decimal" /></Field>
-                <Field label="Dimension Unit"><input value={form.dimensionUnit} onChange={(event) => setForm((current) => ({ ...current, dimensionUnit: event.target.value }))} className={inputClassName} /></Field>
+                <Field label={t("compoundId")}><input value={form.compoundId} onChange={(event) => setForm((current) => ({ ...current, compoundId: event.target.value }))} className={inputClassName} required /></Field>
+                <Field label={t("name")}><input value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} className={inputClassName} required /></Field>
+                <Field label={t("index")}><select value={form.indexId} onChange={(event) => setForm((current) => ({ ...current, indexId: event.target.value }))} className={inputClassName} required>{indexes.map((index) => <option key={index.id} value={index.id}>{index.name}</option>)}</select></Field>
+                <Field label={t("unit")}><select value={form.uom} onChange={(event) => setForm((current) => ({ ...current, uom: event.target.value as (typeof productUnits)[number] }))} className={inputClassName}>{productUnits.map((unit) => <option key={unit} value={unit}>{unit.toUpperCase()}</option>)}</select></Field>
+                <Field label={t("barcode")}><input value={form.barcode} onChange={(event) => setForm((current) => ({ ...current, barcode: event.target.value }))} className={inputClassName} /></Field>
+                <Field label={t("minStock")}><input value={form.minStock} onChange={(event) => setForm((current) => ({ ...current, minStock: event.target.value }))} className={inputClassName} inputMode="numeric" /></Field>
+                <Field label={t("length")}><input value={form.length} onChange={(event) => setForm((current) => ({ ...current, length: event.target.value }))} className={inputClassName} inputMode="decimal" /></Field>
+                <Field label={t("width")}><input value={form.width} onChange={(event) => setForm((current) => ({ ...current, width: event.target.value }))} className={inputClassName} inputMode="decimal" /></Field>
+                <Field label={t("height")}><input value={form.height} onChange={(event) => setForm((current) => ({ ...current, height: event.target.value }))} className={inputClassName} inputMode="decimal" /></Field>
+                <Field label={t("dimensionUnit")}><input value={form.dimensionUnit} onChange={(event) => setForm((current) => ({ ...current, dimensionUnit: event.target.value }))} className={inputClassName} /></Field>
                 <div className="md:col-span-2">
-                  <Field label="Categories">
+                  <Field label={t("categoriesLabel")}>
                     <div className="rounded-xl border border-slate-200 p-3">
                       <div className="flex flex-wrap gap-2">
                         {form.categories.length ? form.categories.map((category) => (
@@ -409,11 +411,11 @@ export function ProductsClient({
                             {category}
                             <X className="h-3 w-3" />
                           </button>
-                        )) : <span className="text-sm text-slate-400">No categories selected yet.</span>}
+                        )) : <span className="text-sm text-slate-400">{t("noCategoriesSelected")}</span>}
                       </div>
                       <div className="mt-3 flex gap-2">
-                        <input value={form.categoryInput} onChange={(event) => setForm((current) => ({ ...current, categoryInput: event.target.value }))} onKeyDown={(event) => { if (event.key === "Enter" || event.key === ",") { event.preventDefault(); addCategory(form.categoryInput); } }} className={inputClassName} placeholder="Type a category and press Enter" />
-                        <button type="button" onClick={() => addCategory(form.categoryInput)} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Add</button>
+                        <input value={form.categoryInput} onChange={(event) => setForm((current) => ({ ...current, categoryInput: event.target.value }))} onKeyDown={(event) => { if (event.key === "Enter" || event.key === ",") { event.preventDefault(); addCategory(form.categoryInput); } }} className={inputClassName} placeholder={t("categoryPlaceholder")} />
+                        <button type="button" onClick={() => addCategory(form.categoryInput)} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">{t("addCategory")}</button>
                       </div>
                       {categories.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-2">
@@ -428,16 +430,16 @@ export function ProductsClient({
                   </Field>
                 </div>
                 <div className="md:col-span-2">
-                  <Field label="Notes"><textarea value={form.notes} onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))} className={`${inputClassName} min-h-24 resize-y`} /></Field>
+                  <Field label={t("notesLabel")}><textarea value={form.notes} onChange={(event) => setForm((current) => ({ ...current, notes: event.target.value }))} className={`${inputClassName} min-h-24 resize-y`} /></Field>
                 </div>
               </div>
 
               <div className="border-t border-slate-200 px-6 py-4">
                 <div className="flex items-center justify-end gap-3">
-                  <button type="button" onClick={() => setDrawerOpen(false)} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">Cancel</button>
+                  <button type="button" onClick={() => setDrawerOpen(false)} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">{t("cancel")}</button>
                   <button type="submit" disabled={submitting} className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60">
                     {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                    {editingProductId ? "Save Changes" : "Create Product"}
+                    {editingProductId ? t("saveChanges") : t("createProduct")}
                   </button>
                 </div>
               </div>

@@ -3,6 +3,7 @@
 import { useMemo, useState, startTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { Pencil, Plus, Power, Trash2, X } from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { canManageCatalog } from "@/lib/permissions";
@@ -35,6 +36,7 @@ export function IndexesManager({
 }: {
   initialIndexes: IndexRecord[];
 }) {
+  const t = useTranslations("Indexes");
   const router = useRouter();
   const { data: session } = useSession();
   const canManage = canManageCatalog(session?.user?.role);
@@ -170,9 +172,9 @@ export function IndexesManager({
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Product Indexes</h1>
+            <h1 className="text-2xl font-bold text-slate-900">{t("title")}</h1>
             <p className="mt-1 text-slate-500">
-              Maintain the routing buckets that drive product flow and imports.
+              {t("subtitle")}
             </p>
           </div>
           {canManage && (
@@ -181,7 +183,7 @@ export function IndexesManager({
               className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
             >
               <Plus className="h-4 w-4" />
-              New Index
+              {t("newIndex")}
             </button>
           )}
         </div>
@@ -200,18 +202,18 @@ export function IndexesManager({
             <table className="min-w-full divide-y divide-slate-200">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">Name</th>
+                  <th className="px-4 py-3">{t("columns.name")}</th>
                   <th className="px-4 py-3">Description</th>
-                  <th className="px-4 py-3">Products</th>
+                  <th className="px-4 py-3">{t("columns.products")}</th>
                   <th className="px-4 py-3">Active</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className="px-4 py-3 text-right">{t("columns.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                 {filteredIndexes.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-4 py-16 text-center text-slate-400">
-                      No indexes match the current search.
+                      {t("noIndexes")}
                     </td>
                   </tr>
                 ) : (
@@ -244,7 +246,7 @@ export function IndexesManager({
                                 className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
                               >
                                 <Pencil className="h-3.5 w-3.5" />
-                                Edit
+                                {t("edit")}
                               </button>
                               <button
                                 onClick={() => toggleActive(index)}
@@ -287,7 +289,7 @@ export function IndexesManager({
             <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">
-                  {editingId ? "Edit Index" : "Create Index"}
+                  {editingId ? t("editIndex") : t("createIndex")}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
                   Keep the product routing list clean and descriptive.
@@ -304,7 +306,7 @@ export function IndexesManager({
             <form onSubmit={submit} className="flex flex-1 flex-col">
               <div className="grid flex-1 gap-5 overflow-y-auto px-6 py-5">
                 <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                  <span>Name</span>
+                  <span>{t("name")}</span>
                   <input
                     value={form.name}
                     onChange={(event) =>
@@ -348,14 +350,14 @@ export function IndexesManager({
                     onClick={() => setDrawerOpen(false)}
                     className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
                   >
-                    Cancel
+                    {t("cancel")}
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
                     className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                   >
-                    {editingId ? "Save Changes" : "Create Index"}
+                    {editingId ? t("saveChanges") : t("createIndex")}
                   </button>
                 </div>
               </div>

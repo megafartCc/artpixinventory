@@ -3,6 +3,7 @@
 import { startTransition, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import QRCode from "react-qr-code";
 import {
   ChevronDown,
@@ -63,6 +64,7 @@ export function LocationManager({
 }: {
   locations: LocationRecord[];
 }) {
+  const t = useTranslations("Locations");
   const router = useRouter();
   const { data: session } = useSession();
   const canManage = canManageLocations(session?.user?.role);
@@ -265,7 +267,7 @@ export function LocationManager({
                     </span>
                     {!location.active && (
                       <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
-                        Inactive
+                        {t("inactive")}
                       </span>
                     )}
                   </div>
@@ -287,9 +289,9 @@ export function LocationManager({
       <div className="w-full max-w-md border-r border-slate-200 bg-slate-50/60">
         <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-4">
           <div>
-            <h2 className="font-semibold text-slate-900">Location Tree</h2>
+            <h2 className="font-semibold text-slate-900">{t("treeTitle")}</h2>
             <p className="text-xs text-slate-500">
-              Warehouse {"->"} zone {"->"} shelf {"->"} bin
+              {t("treeSubtitle")}
             </p>
           </div>
           {canManage && (
@@ -298,7 +300,7 @@ export function LocationManager({
               className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50"
             >
               <Plus className="h-3.5 w-3.5" />
-              Root
+              {t("root")}
             </button>
           )}
         </div>
@@ -319,7 +321,7 @@ export function LocationManager({
                   </span>
                   {!selectedLocation.active && (
                     <span className="rounded-full bg-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-600">
-                      Inactive
+                      {t("inactive")}
                     </span>
                   )}
                 </div>
@@ -327,7 +329,7 @@ export function LocationManager({
                   {selectedLocation.name}
                 </h1>
                 <p className="mt-2 max-w-2xl text-sm text-slate-500">
-                  {selectedLocation.description || "No location description yet."}
+                  {selectedLocation.description || t("noDescription")}
                 </p>
               </div>
 
@@ -338,7 +340,7 @@ export function LocationManager({
                     className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
                   >
                     <Pencil className="h-4 w-4" />
-                    Edit
+                    {t("edit")}
                   </button>
                   {selectedLocationAllowedChildren.length > 0 && (
                     <button
@@ -346,7 +348,7 @@ export function LocationManager({
                       className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
                     >
                       <Plus className="h-4 w-4" />
-                      Add Child
+                      {t("addChild")}
                     </button>
                   )}
                 </div>
@@ -355,7 +357,7 @@ export function LocationManager({
 
             <div className="grid flex-1 gap-6 p-8 lg:grid-cols-[0.95fr_1.05fr]">
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-                <h2 className="text-lg font-semibold text-slate-900">QR Identity</h2>
+                <h2 className="text-lg font-semibold text-slate-900">{t("qrIdentity")}</h2>
                 <div className="mt-5 flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                   <QRCode
                     value={selectedLocation.qrCode ?? buildLocationQrCode(selectedLocation.name)}
@@ -368,23 +370,23 @@ export function LocationManager({
                 </div>
                 <div className="mt-6 space-y-3 text-sm text-slate-600">
                   <p>
-                    <strong>Children:</strong> {childCount(selectedLocation.id)}
+                    <strong>{t("children")}:</strong> {childCount(selectedLocation.id)}
                   </p>
                   <p>
-                    <strong>Parent:</strong>{" "}
+                    <strong>{t("parent")}:</strong>{" "}
                     {locations.find(
                       (location) => location.id === selectedLocation.parentId
-                    )?.name ?? "Top level"}
+                    )?.name ?? t("topLevel")}
                   </p>
                 </div>
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 className="text-lg font-semibold text-slate-900">Management</h2>
+                <h2 className="text-lg font-semibold text-slate-900">{t("management")}</h2>
                 <div className="mt-5 grid gap-4 sm:grid-cols-2">
                   <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Type
+                      {t("type")}
                     </p>
                     <p className="mt-2 text-base font-semibold text-slate-900">
                       {locationTypeLabels[selectedLocation.type]}
@@ -392,10 +394,10 @@ export function LocationManager({
                   </div>
                   <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Status
+                      {t("active")} / {t("inactive")}
                     </p>
                     <p className="mt-2 text-base font-semibold text-slate-900">
-                      {selectedLocation.active ? "Active" : "Inactive"}
+                      {selectedLocation.active ? t("active") : t("inactive")}
                     </p>
                   </div>
                 </div>
@@ -407,14 +409,14 @@ export function LocationManager({
                       className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
                     >
                       <Pencil className="h-4 w-4" />
-                      Edit Location
+                      {t("editLocation")}
                     </button>
                     <button
                       onClick={() => toggleActive(selectedLocation)}
                       className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
                     >
                       <Power className="h-4 w-4" />
-                      {selectedLocation.active ? "Deactivate" : "Reactivate"}
+                      {selectedLocation.active ? t("deactivate") : t("reactivate")}
                     </button>
                   </div>
                 )}
@@ -423,7 +425,7 @@ export function LocationManager({
           </div>
         ) : (
           <div className="flex h-full items-center justify-center text-slate-400">
-            Select a location to inspect and manage it.
+            {t("inspectHint")}
           </div>
         )}
       </div>
@@ -439,10 +441,10 @@ export function LocationManager({
             <div className="flex items-start justify-between border-b border-slate-200 px-6 py-5">
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">
-                  {editingId ? "Edit Location" : "Create Location"}
+                  {editingId ? t("editLocation") : t("createLocation")}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  QR codes are generated automatically from the location name.
+                  {t("drawerSubtitle")}
                 </p>
               </div>
               <button
@@ -456,7 +458,7 @@ export function LocationManager({
             <form onSubmit={submit} className="flex flex-1 flex-col">
               <div className="grid flex-1 gap-5 overflow-y-auto px-6 py-5">
                 <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                  <span>Name</span>
+                  <span>{t("name")}</span>
                   <input
                     value={form.name}
                     onChange={(event) =>
@@ -468,7 +470,7 @@ export function LocationManager({
                 </label>
 
                 <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                  <span>Parent</span>
+                  <span>{t("parent")}</span>
                   <select
                     value={form.parentId}
                     onChange={(event) => {
@@ -484,7 +486,7 @@ export function LocationManager({
                     }}
                     className={inputClassName}
                   >
-                    <option value="">Top level</option>
+                    <option value="">{t("noParent")}</option>
                     {availableParentOptions.map((option) => (
                       <option key={option.id} value={option.id}>
                         {option.label}
@@ -494,7 +496,7 @@ export function LocationManager({
                 </label>
 
                 <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                  <span>Type</span>
+                  <span>{t("type")}</span>
                   <select
                     value={form.type}
                     onChange={(event) =>
@@ -514,7 +516,7 @@ export function LocationManager({
                 </label>
 
                 <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
-                  <span>Description</span>
+                  <span>{t("description")}</span>
                   <textarea
                     value={form.description}
                     onChange={(event) =>
@@ -535,7 +537,7 @@ export function LocationManager({
                       setForm((current) => ({ ...current, active: event.target.checked }))
                     }
                   />
-                  Active
+                  {t("active")}
                 </label>
               </div>
 
@@ -546,14 +548,14 @@ export function LocationManager({
                     onClick={() => setDrawerOpen(false)}
                     className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
                   >
-                    Cancel
+                    {t("cancel")}
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
                     className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60"
                   >
-                    {editingId ? "Save Changes" : "Create Location"}
+                    {editingId ? t("saveChanges") : t("createLocation")}
                   </button>
                 </div>
               </div>
