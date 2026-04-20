@@ -115,13 +115,13 @@ function openPrintWindow(title: string, labels: LabelInstance[]) {
 
 export function LabelsClient({
   initialTab = "products",
-  initialProductId = "",
+  initialProductIds = [],
   products,
   locations,
   pallets,
 }: {
   initialTab?: TabKey;
-  initialProductId?: string;
+  initialProductIds?: string[];
   products: ProductOption[];
   locations: LocationOption[];
   pallets: PalletOption[];
@@ -129,10 +129,12 @@ export function LabelsClient({
   const t = useTranslations("Labels");
   const [tab, setTab] = useState<TabKey>(initialTab);
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>(
-    initialProductId ? [initialProductId] : []
+    initialProductIds.length > 0 ? initialProductIds : []
   );
   const [productQty, setProductQty] = useState<Record<string, string>>(
-    initialProductId ? { [initialProductId]: "1" } : {}
+    initialProductIds.length > 0
+      ? Object.fromEntries(initialProductIds.map((id) => [id, "1"]))
+      : {}
   );
   const [selectedLocationIds, setSelectedLocationIds] = useState<string[]>([]);
   const [selectedPalletId, setSelectedPalletId] = useState("");

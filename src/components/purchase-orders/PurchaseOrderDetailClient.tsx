@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { ChangeEvent, DragEvent, startTransition, useMemo, useState } from "react";
 import Link from "next/link";
@@ -261,7 +261,7 @@ export function PurchaseOrderDetailClient({
                 {t("back")}
               </Link>
               <div className="mt-4 flex flex-wrap items-center gap-4">
-                <h1 className="text-3xl font-extrabold tracking-tight text-slate-950 lg:text-4xl">
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 lg:text-4xl">
                   {purchaseOrder.poNumber}
                 </h1>
                 <span className={`rounded-2xl px-4 py-1.5 text-xs font-bold uppercase tracking-widest ring-1 ring-inset ${getPoStatusTone(purchaseOrder.status)}`}>
@@ -341,7 +341,7 @@ export function PurchaseOrderDetailClient({
                       <tr key={item.id} className="transition hover:bg-slate-50/50">
                         <td className="px-6 py-5">
                           <div className="flex flex-col">
-                            <span className="font-bold text-slate-950">{item.compoundId}</span>
+                            <span className="font-bold text-slate-900">{item.compoundId}</span>
                             <span className="text-xs text-slate-500">{item.name}</span>
                           </div>
                         </td>
@@ -352,7 +352,7 @@ export function PurchaseOrderDetailClient({
                           </span>
                         </td>
                         <td className="px-6 py-5 text-right font-medium">${item.unitCost}</td>
-                        <td className="px-6 py-5 text-right font-bold text-slate-950">${item.totalCost}</td>
+                        <td className="px-6 py-5 text-right font-bold text-slate-900">${item.totalCost}</td>
                         <td className="px-6 py-5 text-xs text-slate-500 italic max-w-[200px] truncate">{item.notes || "-"}</td>
                       </tr>
                     ))}
@@ -450,7 +450,7 @@ export function PurchaseOrderDetailClient({
                         <div className="flex items-start justify-between gap-4">
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                              <p className="text-sm font-bold text-slate-950">{document.label}</p>
+                              <p className="text-sm font-bold text-slate-900">{document.label}</p>
                               <span className="rounded-full bg-white px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-500 ring-1 ring-inset ring-slate-200">
                                 {document.uploadedAt}
                               </span>
@@ -514,7 +514,7 @@ export function PurchaseOrderDetailClient({
                   <>
                     <Link
                       href={`/${locale}/purchase-orders/${purchaseOrder.id}/edit`}
-                      className="rounded-[18px] border border-slate-200 bg-white px-5 py-3.5 text-center text-sm font-bold text-slate-950 shadow-sm transition hover:bg-slate-50"
+                      className="rounded-[18px] border border-slate-200 bg-white px-5 py-3.5 text-center text-sm font-bold text-slate-900 shadow-sm transition hover:bg-slate-50"
                     >
                       {t("edit")}
                     </Link>
@@ -540,7 +540,7 @@ export function PurchaseOrderDetailClient({
                     {canManage && (
                       <Link
                         href={`/${locale}/purchase-orders/${purchaseOrder.id}/edit`}
-                        className="rounded-[18px] border border-slate-200 bg-white px-5 py-3.5 text-center text-sm font-bold text-slate-950 shadow-sm transition hover:bg-slate-50"
+                        className="rounded-[18px] border border-slate-200 bg-white px-5 py-3.5 text-center text-sm font-bold text-slate-900 shadow-sm transition hover:bg-slate-50"
                       >
                         {t("edit")}
                       </Link>
@@ -557,7 +557,7 @@ export function PurchaseOrderDetailClient({
                         <button
                           onClick={() => void runAction("REJECT")}
                           disabled={submitting}
-                          className="rounded-[18px] border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-950 transition hover:bg-slate-50 disabled:opacity-60"
+                          className="rounded-[18px] border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-900 transition hover:bg-slate-50 disabled:opacity-60"
                         >
                           {t("reject")}
                         </button>
@@ -588,7 +588,7 @@ export function PurchaseOrderDetailClient({
                 <button
                   onClick={() => void duplicate()}
                   disabled={submitting}
-                  className="rounded-[18px] border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-950 transition hover:bg-slate-50 disabled:opacity-60"
+                  className="rounded-[18px] border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-900 transition hover:bg-slate-50 disabled:opacity-60"
                 >
                   {t("duplicatePo")}
                 </button>
@@ -687,7 +687,7 @@ function Info({
 }) {
   return (
     <div className="rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-2.5 transition hover:bg-white hover:shadow-sm">
-      <dt className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">{label}</dt>
+      <dt className="text-[9px] font-semibold uppercase tracking-[0.15em] text-slate-400">{label}</dt>
       <dd className="mt-1 text-sm font-bold text-slate-900">{value}</dd>
     </div>
   );
@@ -709,5 +709,7 @@ function SummaryRow({
     </div>
   );
 }
+
+
 
 

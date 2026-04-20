@@ -1,14 +1,15 @@
-"use client";
+﻿"use client";
 
-import { startTransition, useDeferredValue, useState } from "react";
+import { startTransition, useDeferredValue, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { Loader2, PackagePlus, Search, X } from "lucide-react";
+import { Download, Loader2, PackagePlus, Search, X } from "lucide-react";
 import { PdfExportButton } from "@/components/PdfExportButton";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { productUnits } from "@/lib/product-schemas";
+import { useSavedViews } from "@/hooks/useSavedViews";
 
 type ProductRecord = {
   id: string;
@@ -75,6 +76,18 @@ const formatDimensions = (product: ProductRecord) =>
     ? `${product.length} x ${product.width} x ${product.height} ${product.dimensionUnit}`
     : "-";
 
+function downloadCsv(fileName: string, content: string) {
+  const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 export function ProductsClient({
   locale,
   initialProducts,
@@ -89,9 +102,26 @@ export function ProductsClient({
   const { data: session } = useSession();
   const userRole = session?.user?.role ?? "WAREHOUSE";
   const canManageProducts = userRole !== "WAREHOUSE";
-  const [search, setSearch] = useState("");
-  const [indexFilter, setIndexFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("active");
+  const {
+    state: filters,
+    setState: setFilters,
+    views,
+    saveView,
+    deleteView,
+    resetState,
+  } = useSavedViews("artpix:products:list", {
+    search: "",
+    indexFilter: "all",
+    statusFilter: "active",
+  }, {
+    defaultViewName: userRole === "WAREHOUSE" ? "Warehouse catalog" : "Catalog view",
+    defaultViewState: {
+      search: "",
+      indexFilter: "all",
+      statusFilter: "active",
+    },
+  });
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingProductId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(() => createEmptyForm(indexes));
@@ -99,7 +129,7 @@ export function ProductsClient({
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   useToastFeedback(errorMessage, statusMessage);
-  const deferredSearch = useDeferredValue(search);
+  const deferredSearch = useDeferredValue(filters.search);
 
   let filteredProducts = [...initialProducts];
   if (deferredSearch.trim()) {
@@ -111,15 +141,98 @@ export function ProductsClient({
         .includes(query)
     );
   }
-  if (indexFilter !== "all") {
-    filteredProducts = filteredProducts.filter((product) => product.indexId === indexFilter);
+  if (filters.indexFilter !== "all") {
+    filteredProducts = filteredProducts.filter((product) => product.indexId === filters.indexFilter);
   }
-  if (statusFilter !== "all") {
+  if (filters.statusFilter !== "all") {
     filteredProducts = filteredProducts.filter((product) =>
-      statusFilter === "active" ? product.active : !product.active
+      filters.statusFilter === "active" ? product.active : !product.active
     );
   }
   filteredProducts.sort((left, right) => left.compoundId.localeCompare(right.compoundId));
+
+  const selectedProducts = useMemo(
+    () => initialProducts.filter((product) => selectedProductIds.includes(product.id)),
+    [initialProducts, selectedProductIds]
+  );
+
+  const allVisibleSelected =
+    filteredProducts.length > 0 &&
+    filteredProducts.every((product) => selectedProductIds.includes(product.id));
+
+  const toggleVisibleSelection = (checked: boolean) => {
+    if (checked) {
+      setSelectedProductIds((current) =>
+        Array.from(new Set([...current, ...filteredProducts.map((product) => product.id)]))
+      );
+      return;
+    }
+
+    setSelectedProductIds((current) =>
+      current.filter((id) => !filteredProducts.some((product) => product.id === id))
+    );
+  };
+
+  const exportSelected = () => {
+    if (selectedProducts.length === 0) {
+      return;
+    }
+
+    const headers = ["ID", "Name", "Index", "Unit", "Min Stock", "Status"];
+    const rows = selectedProducts.map((product) =>
+      [
+        product.compoundId,
+        product.name,
+        product.indexName,
+        product.uom.toUpperCase(),
+        product.minStock,
+        product.active ? "Active" : "Inactive",
+      ]
+        .map((value) => `"${String(value).replaceAll('"', '""')}"`)
+        .join(",")
+    );
+
+    downloadCsv(
+      `products-selected-${new Date().toISOString().slice(0, 10)}.csv`,
+      [headers.join(","), ...rows].join("\n")
+    );
+  };
+
+  const bulkDeactivate = async () => {
+    if (selectedProducts.length === 0) {
+      return;
+    }
+
+    setSubmitting(true);
+    setErrorMessage("");
+    setStatusMessage("");
+
+    const response = await fetch("/api/products/bulk-update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: selectedProducts.map((product) => product.id), active: false }),
+    });
+    const payload = (await response.json()) as { error?: string; message?: string };
+    setSubmitting(false);
+
+    if (!response.ok) {
+      setErrorMessage(payload.error ?? t("feedback.saveFailed"));
+      return;
+    }
+
+    setStatusMessage(payload.message ?? "Products updated.");
+    setSelectedProductIds([]);
+    startTransition(() => router.refresh());
+  };
+
+  const saveCurrentView = () => {
+    const name = window.prompt("Save this product filter view as:");
+    if (!name) {
+      return;
+    }
+
+    saveView(name);
+  };
 
   const addCategory = (value: string) => {
     const nextValue = value.trim();
@@ -186,7 +299,7 @@ export function ProductsClient({
         <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h1 className="text-4xl font-extrabold tracking-tight text-slate-950">{t("title")}</h1>
+              <h1 className="text-4xl font-bold tracking-tight text-slate-900">{t("title")}</h1>
               <p className="mt-2 text-lg text-slate-500">{t("subtitle")}</p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
@@ -203,6 +316,13 @@ export function ProductsClient({
                   p.active ? "Active" : "Inactive",
                 ])}
               />
+              <button
+                type="button"
+                onClick={saveCurrentView}
+                className="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+              >
+                Save view
+              </button>
               <Link href="../indexes" className="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
                 {t("indexes")}
               </Link>
@@ -222,32 +342,117 @@ export function ProductsClient({
           </div>
         </div>
 
+        {views.length > 0 && (
+          <div className="rounded-[32px] border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                Saved views
+              </span>
+              {views.map((view) => (
+                <div
+                  key={view.id}
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setFilters(view.state)}
+                    className="text-xs font-semibold text-slate-700"
+                  >
+                    {view.name}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deleteView(view.id)}
+                    className="text-xs font-semibold text-slate-400 hover:text-slate-600"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={resetState}
+                className="rounded-full border border-dashed border-slate-200 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 hover:bg-slate-50"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="grid gap-4 rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-4">
           <div className="relative md:col-span-2">
             <Search className="pointer-events-none absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
             <input 
-              value={search} 
-              onChange={(event) => setSearch(event.target.value)} 
+              value={filters.search} 
+              onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))} 
               placeholder={t("searchPlaceholder")} 
               className="w-full rounded-2xl border border-slate-100 bg-slate-50 py-3 pl-11 pr-4 text-sm font-medium text-slate-700 outline-none transition focus:border-slate-200 focus:bg-white focus:ring-4 focus:ring-slate-50" 
             />
           </div>
-          <select value={indexFilter} onChange={(event) => setIndexFilter(event.target.value)} className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 outline-none transition focus:border-slate-200 focus:bg-white">
+          <select value={filters.indexFilter} onChange={(event) => setFilters((current) => ({ ...current, indexFilter: event.target.value }))} className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 outline-none transition focus:border-slate-200 focus:bg-white">
             <option value="all">{t("allIndexes")}</option>
             {indexes.map((index) => <option key={index.id} value={index.id}>{index.name}</option>)}
           </select>
-          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 outline-none transition focus:border-slate-200 focus:bg-white">
+          <select value={filters.statusFilter} onChange={(event) => setFilters((current) => ({ ...current, statusFilter: event.target.value }))} className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 outline-none transition focus:border-slate-200 focus:bg-white">
             <option value="active">{t("activeOnly")}</option>
             <option value="inactive">{t("inactiveOnly")}</option>
             <option value="all">{t("allStatuses")}</option>
           </select>
         </div>
 
+        {selectedProductIds.length > 0 && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="text-sm font-medium text-slate-600">
+              {selectedProductIds.length} selected
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={exportSelected}
+                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                <Download className="h-4 w-4" />
+                Export selected
+              </button>
+              <Link
+                href={`/${locale}/labels?tab=products&products=${selectedProductIds.join(",")}`}
+                className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Print labels
+              </Link>
+              <button
+                type="button"
+                onClick={() => void bulkDeactivate()}
+                disabled={!canManageProducts || submitting}
+                className="inline-flex items-center gap-2 rounded-2xl bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:opacity-60"
+              >
+                Deactivate
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedProductIds([])}
+                className="rounded-2xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Clear selection
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md">
           <div className="min-h-0 flex-1 overflow-auto">
             <table className="min-w-full divide-y divide-slate-100">
               <thead className="bg-slate-50/50 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
                 <tr>
+                  <th className="px-4 py-4">
+                    <input
+                      type="checkbox"
+                      checked={allVisibleSelected}
+                      onChange={(event) => toggleVisibleSelection(event.target.checked)}
+                      className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-200"
+                    />
+                  </th>
                   <th className="px-8 py-4">{t("columns.compoundId")}</th>
                   <th className="px-8 py-4">{t("columns.name")}</th>
                   <th className="px-8 py-4">{t("columns.index")}</th>
@@ -259,11 +464,25 @@ export function ProductsClient({
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
                 {filteredProducts.length === 0 ? (
-                  <tr><td colSpan={7} className="px-8 py-24 text-center font-medium text-slate-400">{t("noMatch")}</td></tr>
+                  <tr><td colSpan={8} className="px-8 py-24 text-center font-medium text-slate-400">{t("noMatch")}</td></tr>
                 ) : filteredProducts.map((product) => (
-                  <tr key={product.id} className="transition hover:bg-slate-50/50">
+                  <tr key={product.id} className={`transition hover:bg-slate-50/50 ${selectedProductIds.includes(product.id) ? "bg-indigo-50/60" : ""}`}>
+                    <td className="px-4 py-5">
+                      <input
+                        type="checkbox"
+                        checked={selectedProductIds.includes(product.id)}
+                        onChange={(event) => {
+                          setSelectedProductIds((current) =>
+                            event.target.checked
+                              ? Array.from(new Set([...current, product.id]))
+                              : current.filter((id) => id !== product.id)
+                          );
+                        }}
+                        className="h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-200"
+                      />
+                    </td>
                     <td className="px-8 py-5">
-                      <Link href={`/${locale}/products/${product.id}`} className="font-black text-slate-950 hover:underline decoration-slate-300 underline-offset-4">
+                      <Link href={`/${locale}/products/${product.id}`} className="font-semibold text-slate-900 hover:underline decoration-slate-300 underline-offset-4">
                         {product.compoundId}
                       </Link>
                     </td>
@@ -282,20 +501,20 @@ export function ProductsClient({
                       </div>
                     </td>
                     <td className="px-8 py-5 text-slate-500 font-medium">{formatDimensions(product)}</td>
-                    <td className="px-8 py-5 text-center font-black text-slate-950">{product.minStock}</td>
+                    <td className="px-8 py-5 text-center font-semibold text-slate-900">{product.minStock}</td>
                       <td className="px-8 py-5">
                         <div className="flex justify-end gap-3">
                           {canManageProducts && (
                             <Link
                               href={`/${locale}/products/${product.id}/edit`}
-                              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-600 transition shadow-sm hover:bg-slate-50"
+                              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-600 transition shadow-sm hover:bg-slate-50"
                             >
                               {t("edit")}
                             </Link>
                           )}
                           <Link
                             href={`/${locale}/products/${product.id}`}
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-slate-100 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-950 hover:bg-slate-200 transition"
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-slate-100 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-900 hover:bg-slate-200 transition"
                           >
                             {t("view")}
                           </Link>
@@ -315,7 +534,7 @@ export function ProductsClient({
           <div className="flex h-full w-full max-w-xl flex-col border-l border-slate-200 bg-white shadow-2xl animate-in slide-in-from-right duration-300">
             <div className="flex items-start justify-between border-b border-slate-100 px-8 py-8">
               <div>
-                <h2 className="text-3xl font-black tracking-tight text-slate-950">{editingProductId ? t("editProduct") : t("addProductTitle")}</h2>
+                <h2 className="text-3xl font-bold tracking-tight text-slate-900">{editingProductId ? t("editProduct") : t("addProductTitle")}</h2>
                 <p className="mt-2 text-sm font-medium text-slate-400 uppercase tracking-widest">{t("drawerSubtitle")}</p>
               </div>
               <button onClick={() => setDrawerOpen(false)} className="rounded-2xl p-3 text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition">
@@ -350,7 +569,7 @@ export function ProductsClient({
                       </div>
                       <div className="mt-4 flex gap-2">
                         <input value={form.categoryInput} onChange={(event) => setForm((current) => ({ ...current, categoryInput: event.target.value }))} onKeyDown={(event) => { if (event.key === "Enter" || event.key === ",") { event.preventDefault(); addCategory(form.categoryInput); } }} className="flex-1 rounded-xl border border-slate-100 bg-white px-4 py-2 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-slate-50 outline-none transition" placeholder={t("categoryPlaceholder")} />
-                        <button type="button" onClick={() => addCategory(form.categoryInput)} className="rounded-xl bg-slate-200 px-4 py-2 text-xs font-black uppercase tracking-wider text-slate-700 hover:bg-slate-300 transition">{t("add")}</button>
+                        <button type="button" onClick={() => addCategory(form.categoryInput)} className="rounded-xl bg-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-700 hover:bg-slate-300 transition">{t("add")}</button>
                       </div>
                     </div>
                   </Field>
@@ -386,8 +605,10 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">{label}</span>
+      <span className="ml-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">{label}</span>
       {children}
     </div>
   );
 }
+
+

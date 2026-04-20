@@ -7,6 +7,7 @@ export default async function ReportsHubPage({ params }: { params: { locale: str
     { href: "stock-levels", title: t("cards.stock.title"), description: t("cards.stock.description") },
     { href: "po-aging", title: t("cards.poAging.title"), description: t("cards.poAging.description") },
     { href: "defects", title: t("cards.defects.title"), description: t("cards.defects.description") },
+    { href: "activity", title: "Activity log", description: "Filter tracked actions by user, module, and date." },
     { href: "production", title: t("cards.production.title"), description: t("cards.production.description") },
     { href: "credits", title: t("cards.credits.title"), description: t("cards.credits.description") },
     { href: "qbo-export", title: t("cards.qbo.title"), description: t("cards.qbo.description") },

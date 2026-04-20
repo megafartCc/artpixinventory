@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useDeferredValue, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -162,10 +162,15 @@ export function AppShell({
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const notificationMenuRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const role = (session?.user as { role?: string })?.role || "WAREHOUSE";
+  const canAccessSettings = role === "ADMIN";
   const currentLocale =
     localeOptions.find((option) => option.value === locale) ?? localeOptions[0];
+  const visibleNavItems = canAccessSettings
+    ? navItems
+    : navItems.filter((item) => item.key !== "settings");
 
   const searchItems: StaticSearchItem[] = [
     { label: t("dashboard"), href: "/", keywords: ["home", "overview", "panel"] },
@@ -183,7 +188,6 @@ export function AppShell({
     { label: t("production"), href: "/production", keywords: ["restock", "queue", "machine"] },
     { label: t("credits"), href: "/credits", keywords: ["vendor credits", "claims", "refunds"] },
     { label: t("reports"), href: "/reports", keywords: ["analytics", "insights"] },
-    { label: t("settings"), href: "/settings", keywords: ["config", "admin", "system"] },
     {
       label: reportsStock("title"),
       href: "/reports/stock-levels",
@@ -210,6 +214,20 @@ export function AppShell({
       keywords: ["quickbooks", "csv export", "accounting"],
     },
   ];
+
+  if (canAccessSettings) {
+    searchItems.push({
+      label: t("settings"),
+      href: "/settings",
+      keywords: ["config", "admin", "system"],
+    });
+  }
+
+  searchItems.push({
+    label: "Activity log",
+    href: "/reports/activity",
+    keywords: ["audit log", "history", "activity"],
+  });
 
   const normalizedSearch = deferredSearchQuery.trim().toLowerCase();
   const filteredPageItems: StaticSearchItem[] = (
@@ -251,6 +269,25 @@ export function AppShell({
 
     document.addEventListener("mousedown", handlePointerDown);
     return () => document.removeEventListener("mousedown", handlePointerDown);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const isCommandK = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
+      if (!isCommandK) {
+        return;
+      }
+
+      event.preventDefault();
+      setSearchOpen(true);
+      window.requestAnimationFrame(() => {
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      });
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   useEffect(() => {
@@ -328,7 +365,7 @@ export function AppShell({
 
         <div className="flex flex-1 flex-col overflow-hidden">
           <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-4">
-            {navItems.map((item) => {
+            {visibleNavItems.map((item) => {
               const isActive =
                 item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
 
@@ -353,23 +390,25 @@ export function AppShell({
             })}
           </nav>
 
-          <div className="border-t border-slate-200 px-2 py-3">
-            <Link
-              href={`/${locale}${settingsNavItem.href}`}
-              className={`
-                flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all
-                ${
-                  pathname.startsWith(settingsNavItem.href)
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                }
-              `}
-              title={collapsed ? t(settingsNavItem.key) : undefined}
-            >
-              <settingsNavItem.icon className="h-5 w-5 flex-shrink-0" />
-              {!collapsed && <span>{t(settingsNavItem.key)}</span>}
-            </Link>
-          </div>
+          {canAccessSettings && (
+            <div className="border-t border-slate-200 px-2 py-3">
+              <Link
+                href={`/${locale}${settingsNavItem.href}`}
+                className={`
+                  flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all
+                  ${
+                    pathname.startsWith(settingsNavItem.href)
+                      ? "bg-indigo-50 text-indigo-700"
+                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  }
+                `}
+                title={collapsed ? t(settingsNavItem.key) : undefined}
+              >
+                <settingsNavItem.icon className="h-5 w-5 flex-shrink-0" />
+                {!collapsed && <span>{t(settingsNavItem.key)}</span>}
+              </Link>
+            </div>
+          )}
 
           <div className="border-t border-slate-200 p-2">
             <button
@@ -455,6 +494,7 @@ export function AppShell({
               <div className="relative">
                 <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
+                  ref={searchInputRef}
                   type="search"
                   value={searchQuery}
                   onChange={(event) => {
@@ -472,48 +512,67 @@ export function AppShell({
                     }
                   }}
                   placeholder={appShell("searchPlaceholder")}
-                  className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-slate-300 focus:bg-white focus:ring-4 focus:ring-slate-100 lg:h-12"
+                  className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-slate-300 focus:bg-white focus:ring-4 focus:ring-slate-100 lg:h-12 lg:pr-20"
                 />
+                <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400 lg:block">
+                  Ctrl K
+                </kbd>
                 {searchOpen && (
-                  <div className="absolute inset-x-0 top-[calc(100%+10px)] z-40 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
-                    {filteredSearchItems.length > 0 ? (
-                      <div className="max-h-80 overflow-y-auto p-2">
-                        {filteredSearchItems.map((item) => (
-                          <button
-                            key={item.href}
-                            type="button"
-                            onClick={() => navigateFromSearch(item.href)}
-                            className="flex w-full items-center justify-between rounded-lg px-3 py-3 text-left transition hover:bg-slate-50"
-                          >
-                            <span>
-                              <span className="block text-sm font-medium text-slate-800">
-                                {item.label}
+                  <>
+                    <button
+                      type="button"
+                      aria-label="Close command palette"
+                      onClick={() => setSearchOpen(false)}
+                      className="fixed inset-0 z-40 bg-slate-950/35 backdrop-blur-sm"
+                    />
+                    <div className="fixed left-1/2 top-20 z-50 w-[min(92vw,760px)] -translate-x-1/2 overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-2xl shadow-slate-200/70">
+                      <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/70 px-5 py-4">
+                        <div>
+                          <h3 className="text-sm font-semibold text-slate-900">
+                            {appShell("searchPlaceholder")}
+                          </h3>
+                          <p className="mt-0.5 text-xs text-slate-500">
+                            Ctrl K / Cmd K
+                          </p>
+                        </div>
+                        <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                          {searchLoading ? appShell("searching") : appShell("noResults")}
+                        </span>
+                      </div>
+                      {filteredSearchItems.length > 0 ? (
+                        <div className="max-h-[60vh] overflow-y-auto p-2">
+                          {filteredSearchItems.map((item) => (
+                            <button
+                              key={item.href}
+                              type="button"
+                              onClick={() => navigateFromSearch(item.href)}
+                              className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition hover:bg-slate-50"
+                            >
+                              <span>
+                                <span className="block text-sm font-medium text-slate-800">
+                                  {item.label}
+                                </span>
+                                <span className="block text-xs text-slate-400">
+                                  {"subtitle" in item
+                                    ? item.subtitle
+                                    : item.href === "/"
+                                      ? "/dashboard"
+                                      : item.href}
+                                </span>
                               </span>
-                              <span className="block text-xs text-slate-400">
-                                {"subtitle" in item
-                                  ? item.subtitle
-                                  : item.href === "/"
-                                    ? "/dashboard"
-                                    : item.href}
+                              <span className="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                                {"kind" in item ? item.kind : "Go"}
                               </span>
-                            </span>
-                            <span className="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium uppercase tracking-wide text-slate-500">
-                              {"kind" in item ? item.kind : "Go"}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="px-4 py-5 text-sm text-slate-500">
-                        {appShell("noResults")}
-                      </div>
-                    )}
-                    {searchLoading && (
-                      <div className="border-t border-slate-200 px-4 py-3 text-xs text-slate-400">
-                        {appShell("searching")}
-                      </div>
-                    )}
-                  </div>
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="px-5 py-8 text-sm text-slate-500">
+                          {appShell("noResults")}
+                        </div>
+                      )}
+                    </div>
+                  </>
                 )}
               </div>
             </div>
@@ -639,7 +698,7 @@ export function AppShell({
         {mobileMenuOpen && (
           <div className="border-b border-slate-200 bg-white shadow-lg lg:hidden">
             <nav className="space-y-1 p-3">
-              {navItems.map((item) => {
+              {visibleNavItems.map((item) => {
                 const isActive =
                   item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
 
@@ -662,18 +721,20 @@ export function AppShell({
                   </Link>
                 );
               })}
-              <Link
-                href={`/${locale}${settingsNavItem.href}`}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium ${
-                  pathname.startsWith(settingsNavItem.href)
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "text-slate-600 hover:bg-slate-100"
-                }`}
-              >
-                <settingsNavItem.icon className="h-5 w-5" />
-                <span>{t(settingsNavItem.key)}</span>
-              </Link>
+              {canAccessSettings && (
+                <Link
+                  href={`/${locale}${settingsNavItem.href}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium ${
+                    pathname.startsWith(settingsNavItem.href)
+                      ? "bg-indigo-50 text-indigo-700"
+                      : "text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  <settingsNavItem.icon className="h-5 w-5" />
+                  <span>{t(settingsNavItem.key)}</span>
+                </Link>
+              )}
             </nav>
           </div>
         )}
@@ -731,3 +792,5 @@ export function AppShell({
     </div>
   );
 }
+
+

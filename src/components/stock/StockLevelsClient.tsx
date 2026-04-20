@@ -8,6 +8,7 @@ import { Download, Search, X } from "lucide-react";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
 import { canAdjustStock } from "@/lib/permissions";
 import { stockAdjustmentReasonOptions } from "@/lib/stock-schemas";
+import { useSavedViews } from "@/hooks/useSavedViews";
 
 type ProductRow = {
   id: string;
@@ -98,11 +99,29 @@ export function StockLevelsClient({
   const t = useTranslations("Stock");
   const router = useRouter();
   const { data: session } = useSession();
+  const userRole = session?.user?.role ?? "WAREHOUSE";
   const canAdjust = canAdjustStock(session?.user?.role);
-  const [search, setSearch] = useState("");
-  const [indexFilter, setIndexFilter] = useState("all");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-  const [locationFilter, setLocationFilter] = useState("all");
+  const {
+    state: filters,
+    setState: setFilters,
+    views,
+    saveView,
+    deleteView,
+    resetState,
+  } = useSavedViews("artpix:stock:list", {
+    search: "",
+    indexFilter: "all",
+    categoryFilter: "all",
+    locationFilter: "all",
+  }, {
+    defaultViewName: userRole === "WAREHOUSE" ? "Warehouse grid" : "Management grid",
+    defaultViewState: {
+      search: "",
+      indexFilter: "all",
+      categoryFilter: "all",
+      locationFilter: "all",
+    },
+  });
   const [feedback, setFeedback] = useState("");
   const [error, setError] = useState("");
   useToastFeedback(error, feedback);
@@ -117,14 +136,14 @@ export function StockLevelsClient({
   const [submitting, setSubmitting] = useState(false);
 
   const visibleLocations = useMemo(() => {
-    return locationFilter === "all"
+    return filters.locationFilter === "all"
       ? locationColumns
-      : locationColumns.filter((location) => location.id === locationFilter);
-  }, [locationColumns, locationFilter]);
+      : locationColumns.filter((location) => location.id === filters.locationFilter);
+  }, [filters.locationFilter, locationColumns]);
 
   const filteredProducts = useMemo(() => {
     let products = [...initialProducts];
-    const normalizedSearch = search.trim().toLowerCase();
+    const normalizedSearch = filters.search.trim().toLowerCase();
 
     if (normalizedSearch) {
       products = products.filter((product) =>
@@ -135,18 +154,27 @@ export function StockLevelsClient({
       );
     }
 
-    if (indexFilter !== "all") {
-      products = products.filter((product) => product.indexId === indexFilter);
+    if (filters.indexFilter !== "all") {
+      products = products.filter((product) => product.indexId === filters.indexFilter);
     }
 
-    if (categoryFilter !== "all") {
+    if (filters.categoryFilter !== "all") {
       products = products.filter((product) =>
-        product.categories.includes(categoryFilter)
+        product.categories.includes(filters.categoryFilter)
       );
     }
 
     return products;
-  }, [categoryFilter, indexFilter, initialProducts, search]);
+  }, [filters.categoryFilter, filters.indexFilter, filters.search, initialProducts]);
+
+  const saveCurrentView = () => {
+    const name = window.prompt("Save this stock filter view as:");
+    if (!name) {
+      return;
+    }
+
+    saveView(name);
+  };
 
   const exportCurrentView = () => {
     const headers = [
@@ -275,19 +303,64 @@ export function StockLevelsClient({
           </button>
         </div>
 
+        {views.length > 0 && (
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                Saved views
+              </span>
+              {views.map((view) => (
+                <div
+                  key={view.id}
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setFilters(view.state)}
+                    className="text-xs font-semibold text-slate-700"
+                  >
+                    {view.name}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deleteView(view.id)}
+                    className="text-xs font-semibold text-slate-400 hover:text-slate-600"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={saveCurrentView}
+                className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-slate-700 hover:bg-slate-50"
+              >
+                Save view
+              </button>
+              <button
+                type="button"
+                onClick={resetState}
+                className="rounded-full border border-dashed border-slate-200 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 hover:bg-slate-50"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm lg:grid-cols-[2fr_1fr_1fr_1fr]">
           <label className="relative">
             <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
             <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              value={filters.search}
+              onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))}
               placeholder={t("searchPlaceholder")}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm text-slate-700 outline-none focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-200"
             />
           </label>
           <select
-            value={indexFilter}
-            onChange={(event) => setIndexFilter(event.target.value)}
+            value={filters.indexFilter}
+            onChange={(event) => setFilters((current) => ({ ...current, indexFilter: event.target.value }))}
             className={inputClassName}
           >
             <option value="all">{t("allIndexes")}</option>
@@ -298,8 +371,8 @@ export function StockLevelsClient({
             ))}
           </select>
           <select
-            value={categoryFilter}
-            onChange={(event) => setCategoryFilter(event.target.value)}
+            value={filters.categoryFilter}
+            onChange={(event) => setFilters((current) => ({ ...current, categoryFilter: event.target.value }))}
             className={inputClassName}
           >
             <option value="all">{t("allCategories")}</option>
@@ -310,8 +383,8 @@ export function StockLevelsClient({
             ))}
           </select>
           <select
-            value={locationFilter}
-            onChange={(event) => setLocationFilter(event.target.value)}
+            value={filters.locationFilter}
+            onChange={(event) => setFilters((current) => ({ ...current, locationFilter: event.target.value }))}
             className={inputClassName}
           >
             <option value="all">{t("allLocations")}</option>

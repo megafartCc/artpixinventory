@@ -1,10 +1,11 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Copy, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useToastFeedback } from "@/hooks/useToastFeedback";
+import { useSavedViews } from "@/hooks/useSavedViews";
 
 type CountRow = {
   id: string;
@@ -38,10 +39,53 @@ export function CountSessionsClient({
   canCreate: boolean;
 }) {
   const t = useTranslations("Counts");
+  const userRole = canCreate ? "WAREHOUSE" : "MANAGER";
+  const {
+    state: filters,
+    setState: setFilters,
+    views,
+    saveView,
+    deleteView,
+    resetState,
+  } = useSavedViews("artpix:counts:list", {
+    search: "",
+    statusFilter: "ALL",
+  }, {
+    defaultViewName: userRole === "WAREHOUSE" ? "My counts" : "Count overview",
+    defaultViewState: {
+      search: "",
+      statusFilter: "ALL",
+    },
+  });
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
   const [duplicatingId, setDuplicatingId] = useState("");
   useToastFeedback(error, feedback);
+
+  const filteredRows = useMemo(() => {
+    let next = [...rows];
+    if (filters.search.trim()) {
+      const query = filters.search.trim().toLowerCase();
+      next = next.filter((row) =>
+        `${row.name} ${row.locationName} ${row.assignedToName ?? ""}`.toLowerCase().includes(query)
+      );
+    }
+
+    if (filters.statusFilter !== "ALL") {
+      next = next.filter((row) => row.status === filters.statusFilter);
+    }
+
+    return next;
+  }, [filters.search, filters.statusFilter, rows]);
+
+  const saveCurrentView = () => {
+    const name = window.prompt("Save this count filter view as:");
+    if (!name) {
+      return;
+    }
+
+    saveView(name);
+  };
 
   const duplicate = async (id: string) => {
     setDuplicatingId(id);
@@ -88,8 +132,87 @@ export function CountSessionsClient({
           )}
         </div>
 
+        {views.length > 0 && (
+          <div className="rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                Saved views
+              </span>
+              {views.map((view) => (
+                <div
+                  key={view.id}
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setFilters(view.state)}
+                    className="text-xs font-semibold text-slate-700"
+                  >
+                    {view.name}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => deleteView(view.id)}
+                    className="text-xs font-semibold text-slate-400 hover:text-slate-600"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={saveCurrentView}
+                className="rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-slate-700 hover:bg-slate-50"
+              >
+                Save view
+              </button>
+              <button
+                type="button"
+                onClick={resetState}
+                className="rounded-full border border-dashed border-slate-200 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 hover:bg-slate-50"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="grid gap-3 rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm lg:grid-cols-[2fr_1fr]">
+          <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+              Search
+            </span>
+            <input
+              value={filters.search}
+              onChange={(event) =>
+                setFilters((current) => ({ ...current, search: event.target.value }))
+              }
+              placeholder="Name, location, or assignee"
+              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-200"
+            />
+          </label>
+          <label className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+              Status
+            </span>
+            <select
+              value={filters.statusFilter}
+              onChange={(event) =>
+                setFilters((current) => ({ ...current, statusFilter: event.target.value }))
+              }
+              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-200"
+            >
+              <option value="ALL">All</option>
+              <option value="IN_PROGRESS">In progress</option>
+              <option value="SUBMITTED">Submitted</option>
+              <option value="APPROVED">Approved</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
+          </label>
+        </div>
+
         <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          {rows.length === 0 ? (
+          {filteredRows.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center text-sm text-slate-400">
               {t("empty")}
             </div>
@@ -109,7 +232,7 @@ export function CountSessionsClient({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-sm text-slate-700">
-                  {rows.map((row) => (
+                  {filteredRows.map((row) => (
                     <tr key={row.id}>
                       <td className="px-4 py-3">
                         <Link
@@ -161,3 +284,5 @@ export function CountSessionsClient({
     </div>
   );
 }
+
+

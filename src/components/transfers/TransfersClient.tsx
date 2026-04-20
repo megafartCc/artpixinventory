@@ -28,7 +28,7 @@ export function TransfersClient({
         <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h1 className="text-4xl font-extrabold tracking-tight text-slate-950">
+              <h1 className="text-4xl font-bold tracking-tight text-slate-900">
                 {t("title")}
               </h1>
               <p className="mt-2 text-lg text-slate-500">
@@ -86,7 +86,7 @@ export function TransfersClient({
                       <td className="px-8 py-5">
                         <Link
                           href={`/${locale}/transfers/${transfer.id}`}
-                          className="font-black text-slate-950 hover:underline decoration-slate-300 underline-offset-4"
+                          className="font-semibold text-slate-900 hover:underline decoration-slate-300 underline-offset-4"
                         >
                           {transfer.reference}
                         </Link>
@@ -102,7 +102,7 @@ export function TransfersClient({
                       </td>
                       <td className="px-8 py-5 font-medium text-slate-500">{transfer.createdBy}</td>
                       <td className="px-8 py-5 text-slate-500">{transfer.startedAt}</td>
-                      <td className="px-8 py-5 text-center font-bold text-slate-950">
+                      <td className="px-8 py-5 text-center font-semibold text-slate-900">
                         <div className="flex items-center justify-center gap-2">
                           <Package2 className="h-3.5 w-3.5 text-slate-400" />
                           {transfer.itemsCount}
@@ -122,16 +122,16 @@ export function TransfersClient({
 }
 
 function statusTone(status: string) {
-switch (status) {
-  case "COLLECTING":
-    return "bg-sky-100 text-sky-700";
-  case "DROPPING":
-    return "bg-amber-100 text-amber-700";
-  case "COMPLETED":
-    return "bg-emerald-100 text-emerald-700";
-  case "CANCELLED":
-    return "bg-slate-200 text-slate-600";
-  default:
-    return "bg-slate-100 text-slate-700";
-}
+  switch (status) {
+    case "COLLECTING":
+      return "bg-sky-100 text-sky-700";
+    case "DROPPING":
+      return "bg-amber-100 text-amber-700";
+    case "COMPLETED":
+      return "bg-emerald-100 text-emerald-700";
+    case "CANCELLED":
+      return "bg-slate-200 text-slate-600";
+    default:
+      return "bg-slate-100 text-slate-700";
+  }
 }

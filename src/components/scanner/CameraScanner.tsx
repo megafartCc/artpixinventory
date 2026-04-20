@@ -50,6 +50,7 @@ export function CameraScanner({
   const [supported, setSupported] = useState(false);
   const [status, setStatus] = useState("Camera scanner ready.");
   const [error, setError] = useState("");
+  const manualInputRef = useRef<HTMLInputElement>(null);
 
   const canSubmitManual = manualValue.trim().length > 0;
 
@@ -106,6 +107,10 @@ export function CameraScanner({
       mounted = false;
       stopScanner();
     };
+  }, []);
+
+  useEffect(() => {
+    manualInputRef.current?.focus({ preventScroll: true });
   }, []);
 
   const detectionLoop = useMemo(
@@ -260,13 +265,14 @@ export function CameraScanner({
         <button
           type="button"
           onClick={() => void (scanning ? stopScanner() : startScanner())}
-          className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+          className="flex min-h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 sm:min-h-12"
         >
           {scanning ? <CameraOff className="h-4 w-4" /> : <Camera className="h-4 w-4" />}
           <span>{scanning ? "Stop Camera" : "Start Camera"}</span>
         </button>
         <div className="flex flex-1 items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2">
           <input
+            ref={manualInputRef}
             value={manualValue}
             onChange={(event) => setManualValue(event.target.value)}
             onKeyDown={(event) => {
@@ -276,13 +282,15 @@ export function CameraScanner({
               }
             }}
             placeholder={placeholder}
+            autoCapitalize="characters"
+            autoCorrect="off"
             className="min-w-0 flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
           />
           <button
             type="button"
             onClick={submitManual}
             disabled={!canSubmitManual}
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-600 transition disabled:cursor-not-allowed disabled:opacity-50"
+            className="min-h-12 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.16em] text-slate-600 transition disabled:cursor-not-allowed disabled:opacity-50"
           >
             Use
           </button>

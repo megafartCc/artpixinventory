@@ -5,7 +5,7 @@ import { LabelsClient } from "@/components/labels/LabelsClient";
 export default async function LabelsPage({
   searchParams,
 }: {
-  searchParams?: { tab?: string; product?: string };
+  searchParams?: { tab?: string; product?: string; products?: string };
 }) {
   noStore();
 
@@ -36,7 +36,16 @@ export default async function LabelsPage({
           ? searchParams.tab
           : "products"
       }
-      initialProductId={searchParams?.product ?? ""}
+      initialProductIds={
+        searchParams?.products
+          ? searchParams.products
+              .split(",")
+              .map((value) => value.trim())
+              .filter(Boolean)
+          : searchParams?.product
+            ? [searchParams.product]
+            : []
+      }
       products={products}
       locations={locations.map((location) => ({
         ...location,

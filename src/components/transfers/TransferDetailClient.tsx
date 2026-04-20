@@ -46,7 +46,7 @@ export function TransferDetailClient({
           >
             {t("back")}
           </Link>
-          <h1 className="mt-3 text-3xl font-bold text-slate-900">{transfer.reference}</h1>
+          <h1 className="mt-3 text-3xl font-semibold text-slate-900">{transfer.reference}</h1>
           <p className="mt-1 text-slate-500">
             {transfer.status} • {transfer.createdBy} • {transfer.startedAt}
           </p>
@@ -96,8 +96,8 @@ export function TransferDetailClient({
           </section>
         </div>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm mt-6">
-          <h2 className="text-lg font-semibold text-slate-900 mb-5">{t("activityHistory")}</h2>
+        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="mb-5 text-lg font-semibold text-slate-900">{t("activityHistory")}</h2>
           <ActivityTimeline entityType="Transfer" entityId={transfer.id} />
         </section>
       </div>

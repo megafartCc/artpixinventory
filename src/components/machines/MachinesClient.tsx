@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { startTransition, useMemo, useState } from "react";
 import Link from "next/link";
@@ -157,7 +157,7 @@ export function MachinesClient({
       <div className="flex min-h-0 flex-1 flex-col gap-5">
         <div className="flex flex-col gap-4 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-950">{t("title")}</h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-slate-900">{t("title")}</h1>
             <p className="mt-2 text-sm text-slate-500">
               {t("subtitle")}
             </p>
@@ -234,7 +234,7 @@ export function MachinesClient({
                         </span>
                       </td>
                       <td className="px-5 py-4 sm:px-6">{machine.locationName}</td>
-                      <td className="px-5 py-4 sm:px-6">{machine.erpixMachineId || "—"}</td>
+                      <td className="px-5 py-4 sm:px-6">{machine.erpixMachineId || "â€”"}</td>
                       <td className="px-5 py-4 sm:px-6">
                         <span
                           className={`rounded-full px-2.5 py-1 text-xs font-medium ${
@@ -413,3 +413,5 @@ export function MachinesClient({
     </div>
   );
 }
+
+
