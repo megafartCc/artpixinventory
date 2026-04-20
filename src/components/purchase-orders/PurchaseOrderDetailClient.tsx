@@ -76,33 +76,6 @@ const inputClassName =
 
 const documentPresets = ["CI", "PL", "Invoice", "Spec", "Photos"];
 
-function stepState(status: string, step: "draft" | "approval" | "ordered" | "received") {
-  if (status === "DRAFT") {
-    return step === "draft" ? "active" : "upcoming";
-  }
-
-  if (status === "PENDING_APPROVAL") {
-    if (step === "draft") return "complete";
-    return step === "approval" ? "active" : "upcoming";
-  }
-
-  if (status === "APPROVED") {
-    if (step === "ordered" || step === "received") return "upcoming";
-    return "complete";
-  }
-
-  if (status === "ORDERED") {
-    if (step === "received") return "upcoming";
-    return "complete";
-  }
-
-  if (["PARTIALLY_RECEIVED", "RECEIVED", "CLOSED"].includes(status)) {
-    return "complete";
-  }
-
-  return step === "draft" ? "active" : "upcoming";
-}
-
 function readinessIssues(purchaseOrder: PurchaseOrderDetail) {
   const zeroReceived = purchaseOrder.items.every((item) => item.receivedQty === 0);
   return {
@@ -308,15 +281,6 @@ export function PurchaseOrderDetailClient({
             </div>
           </div>
         </div>
-
-        <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm lg:p-6">
-          <div className="grid gap-3 sm:grid-cols-4">
-            <FlowStep label="Draft" detail="Initial revision" state={stepState(purchaseOrder.status, "draft")} />
-            <FlowStep label="Approval" detail="Manager signoff" state={stepState(purchaseOrder.status, "approval")} />
-            <FlowStep label="Ordered" detail="Sent to vendor" state={stepState(purchaseOrder.status, "ordered")} />
-            <FlowStep label="Receiving" detail="Inbound logistics" state={stepState(purchaseOrder.status, "received")} />
-          </div>
-        </section>
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
           <div className="space-y-6">
@@ -664,30 +628,6 @@ export function PurchaseOrderDetailClient({
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function FlowStep({
-  label,
-  detail,
-  state,
-}: {
-  label: string;
-  detail: string;
-  state: "active" | "complete" | "upcoming";
-}) {
-  const tone =
-    state === "active"
-      ? "border-slate-900 bg-slate-900 text-white"
-      : state === "complete"
-        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-        : "border-slate-200 bg-slate-50 text-slate-500";
-
-  return (
-    <div className={`rounded-2xl border px-4 py-3.5 ${tone}`}>
-      <p className="text-xs font-semibold uppercase tracking-[0.16em]">{label}</p>
-      <p className="mt-2 text-sm font-medium">{detail}</p>
     </div>
   );
 }
