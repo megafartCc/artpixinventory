@@ -227,7 +227,14 @@ export function PurchaseOrderFormClient({
     return moq !== null && parseQty(item.orderedQty) < moq;
   }).length;
   const approvalIssues = zeroCostCount + moqWarningCount + calculation.constraintWarnings.length;
-  const canSubmit = form.vendorId !== "" && form.items.length > 0;
+  const missingVendor = form.vendorId.trim() === "";
+  const missingItems = !missingVendor && form.items.length === 0;
+  const requiredNotice = missingVendor
+    ? t("requiredVendorNotice")
+    : missingItems
+      ? t("requiredItemsNotice")
+      : "";
+  const canSubmit = !missingVendor && !missingItems;
 
   useEffect(() => {
     if (!selectedVendor || initialValue) {
@@ -527,6 +534,18 @@ export function PurchaseOrderFormClient({
                 </span>
               </div>
 
+              {(missingVendor || missingItems) && (
+                <div className="mt-5 rounded-3xl border border-amber-200 bg-amber-50 p-4" role="alert" aria-live="polite">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-600" />
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold text-amber-800">{t("requiredInfoTitle")}</p>
+                      <p className="text-sm text-amber-700">{requiredNotice}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="mt-5 grid gap-4 md:grid-cols-2">
                 <Field label={t("shippingCost")}>
                   <input
@@ -582,6 +601,13 @@ export function PurchaseOrderFormClient({
                   {pendingSubmitType === "submit" ? t("submitting") : t("submitApproval")}
                 </button>
               </div>
+              <p className="mt-3 text-xs text-slate-500">
+                {missingVendor
+                  ? t("requiredVendorNotice")
+                  : missingItems
+                    ? t("requiredItemsNotice")
+                    : t("readyHint")}
+              </p>
             </section>
           </div>
 
@@ -787,6 +813,11 @@ export function PurchaseOrderFormClient({
               {pendingSubmitType === "submit" ? t("submitting") : t("submitApproval")}
             </button>
           </div>
+          {(missingVendor || missingItems) && (
+            <p className="mx-auto mt-3 max-w-5xl text-xs text-amber-700">
+              {requiredNotice}
+            </p>
+          )}
         </div>
       </div>
     </div>

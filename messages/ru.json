@@ -1,4 +1,4 @@
-{
+﻿{
   "Navigation": {
     "dashboard": "Панель приборов",
     "products": "Товары",
@@ -782,7 +782,11 @@
     "meterWeight": "Вес",
     "meterPallets": "Паллеты",
     "meterLooseBoxes": "Коробки россыпью",
-    "costsTitle": "Расходы",
+    "costsTitle": "Costs",
+    "requiredInfoTitle": "Required info missing",
+    "requiredVendorNotice": "Select a vendor before saving or submitting this purchase order.",
+    "requiredItemsNotice": "Add at least one line item before saving or submitting this purchase order.",
+    "readyHint": "All required fields are present. You can save a draft or submit for approval.",
     "shippingCost": "Стоимость доставки",
     "otherCosts": "Прочие расходы",
     "notes": "Заметки",
@@ -1104,3 +1108,4 @@
     }
   }
 }
+
