@@ -360,7 +360,7 @@ export function AppShell({
   };
 
   return (
-    <div className="flex min-h-[100dvh] overflow-hidden bg-slate-50">
+    <div className="flex h-[100dvh] overflow-hidden bg-slate-50">
       <aside
         className={`
           hidden lg:flex flex-col border-r border-slate-200 bg-white
