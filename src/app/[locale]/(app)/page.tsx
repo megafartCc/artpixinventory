@@ -175,13 +175,13 @@ export default async function DashboardPage({ params }: { params: { locale: stri
 
   return (
     <div className="p-0">
-      <div className="w-full space-y-10">
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+      <div className="w-full space-y-6 sm:space-y-8">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-slate-950 sm:text-5xl">
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
               {t("title")}
             </h1>
-            <p className="mt-3 max-w-4xl text-lg text-slate-500 leading-relaxed">
+            <p className="mt-2 max-w-4xl text-base leading-relaxed text-slate-500 sm:text-lg">
               {t("description")}
             </p>
           </div>
@@ -214,7 +214,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
           />
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)]">
           <InsightCard
             title={t("lowStockSeverityTitle")}
             subtitle={t("lowStockSeveritySubtitle")}
@@ -250,7 +250,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
           />
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.3fr)_minmax(360px,0.9fr)]">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(360px,0.9fr)]">
           <DashboardPanel title={t("defectReasons")}>
             <DefectsGraph data={defectData} />
           </DashboardPanel>
@@ -273,7 +273,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
           </section>
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-3">
+        <div className="grid gap-4 xl:grid-cols-3">
           <DashboardPanel title={t("lowStockItems")}>
             {lowStockAlerts.length === 0 ? (
               <EmptyState message={t("noLowStockAlerts")} />
@@ -324,7 +324,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
           </DashboardPanel>
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,1fr)]">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,1fr)]">
           <RecentActivityPanel
             title={t("recentActivity")}
             description={t("description")}
@@ -382,7 +382,7 @@ function StatCard({
   iconClassName: string;
 }) {
   return (
-    <div className="group rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+    <div className="group rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md sm:p-7">
       <div className="flex items-start justify-between gap-4">
         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
           {title}
@@ -392,7 +392,7 @@ function StatCard({
         </div>
       </div>
 
-      <p className="mt-8 text-4xl font-semibold tracking-tight text-slate-900">{value}</p>
+      <p className="mt-6 text-3xl font-semibold tracking-tight text-slate-900 sm:mt-8 sm:text-4xl">{value}</p>
     </div>
   );
 }
@@ -411,7 +411,7 @@ function InsightCard({
   iconClassName: string;
 }) {
   return (
-    <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
+    <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-950">{title}</h2>
@@ -422,13 +422,13 @@ function InsightCard({
         </div>
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid gap-3 sm:mt-7 sm:grid-cols-3 sm:gap-4">
         {metrics.map((metric) => (
-          <div key={metric.label} className="rounded-[24px] border border-slate-100 bg-slate-50/50 p-6">
+          <div key={metric.label} className="rounded-[22px] border border-slate-100 bg-slate-50/50 p-5 sm:p-6">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
               {metric.label}
             </p>
-            <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">
+            <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 sm:mt-3 sm:text-3xl">
               {metric.value}
             </p>
           </div>
@@ -440,9 +440,9 @@ function InsightCard({
 
 function DashboardPanel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
-      <h2 className="text-xl font-bold text-slate-950">{title}</h2>
-      <div className="mt-8 space-y-4">{children}</div>
+    <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
+      <h2 className="text-lg font-bold text-slate-950 sm:text-xl">{title}</h2>
+      <div className="mt-6 space-y-3 sm:mt-7 sm:space-y-4">{children}</div>
     </section>
   );
 }
@@ -457,7 +457,7 @@ function DashboardListItem({
   actionHref?: string;
 }) {
   return (
-    <div className="rounded-[24px] border border-slate-100 bg-slate-50/50 px-6 py-4 transition hover:bg-white hover:shadow-sm">
+    <div className="rounded-[22px] border border-slate-100 bg-slate-50/50 px-4 py-3.5 transition hover:bg-white hover:shadow-sm sm:px-6 sm:py-4">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-sm font-bold text-slate-950">{title}</p>
@@ -495,23 +495,23 @@ function ActiveMetricCard({
   icon: React.ElementType;
 }) {
   return (
-    <div className="rounded-[24px] border border-slate-100 bg-slate-50/50 p-6 transition hover:bg-white hover:shadow-md">
+    <div className="rounded-[22px] border border-slate-100 bg-slate-50/50 p-5 transition hover:bg-white hover:shadow-md sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <p className="text-sm font-bold text-slate-600">{title}</p>
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-sm border border-slate-100">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-100 bg-white text-slate-700 shadow-sm sm:h-12 sm:w-12">
           <Icon className="h-5 w-5" />
         </div>
       </div>
-      <p className="mt-8 text-4xl font-semibold tracking-tight text-slate-900">{value}</p>
+      <p className="mt-6 text-3xl font-semibold tracking-tight text-slate-900 sm:mt-8 sm:text-4xl">{value}</p>
     </div>
   );
 }
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-[20px] bg-white px-5 py-4 shadow-sm border border-slate-100">
+    <div className="flex items-center justify-between gap-4 rounded-[18px] border border-slate-100 bg-white px-4 py-3 shadow-sm sm:px-5 sm:py-4">
       <p className="text-sm font-bold text-slate-500">{label}</p>
-      <p className="text-lg font-semibold text-slate-900">{value}</p>
+      <p className="text-base font-semibold text-slate-900 sm:text-lg">{value}</p>
     </div>
   );
 }
