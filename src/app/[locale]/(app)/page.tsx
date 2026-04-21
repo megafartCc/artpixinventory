@@ -324,7 +324,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
           </DashboardPanel>
         </div>
 
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,1fr)]">
+        <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,1fr)]">
           <RecentActivityPanel
             title={t("recentActivity")}
             description={t("description")}
@@ -339,7 +339,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
             }))}
           />
 
-          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <section className="self-start rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <h2 className="text-lg font-semibold text-slate-900">{t("activeOps")}</h2>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
