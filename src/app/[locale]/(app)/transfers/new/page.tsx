@@ -7,7 +7,7 @@ export default async function NewTransferPage({
   searchParams,
 }: {
   params: { locale: string };
-  searchParams: { transfer?: string };
+  searchParams: { transfer?: string; source?: string; product?: string };
 }) {
   noStore();
 
@@ -75,6 +75,8 @@ export default async function NewTransferPage({
   return (
     <TransferWorkflowClient
       locale={params.locale}
+      initialSourceQr={searchParams.source}
+      initialSelectedProductId={searchParams.product}
       currentTransfer={
         transfer
           ? {

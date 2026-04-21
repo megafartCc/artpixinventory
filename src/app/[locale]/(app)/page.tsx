@@ -1,5 +1,6 @@
 import { unstable_noStore as noStore } from "next/cache";
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 import {
   AlertTriangle,
   ArrowLeftRight,
@@ -57,8 +58,8 @@ export default async function DashboardPage({ params }: { params: { locale: stri
     prisma.stockLevel.findMany({
       where: { product: { active: true } },
       include: {
-        product: { select: { compoundId: true, name: true, minStock: true } },
-        location: { select: { name: true } },
+        product: { select: { id: true, compoundId: true, name: true, minStock: true } },
+        location: { select: { id: true, name: true, qrCode: true } },
       },
     }),
     prisma.purchaseOrder.count({
@@ -278,13 +279,20 @@ export default async function DashboardPage({ params }: { params: { locale: stri
               <EmptyState message={t("noLowStockAlerts")} />
             ) : (
               lowStockAlerts.map((row) => (
-                <DashboardListItem
-                  key={row.id}
-                  title={`${row.product.compoundId} / ${row.location.name}`}
-                  detail={`${t("qty")} ${row.quantity} / ${t("min")} ${row.product.minStock}`}
-                />
-              ))
-            )}
+              <DashboardListItem
+                key={row.id}
+                title={`${row.product.compoundId} / ${row.location.name}`}
+                detail={`${t("qty")} ${row.quantity} / ${t("min")} ${row.product.minStock}`}
+                actionHref={
+                  row.location.qrCode
+                    ? `/${params.locale}/transfers/new?source=${encodeURIComponent(
+                        row.location.qrCode
+                      )}&product=${encodeURIComponent(row.product.id)}`
+                    : undefined
+                }
+              />
+            ))
+          )}
           </DashboardPanel>
 
           <DashboardPanel title={t("overduePo")}>
@@ -439,11 +447,32 @@ function DashboardPanel({ title, children }: { title: string; children: React.Re
   );
 }
 
-function DashboardListItem({ title, detail }: { title: string; detail: string }) {
+function DashboardListItem({
+  title,
+  detail,
+  actionHref,
+}: {
+  title: string;
+  detail: string;
+  actionHref?: string;
+}) {
   return (
     <div className="rounded-[24px] border border-slate-100 bg-slate-50/50 px-6 py-4 transition hover:bg-white hover:shadow-sm">
-      <p className="text-sm font-bold text-slate-950">{title}</p>
-      <p className="mt-1 text-xs text-slate-500">{detail}</p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-slate-950">{title}</p>
+          <p className="mt-1 text-xs text-slate-500">{detail}</p>
+        </div>
+        {actionHref && (
+          <Link
+            href={actionHref}
+            aria-label={`Transfer ${title}`}
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-slate-900"
+          >
+            <ArrowLeftRight className="h-4 w-4" />
+          </Link>
+        )}
+      </div>
     </div>
   );
 }
@@ -486,4 +515,3 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-

@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -103,11 +103,15 @@ export function TransferWorkflowClient({
   currentTransfer,
   locations,
   stockLevels,
+  initialSourceQr,
+  initialSelectedProductId,
 }: {
   locale: string;
   currentTransfer: TransferRecord | null;
   locations: LocationRecord[];
   stockLevels: StockRecord[];
+  initialSourceQr?: string;
+  initialSelectedProductId?: string;
 }) {
   const router = useRouter();
   const t = useTranslations("TransferWorkflow");
@@ -128,6 +132,19 @@ export function TransferWorkflowClient({
   useToastFeedback(error, feedback);
 
   const refresh = () => startTransition(() => router.refresh());
+
+  useEffect(() => {
+    if (currentTransfer) {
+      return;
+    }
+
+    if (initialSourceQr) {
+      setSourceQr(initialSourceQr);
+    }
+    if (initialSelectedProductId) {
+      setSelectedProductId(initialSelectedProductId);
+    }
+  }, [currentTransfer, initialSelectedProductId, initialSourceQr]);
 
   const sourceLocation = useMemo(
     () =>

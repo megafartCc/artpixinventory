@@ -548,12 +548,23 @@ export function AppShell({
                     <button
                       type="button"
                       onClick={() => setAccountMenuOpen((current) => !current)}
-                      className="flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm"
+                      className="flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-2 text-sm font-medium text-slate-700 shadow-sm"
                       aria-label="Profile"
                     >
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white">
-                        {(session.user.name ?? "U").trim().charAt(0).toUpperCase()}
-                      </span>
+                      {session.user.image ? (
+                        // Google profile avatars are remote and not worth optimizing through next/image here.
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={session.user.image}
+                          alt={session.user.name ?? "Profile"}
+                          referrerPolicy="no-referrer"
+                          className="h-6 w-6 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold leading-none text-white">
+                          {(session.user.name ?? "U").trim().charAt(0).toUpperCase()}
+                        </span>
+                      )}
                     </button>
                     {accountMenuOpen && (
                       <div className="absolute right-0 top-[calc(100%+10px)] z-40 min-w-[200px] rounded-xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-200/60">
