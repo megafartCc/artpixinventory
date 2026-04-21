@@ -174,7 +174,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
   const todayReceiptLines = todayReceipts._count.id;
 
   return (
-    <div className="p-0">
+    <div className="pb-3 sm:pb-4 lg:pb-6">
       <div className="w-full space-y-6 sm:space-y-8">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
