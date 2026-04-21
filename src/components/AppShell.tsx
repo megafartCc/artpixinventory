@@ -871,7 +871,7 @@ export function AppShell({
           </div>
         )}
 
-        <main className="min-h-0 flex flex-1 flex-col overflow-y-auto pb-[calc(9rem+env(safe-area-inset-bottom))] lg:pb-0">
+        <main className="min-h-0 flex flex-1 flex-col overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
           <div className="flex h-full min-h-0 w-full flex-col">{children}</div>
         </main>
 
