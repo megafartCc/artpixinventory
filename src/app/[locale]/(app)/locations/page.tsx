@@ -24,10 +24,8 @@ export default async function LocationsPage() {
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col">
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[32px] border border-slate-200 bg-white p-1 shadow-sm">
-          <LocationManager locations={locations} />
-        </div>
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <LocationManager locations={locations} />
       </div>
     </div>
   );
