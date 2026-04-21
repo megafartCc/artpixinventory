@@ -214,7 +214,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
           />
         </div>
 
-        <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)]">
           <InsightCard
             title={t("lowStockSeverityTitle")}
             subtitle={t("lowStockSeveritySubtitle")}
@@ -250,12 +250,12 @@ export default async function DashboardPage({ params }: { params: { locale: stri
           />
         </div>
 
-        <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(360px,0.9fr)]">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.3fr)_minmax(360px,0.9fr)]">
           <DashboardPanel title={t("defectReasons")}>
             <DefectsGraph data={defectData} />
           </DashboardPanel>
 
-          <section className="self-start rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <h2 className="text-lg font-semibold text-slate-900">{t("approvalsAndReceipts")}</h2>
             <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
               <ActiveMetricCard title={t("pendingApprovals")} value={String(pendingApprovals)} icon={ClipboardCheck} />
@@ -273,7 +273,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
           </section>
         </div>
 
-        <div className="grid items-start gap-4 xl:grid-cols-3">
+        <div className="grid gap-4 xl:grid-cols-3">
           <DashboardPanel title={t("lowStockItems")}>
             {lowStockAlerts.length === 0 ? (
               <EmptyState message={t("noLowStockAlerts")} />
@@ -324,7 +324,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
           </DashboardPanel>
         </div>
 
-        <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,1fr)]">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,1fr)]">
           <RecentActivityPanel
             title={t("recentActivity")}
             description={t("description")}
@@ -339,7 +339,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
             }))}
           />
 
-          <section className="self-start rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <section className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <h2 className="text-lg font-semibold text-slate-900">{t("activeOps")}</h2>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
@@ -411,7 +411,7 @@ function InsightCard({
   iconClassName: string;
 }) {
   return (
-    <section className="self-start rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
+    <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-950">{title}</h2>
@@ -440,7 +440,7 @@ function InsightCard({
 
 function DashboardPanel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="self-start rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
+    <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
       <h2 className="text-lg font-bold text-slate-950 sm:text-xl">{title}</h2>
       <div className="mt-6 space-y-3 sm:mt-7 sm:space-y-4">{children}</div>
     </section>
