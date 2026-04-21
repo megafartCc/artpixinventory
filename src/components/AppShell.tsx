@@ -462,117 +462,118 @@ export function AppShell({
                   <span className="text-sm font-bold tracking-tight text-slate-800">ArtPix</span>
                 </div>
               </div>
-            </div>
 
-            <div className="flex items-center justify-end gap-2 border-t border-slate-200 px-3 py-2 sm:px-4 lg:hidden">
-              <div ref={notificationMenuRef} className="relative">
-                <button
-                  onClick={() => setNotificationOpen(!notificationOpen)}
-                  className="relative rounded-xl p-2 text-slate-500 transition-colors hover:bg-slate-100"
-                >
-                  <Bell className="h-5 w-5" />
-                  {notificationItems.length > 0 && (
-                    <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
-                  )}
-                </button>
-                {notificationOpen && (
-                  <div className="absolute right-0 top-[calc(100%+10px)] w-80 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
-                    <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-4">
-                      <h3 className="text-sm font-bold text-slate-900">{appShell("notifications")}</h3>
-                      <p className="mt-0.5 text-xs text-slate-500">{appShell("notificationsSubtitle")}</p>
-                    </div>
-                    <div className="max-h-96 overflow-y-auto p-2">
-                      {notificationItems.length === 0 ? (
-                        <div className="px-4 py-8 text-center text-sm text-slate-400">{appShell("noNotifications")}</div>
-                      ) : (
-                        notificationItems.map((item) => (
-                          <Link
-                            key={item.id}
-                            href={`/${locale}${item.href}`}
-                            onClick={() => setNotificationOpen(false)}
-                            className="group flex w-full items-start gap-3 rounded-xl p-3 text-left transition hover:bg-slate-50"
-                          >
-                            <div className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
-                              item.tone === "rose" ? "bg-rose-500" : item.tone === "amber" ? "bg-amber-500" : "bg-slate-400"
-                            }`} />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-semibold text-slate-800 group-hover:text-indigo-600">{item.title}</p>
-                              <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{item.detail}</p>
-                            </div>
-                          </Link>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div ref={localeMenuRef} className="relative">
-                <button
-                  type="button"
-                  onClick={() => setLocaleMenuOpen((current) => !current)}
-                  className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm"
-                >
-                  <LocaleFlag locale={currentLocale.value} />
-                  <span>{currentLocale.label}</span>
-                </button>
-                {localeMenuOpen && (
-                  <div className="absolute right-0 top-[calc(100%+10px)] z-40 min-w-[168px] rounded-xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-200/60">
-                    {localeOptions.map((option) => {
-                      const active = option.value === locale;
-                      return (
-                        <Link
-                          key={option.value}
-                          href={`/${option.value}${pathname}`}
-                          className={`flex items-center justify-between rounded-lg px-3 py-2.5 text-sm transition ${
-                            active
-                              ? "bg-slate-100 font-medium text-slate-900"
-                              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                          }`}
-                        >
-                          <span className="flex items-center gap-2">
-                            <LocaleFlag locale={option.value} />
-                            <span>{option.label}</span>
-                          </span>
-                          {active && <Check className="h-4 w-4 text-slate-500" />}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {session?.user && (
-                <div ref={accountMenuRef} className="relative">
+              <div className="flex items-center gap-2 lg:hidden">
+                <div ref={notificationMenuRef} className="relative">
                   <button
-                    type="button"
-                    onClick={() => setAccountMenuOpen((current) => !current)}
-                    className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm"
+                    onClick={() => setNotificationOpen(!notificationOpen)}
+                    className="relative rounded-xl p-2 text-slate-500 transition-colors hover:bg-slate-100"
+                    aria-label="Notifications"
                   >
-                    <div className="flex flex-col items-end text-right">
-                      <span className="block text-xs font-bold leading-none text-slate-900">{session.user.name}</span>
-                      <span className="mt-1 block text-[9px] font-bold uppercase tracking-wider text-slate-400">{role}</span>
-                    </div>
-                    <ChevronDown
-                      className={`h-4 w-4 text-slate-400 transition-transform ${
-                        accountMenuOpen ? "rotate-180" : ""
-                      }`}
-                    />
+                    <Bell className="h-5 w-5" />
+                    {notificationItems.length > 0 && (
+                      <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
+                    )}
                   </button>
-                  {accountMenuOpen && (
-                    <div className="absolute right-0 top-[calc(100%+10px)] z-40 min-w-[200px] rounded-xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-200/60">
-                      <button
-                        type="button"
-                        onClick={() => signOut({ callbackUrl: `/${locale}/login` })}
-                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-rose-50 hover:text-rose-600"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        <span>{appShell("signOut")}</span>
-                      </button>
+                  {notificationOpen && (
+                    <div className="absolute right-0 top-[calc(100%+10px)] z-40 w-80 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
+                      <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-4">
+                        <h3 className="text-sm font-bold text-slate-900">{appShell("notifications")}</h3>
+                        <p className="mt-0.5 text-xs text-slate-500">{appShell("notificationsSubtitle")}</p>
+                      </div>
+                      <div className="max-h-96 overflow-y-auto p-2">
+                        {notificationItems.length === 0 ? (
+                          <div className="px-4 py-8 text-center text-sm text-slate-400">{appShell("noNotifications")}</div>
+                        ) : (
+                          notificationItems.map((item) => (
+                            <Link
+                              key={item.id}
+                              href={`/${locale}${item.href}`}
+                              onClick={() => setNotificationOpen(false)}
+                              className="group flex w-full items-start gap-3 rounded-xl p-3 text-left transition hover:bg-slate-50"
+                            >
+                              <div className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
+                                item.tone === "rose" ? "bg-rose-500" : item.tone === "amber" ? "bg-amber-500" : "bg-slate-400"
+                              }`} />
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-semibold text-slate-800 group-hover:text-indigo-600">{item.title}</p>
+                                <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{item.detail}</p>
+                              </div>
+                            </Link>
+                          ))
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
-              )}
+
+                <div ref={localeMenuRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setLocaleMenuOpen((current) => !current)}
+                    className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm"
+                    aria-label="Language"
+                  >
+                    <LocaleFlag locale={currentLocale.value} />
+                    <span>{currentLocale.label}</span>
+                  </button>
+                  {localeMenuOpen && (
+                    <div className="absolute right-0 top-[calc(100%+10px)] z-40 min-w-[168px] rounded-xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-200/60">
+                      {localeOptions.map((option) => {
+                        const active = option.value === locale;
+                        return (
+                          <Link
+                            key={option.value}
+                            href={`/${option.value}${pathname}`}
+                            className={`flex items-center justify-between rounded-lg px-3 py-2.5 text-sm transition ${
+                              active
+                                ? "bg-slate-100 font-medium text-slate-900"
+                                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                            }`}
+                          >
+                            <span className="flex items-center gap-2">
+                              <LocaleFlag locale={option.value} />
+                              <span>{option.label}</span>
+                            </span>
+                            {active && <Check className="h-4 w-4 text-slate-500" />}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {session?.user && (
+                  <div ref={accountMenuRef} className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setAccountMenuOpen((current) => !current)}
+                      className="flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 shadow-sm"
+                      aria-label="Profile"
+                    >
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white">
+                        {(session.user.name ?? "U").trim().charAt(0).toUpperCase()}
+                      </span>
+                    </button>
+                    {accountMenuOpen && (
+                      <div className="absolute right-0 top-[calc(100%+10px)] z-40 min-w-[200px] rounded-xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-200/60">
+                        <div className="px-3 py-2">
+                          <p className="text-sm font-semibold text-slate-900">{session.user.name}</p>
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{role}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => signOut({ callbackUrl: `/${locale}/login` })}
+                          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-rose-50 hover:text-rose-600"
+                        >
+                          <LogOut className="h-4 w-4" />
+                          <span>{appShell("signOut")}</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div ref={searchRef} className="flex-1 border-t border-slate-200 px-3 py-3 sm:px-4 lg:border-t-0 lg:mx-auto lg:max-w-[600px] lg:px-0 lg:py-0">
