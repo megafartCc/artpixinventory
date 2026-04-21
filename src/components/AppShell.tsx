@@ -872,7 +872,9 @@ export function AppShell({
         )}
 
         <main className="min-h-0 flex flex-1 flex-col overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
-          <div className="flex h-full min-h-0 w-full flex-col">{children}</div>
+          <div className="flex h-full min-h-0 w-full flex-col px-3 py-3 sm:px-4 sm:py-4 lg:px-6 lg:py-6">
+            {children}
+          </div>
         </main>
 
         <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-slate-200 bg-white px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] lg:hidden">
