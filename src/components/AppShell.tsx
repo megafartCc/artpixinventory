@@ -521,9 +521,9 @@ export function AppShell({
                   }}
                   onFocus={() => setSearchOpen(true)}
                   onKeyDown={(event) => {
-                    if (event.key === "Enter" && filteredSearchItems[0]) {
+                    if (event.key === "Enter" && visibleSearchItems[0]) {
                       event.preventDefault();
-                      navigateFromSearch(filteredSearchItems[0].href);
+                      navigateFromSearch(visibleSearchItems[0].href);
                     }
                     if (event.key === "Escape") {
                       setSearchOpen(false);
@@ -600,7 +600,7 @@ export function AppShell({
                           )}
                           {entitySearchItems.map((item) => (
                             <button
-                              key={item.id}
+                              key={item.href}
                               type="button"
                               onClick={() => navigateFromSearch(item.href)}
                               className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition hover:bg-slate-50"
