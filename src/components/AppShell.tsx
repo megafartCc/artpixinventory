@@ -158,6 +158,7 @@ export function AppShell({
   }>>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const deferredSearchQuery = useDeferredValue(searchQuery);
+  const searchRequestIdRef = useRef(0);
   const localeMenuRef = useRef<HTMLDivElement>(null);
   const accountMenuRef = useRef<HTMLDivElement>(null);
   const notificationMenuRef = useRef<HTMLDivElement>(null);
@@ -229,26 +230,33 @@ export function AppShell({
     keywords: ["audit log", "history", "activity"],
   });
 
-  const normalizedSearch = deferredSearchQuery.trim().toLowerCase();
-  const filteredPageItems: StaticSearchItem[] = (
-    normalizedSearch
+  const normalizedSearch = deferredSearchQuery.trim();
+  const normalizedSearchQuery = normalizedSearch.toLowerCase();
+  const pageSearchItems: StaticSearchItem[] = (
+    normalizedSearchQuery
       ? searchItems.filter((item) =>
-          `${item.label} ${item.keywords.join(" ")}`.toLowerCase().includes(normalizedSearch)
+          `${item.label} ${item.keywords.join(" ")}`.toLowerCase().includes(normalizedSearchQuery)
         )
       : searchItems
-  ).slice(0, normalizedSearch ? 5 : 8);
-  const filteredSearchItems: Array<StaticSearchItem | EntitySearchItem> = normalizedSearch
-    ? [
-        ...filteredPageItems,
-        ...entityResults.map((item) => ({
-          label: item.label,
-          href: item.href,
-          keywords: [item.kind, item.subtitle],
-          subtitle: item.subtitle,
-          kind: item.kind,
-        })),
-      ].slice(0, 10)
-    : filteredPageItems;
+  ).slice(0, normalizedSearchQuery ? 5 : 8);
+  const entitySearchItems: EntitySearchItem[] = normalizedSearchQuery
+    ? entityResults.map((item) => ({
+        label: item.label,
+        href: item.href,
+        keywords: [item.kind, item.subtitle],
+        subtitle: item.subtitle,
+        kind: item.kind,
+      }))
+    : [];
+  const visibleSearchItems = [...pageSearchItems, ...entitySearchItems].slice(0, 10);
+  const hasSearchQuery = normalizedSearchQuery.length >= 2;
+  const searchStatus = searchLoading
+    ? appShell("searching")
+    : hasSearchQuery
+      ? visibleSearchItems.length > 0
+        ? `${visibleSearchItems.length} result${visibleSearchItems.length === 1 ? "" : "s"}`
+        : appShell("noResults")
+      : "Type 2+ characters";
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -300,6 +308,9 @@ export function AppShell({
 
   useEffect(() => {
     const query = deferredSearchQuery.trim();
+    searchRequestIdRef.current += 1;
+    const requestId = searchRequestIdRef.current;
+
     if (query.length < 2) {
       setEntityResults([]);
       setSearchLoading(false);
@@ -308,6 +319,7 @@ export function AppShell({
 
     const controller = new AbortController();
     setSearchLoading(true);
+    setEntityResults([]);
 
     fetch(`/api/search?q=${encodeURIComponent(query)}`, { signal: controller.signal })
       .then(async (response) => {
@@ -323,14 +335,20 @@ export function AppShell({
             kind: string;
           }>;
         };
-        setEntityResults(payload.items);
+        if (searchRequestIdRef.current === requestId) {
+          setEntityResults(payload.items);
+        }
       })
       .catch((error) => {
-        if ((error as Error).name !== "AbortError") {
+        if ((error as Error).name !== "AbortError" && searchRequestIdRef.current === requestId) {
           setEntityResults([]);
         }
       })
-      .finally(() => setSearchLoading(false));
+      .finally(() => {
+        if (searchRequestIdRef.current === requestId) {
+          setSearchLoading(false);
+        }
+      });
 
     return () => controller.abort();
   }, [deferredSearchQuery]);
@@ -536,12 +554,25 @@ export function AppShell({
                           </p>
                         </div>
                         <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                          {searchLoading ? appShell("searching") : appShell("noResults")}
+                          {searchStatus}
                         </span>
                       </div>
-                      {filteredSearchItems.length > 0 ? (
+                      {searchLoading ? (
+                        <div className="px-5 py-8 text-sm text-slate-500">
+                          {appShell("searching")}
+                        </div>
+                      ) : !hasSearchQuery ? (
+                        <div className="px-5 py-8 text-sm text-slate-500">
+                          Type at least 2 characters to search pages and records.
+                        </div>
+                      ) : visibleSearchItems.length > 0 ? (
                         <div className="max-h-[60vh] overflow-y-auto p-2">
-                          {filteredSearchItems.map((item) => (
+                          {pageSearchItems.length > 0 && (
+                            <div className="px-3 pb-2 pt-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                              Pages
+                            </div>
+                          )}
+                          {pageSearchItems.map((item) => (
                             <button
                               key={item.href}
                               type="button"
@@ -553,15 +584,37 @@ export function AppShell({
                                   {item.label}
                                 </span>
                                 <span className="block text-xs text-slate-400">
-                                  {"subtitle" in item
-                                    ? item.subtitle
-                                    : item.href === "/"
-                                      ? "/dashboard"
-                                      : item.href}
+                                  {item.href === "/" ? "/dashboard" : item.href}
                                 </span>
                               </span>
                               <span className="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium uppercase tracking-wide text-slate-500">
-                                {"kind" in item ? item.kind : "Go"}
+                                Go
+                              </span>
+                            </button>
+                          ))}
+
+                          {entitySearchItems.length > 0 && (
+                            <div className="px-3 pb-2 pt-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                              Inventory matches
+                            </div>
+                          )}
+                          {entitySearchItems.map((item) => (
+                            <button
+                              key={item.id}
+                              type="button"
+                              onClick={() => navigateFromSearch(item.href)}
+                              className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left transition hover:bg-slate-50"
+                            >
+                              <span>
+                                <span className="block text-sm font-medium text-slate-800">
+                                  {item.label}
+                                </span>
+                                <span className="block text-xs text-slate-400">
+                                  {item.subtitle}
+                                </span>
+                              </span>
+                              <span className="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                                {item.kind}
                               </span>
                             </button>
                           ))}
