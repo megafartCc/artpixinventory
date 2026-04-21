@@ -285,7 +285,7 @@ export function LocationManager({
   };
 
   return (
-    <div className="flex h-[calc(100vh-12rem)] min-h-[640px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div className="flex min-h-0 flex-1 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="w-full max-w-md border-r border-slate-200 bg-slate-50/60">
         <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-4">
           <div>
