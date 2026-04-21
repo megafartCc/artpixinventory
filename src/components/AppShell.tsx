@@ -523,7 +523,7 @@ export function AppShell({
                       type="button"
                       aria-label="Close command palette"
                       onClick={() => setSearchOpen(false)}
-                      className="fixed inset-0 z-40 bg-slate-950/35 backdrop-blur-sm"
+                      className="fixed inset-0 z-40 bg-slate-950/25"
                     />
                     <div className="fixed left-1/2 top-20 z-50 w-[min(92vw,760px)] -translate-x-1/2 overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-2xl shadow-slate-200/70">
                       <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/70 px-5 py-4">
